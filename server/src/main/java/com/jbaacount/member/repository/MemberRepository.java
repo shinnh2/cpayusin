@@ -1,6 +1,6 @@
-package com.jbaacount.repository;
+package com.jbaacount.member.repository;
 
-import com.jbaacount.domain.Member;
+import com.jbaacount.member.entity.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

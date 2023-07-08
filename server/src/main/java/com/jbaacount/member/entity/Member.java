@@ -1,8 +1,11 @@
-package com.jbaacount.domain;
+package com.jbaacount.member.entity;
 
-import com.jbaacount.global.BaseEntity;
+import com.jbaacount.global.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @AllArgsConstructor @Builder
@@ -14,23 +17,17 @@ public class Member extends BaseEntity
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true)
+    @Column(unique = true, nullable = false)
     private String nickname;
 
-    @Column(updatable = false, unique = true)
+    @Column(updatable = false, unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
-    private String authority;
-
-
-
-
-    public void updateAuthority(String authority)
-    {
-        this.authority = authority;
-    }
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> roles = new ArrayList<>();
 
     public void updatePassword(String password)
     {

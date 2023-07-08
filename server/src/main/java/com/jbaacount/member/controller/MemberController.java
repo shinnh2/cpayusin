@@ -1,11 +1,11 @@
-package com.jbaacount.controller;
+package com.jbaacount.member.controller;
 
-import com.jbaacount.domain.Member;
-import com.jbaacount.dto.request.member.MemberPathDto;
-import com.jbaacount.dto.request.member.MemberPostDto;
-import com.jbaacount.dto.response.MemberResponseDto;
-import com.jbaacount.mapper.MemberMapper;
-import com.jbaacount.service.MemberService;
+import com.jbaacount.member.entity.Member;
+import com.jbaacount.member.mapper.MemberMapper;
+import com.jbaacount.member.dto.request.member.MemberPathDto;
+import com.jbaacount.member.dto.request.member.MemberPostDto;
+import com.jbaacount.member.dto.response.MemberResponseDto;
+import com.jbaacount.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -57,7 +57,7 @@ public class MemberController
     @DeleteMapping("/{member-id}")
     public ResponseEntity deleteMember(@PathVariable("member-id") long memberId)
     {
-        memberService.findById(memberId);
+        memberService.deleteById(memberId);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

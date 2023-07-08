@@ -1,13 +1,16 @@
-package com.jbaacount.service;
+package com.jbaacount.member.service;
 
-import com.jbaacount.domain.Member;
-import com.jbaacount.repository.MemberRepository;
+import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
+import com.jbaacount.member.entity.Member;
+import com.jbaacount.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -17,10 +20,15 @@ import java.util.Optional;
 public class MemberService
 {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final CustomAuthorityUtils authorityUtils;
 
     public Member createMember(Member member)
     {
         Member savedMember = memberRepository.save(member);
+        savedMember.setPassword(passwordEncoder.encode(member.getPassword()));
+        List<String> roles = authorityUtils.createRoles(member.getEmail());
+        savedMember.setRoles(roles);
 
         return savedMember;
     }

@@ -1,4 +1,4 @@
-package com.jbaacount.global;
+package com.jbaacount.global.audit;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
