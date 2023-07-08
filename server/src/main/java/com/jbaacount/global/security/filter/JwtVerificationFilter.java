@@ -3,6 +3,7 @@ package com.jbaacount.global.security.filter;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.security.jwt.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -49,6 +50,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (ExpiredJwtException e){
                 log.error("만료된 토큰입니다.");
+            } catch (SignatureException se){
+                request.setAttribute("exception", se);
             }
         }
 
