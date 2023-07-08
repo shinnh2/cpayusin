@@ -1,4 +1,4 @@
-package com.jbaacount.dto.request.member;
+package com.jbaacount.member.dto.request.member;
 
 import lombok.Data;
 

@@ -1,9 +1,9 @@
-package com.jbaacount.mapper;
+package com.jbaacount.member.mapper;
 
-import com.jbaacount.domain.Member;
-import com.jbaacount.dto.request.member.MemberPathDto;
-import com.jbaacount.dto.request.member.MemberPostDto;
-import com.jbaacount.dto.response.MemberResponseDto;
+import com.jbaacount.member.entity.Member;
+import com.jbaacount.member.dto.request.member.MemberPathDto;
+import com.jbaacount.member.dto.request.member.MemberPostDto;
+import com.jbaacount.member.dto.response.MemberResponseDto;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -14,13 +14,10 @@ public class MemberMapper
         if(postDto == null)
             return null;
 
-        String authority = "USER";
-
         Member member = Member.builder()
                 .nickname(postDto.getNickname())
                 .email(postDto.getEmail())
                 .password(postDto.getPassword())
-                .authority(authority)
                 .build();
 
         return member;
@@ -47,7 +44,7 @@ public class MemberMapper
                 .nickname(member.getNickname())
                 .email(member.getEmail())
                 .password(member.getPassword())
-                .authority(member.getAuthority())
+                .roles(member.getRoles())
                 .build();
 
         return response;

@@ -1,7 +1,10 @@
-package com.jbaacount.dto.response;
+package com.jbaacount.member.dto.response;
 
 import lombok.Builder;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -15,5 +18,6 @@ public class MemberResponseDto
 
     private String password;
 
-    private String authority;
+    private List<String> roles = new ArrayList<>();
+
 }
