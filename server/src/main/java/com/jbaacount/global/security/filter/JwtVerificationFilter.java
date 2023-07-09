@@ -25,7 +25,8 @@ public class JwtVerificationFilter extends OncePerRequestFilter
 
     private String ENDPOINT_WHITELIST[] = {
             "/member/login",
-            "/member/sign-up"
+            "/member/sign-up",
+            "/member/logout"
     };
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
@@ -53,7 +54,6 @@ public class JwtVerificationFilter extends OncePerRequestFilter
     {
         return isSignUpRequest(request) || headerNotValidate(request);
     }
-
 
 
     private boolean isSignUpRequest(HttpServletRequest request)

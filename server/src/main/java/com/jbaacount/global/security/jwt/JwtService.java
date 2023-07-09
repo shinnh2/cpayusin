@@ -3,6 +3,7 @@ package com.jbaacount.global.security.jwt;
 import com.jbaacount.global.security.userdetails.MemberDetailsService;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
+@Getter
 @Service
 public class JwtService
 {
@@ -32,7 +34,8 @@ public class JwtService
 
     public JwtService(@Value("${jwt.key}")String secretKey,
                       @Value("${jwt.access-token-expiration-minutes}")int accessTokenExpiration,
-                      @Value("${jwt.refresh-token-expiration-minutes}")int refreshTokenExpiration, UserDetailsService userDetailsService, MemberDetailsService memberDetailsService)
+                      @Value("${jwt.refresh-token-expiration-minutes}")int refreshTokenExpiration,
+                      MemberDetailsService memberDetailsService)
     {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiration = accessTokenExpiration;
@@ -102,12 +105,17 @@ public class JwtService
 
     public boolean isValidToken(String token)
     {
-        Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(token);
+        try{
+            Jws<Claims> claims = Jwts.parserBuilder()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token);
+            Date exp = claims.getBody().getExpiration();
 
-        return true;
+            return exp.after(new Date());
+        } catch (JwtException e){
+            return false;
+        }
     }
 
 }

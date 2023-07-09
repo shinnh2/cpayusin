@@ -7,6 +7,7 @@ import com.jbaacount.global.handler.CustomAuthenticationSuccessfulHandler;
 import com.jbaacount.global.security.filter.JwtAuthenticationFilter;
 import com.jbaacount.global.security.filter.JwtVerificationFilter;
 import com.jbaacount.global.security.jwt.JwtService;
+import com.jbaacount.redis.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
@@ -29,6 +30,7 @@ import java.util.List;
 public class SecurityConfig
 {
     private final JwtService jwtService;
+    private final RedisRepository redisRepository;
     private static final String ENDPOINT_WHITELIST[] = {
             "/login",
             "/error"
@@ -88,7 +90,7 @@ public class SecurityConfig
         {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
-            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtService);
+            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtService, redisRepository);
             jwtAuthenticationFilter.setFilterProcessesUrl("/member/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
