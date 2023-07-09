@@ -1,5 +1,9 @@
 package com.jbaacount.config;
 
+import com.jbaacount.global.handler.CustomAccessDeniedHandler;
+import com.jbaacount.global.handler.CustomAuthenticationEntryPoint;
+import com.jbaacount.global.handler.CustomAuthenticationFailureHandler;
+import com.jbaacount.global.handler.CustomAuthenticationSuccessfulHandler;
 import com.jbaacount.global.security.filter.JwtAuthenticationFilter;
 import com.jbaacount.global.security.filter.JwtVerificationFilter;
 import com.jbaacount.global.security.jwt.JwtService;
@@ -35,20 +39,21 @@ public class SecurityConfig
     {
         http
                 .headers((headers) ->
-                        headers
-                                .frameOptions((frameOptions) -> frameOptions.disable()))
-                .csrf(csrf -> csrf
-                        .disable())
-                .cors(cors -> cors
-                        .disable())
-                .httpBasic(httpBasic -> httpBasic
-                        .disable())
-                .formLogin(formLogin -> formLogin
-                        .disable())
+                        headers.frameOptions((frameOptions) -> frameOptions.disable()))
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(formLogin -> formLogin.disable())
+
+                .exceptionHandling(exceptionHandling ->
+                        exceptionHandling
+                                .accessDeniedHandler(new CustomAccessDeniedHandler())
+                                .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(HttpMethod.POST, "/member/login", "/member/sign-up").permitAll())
                 .apply(new CustomFilterConfigurer());
+
 
         return http.build();
     }
@@ -85,7 +90,8 @@ public class SecurityConfig
 
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtService);
             jwtAuthenticationFilter.setFilterProcessesUrl("/member/login");
-            //jwtAuthenticationFilter.setAuthenticationSuccessHandler();
+            jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler());
+            jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService);
 
