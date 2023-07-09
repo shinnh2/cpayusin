@@ -3,6 +3,7 @@ package com.jbaacount.global.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.global.security.dto.LoginDto;
 import com.jbaacount.global.security.jwt.JwtService;
+import com.jbaacount.redis.RedisRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final RedisRepository redisRepository;
 
     @SneakyThrows
     @Override
@@ -57,7 +59,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtService.generateRefreshToken();
 
         //TODO store the refreshToken in redis
-
+        redisRepository.saveRefreshToken(refreshToken, authentication.getName());
 
         response.setHeader("Authorization", "Bearer " + accessToken);
         response.setHeader("RefreshToken", refreshToken);
