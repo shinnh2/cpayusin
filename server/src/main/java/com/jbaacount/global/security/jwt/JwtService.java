@@ -102,17 +102,12 @@ public class JwtService
 
     public boolean isValidToken(String token)
     {
-        try{
-            Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(secretKey)
-                    .build()
-                    .parseClaimsJws(token);
-            Date exp = claims.getBody().getExpiration();
+        Jwts.parserBuilder()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token);
 
-            return exp.after(new Date());
-        } catch (JwtException e){
-            return false;
-        }
+        return true;
     }
 
 }

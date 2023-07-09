@@ -28,6 +28,8 @@ public class MemberController
 
         MemberResponseDto response = mapper.responseToMember(signedUpMember);
 
+        log.info("===enrollMember===");
+        log.info("user enrolled successfully");
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
@@ -41,6 +43,8 @@ public class MemberController
 
         MemberResponseDto response = mapper.responseToMember(memberService.updateMember(member));
 
+        log.info("===updateMember===");
+        log.info("user updated successfully");
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
@@ -57,6 +61,8 @@ public class MemberController
     @DeleteMapping("/{member-id}")
     public ResponseEntity deleteMember(@PathVariable("member-id") long memberId)
     {
+        log.info("===deleteMember===");
+        log.info("user deleted successfully, deleted id = {}", memberId);
         memberService.deleteById(memberId);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);

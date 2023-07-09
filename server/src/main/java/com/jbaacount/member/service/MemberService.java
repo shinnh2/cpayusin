@@ -1,5 +1,7 @@
 package com.jbaacount.member.service;
 
+import com.jbaacount.global.exception.BusinessLogicException;
+import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
@@ -25,9 +27,18 @@ public class MemberService
 
     public Member createMember(Member member)
     {
+        log.info("===createMember===");
+        String email = member.getEmail();
+        String nickname = member.getNickname();
+
+        verifyExistEmail(email);
+        log.info("email = {}", email);
+        verifyExistNickname(nickname);
+        log.info("nickname = {}", nickname);
+
         Member savedMember = memberRepository.save(member);
         savedMember.setPassword(passwordEncoder.encode(member.getPassword()));
-        List<String> roles = authorityUtils.createRoles(member.getEmail());
+        List<String> roles = authorityUtils.createRoles(email);
         savedMember.setRoles(roles);
 
         return savedMember;
@@ -35,7 +46,10 @@ public class MemberService
 
     public Member updateMember(Member member)
     {
+        log.info("===updateMember");
         Member findMember = findById(member.getId());
+        log.info("findMember email = {}", member.getEmail());
+
 
         Optional.ofNullable(member.getNickname())
                 .ifPresent(nickname -> findMember.updateNickname(nickname));
@@ -61,17 +75,17 @@ public class MemberService
     }
 
     @Transactional(readOnly = true)
-    public Member verifyExistEmail(String email)
+    public void verifyExistEmail(String email)
     {
-        return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        memberRepository.findByEmail(email)
+                .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.EMAIL_ALREADY_EXIST);});
     }
 
     @Transactional(readOnly = true)
-    public Member verifyExistNickname(String nickname)
+    public void verifyExistNickname(String nickname)
     {
-        return memberRepository.findByNickname(nickname)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+         memberRepository.findByNickname(nickname)
+                 .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.NICKNAME_ALREADY_EXIST);});
     }
 
 }

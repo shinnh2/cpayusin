@@ -39,16 +39,11 @@ public class SecurityConfig
     {
         http
                 .headers((headers) ->
-                        headers
-                                .frameOptions((frameOptions) -> frameOptions.disable()))
-                .csrf(csrf -> csrf
-                        .disable())
-                .cors(cors -> cors
-                        .disable())
-                .httpBasic(httpBasic -> httpBasic
-                        .disable())
-                .formLogin(formLogin -> formLogin
-                        .disable())
+                        headers.frameOptions((frameOptions) -> frameOptions.disable()))
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.disable())
+                .httpBasic(httpBasic -> httpBasic.disable())
+                .formLogin(formLogin -> formLogin.disable())
 
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
@@ -58,6 +53,7 @@ public class SecurityConfig
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(HttpMethod.POST, "/member/login", "/member/sign-up").permitAll())
                 .apply(new CustomFilterConfigurer());
+
 
         return http.build();
     }

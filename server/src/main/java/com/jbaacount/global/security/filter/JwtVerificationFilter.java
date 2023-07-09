@@ -1,9 +1,6 @@
 package com.jbaacount.global.security.filter;
 
-import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.security.jwt.JwtService;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,50 +30,63 @@ public class JwtVerificationFilter extends OncePerRequestFilter
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
     {
-        String header = request.getHeader(AUTHORIZATION);
+        String accessToken = extractAccessToken(request);
+
         log.info("===doFilterInternal===");
-        log.info("header = {}", header);
+        log.info("accessToken = {}", accessToken);
 
 
-        if(header != null)
+        if(jwtService.isValidToken(accessToken))
         {
-            try{
-                String accessToken = header.replace("Bearer ", "");
+            Authentication authentication = jwtService.getAuthentication(accessToken);
+            log.info("header is not null");
+            log.info("accessToken = {}", accessToken);
 
-                Authentication authentication = jwtService.getAuthentication(accessToken);
-                log.info("header is not null");
-                log.info("accessToken = {}", accessToken);
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } catch (ExpiredJwtException e){
-                log.error("만료된 토큰입니다.");
-            } catch (SignatureException se){
-                request.setAttribute("exception", se);
-            }
+            SecurityContextHolder.getContext().setAuthentication(authentication);
         }
 
         filterChain.doFilter(request,response);
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException
+    protected boolean shouldNotFilter(HttpServletRequest request)
     {
-        return isHeaderValid(request) || isSignUpRequest(request);
+        return isSignUpRequest(request) || headerNotValidate(request);
     }
+
+
 
     private boolean isSignUpRequest(HttpServletRequest request)
     {
         String requestURI = request.getRequestURI();
         String method = request.getMethod();
+        log.info("===isSignUpRequest===");
+        log.info("requestURI = {}", request);
+        log.info("method = {}", method);
 
         return Arrays.stream(ENDPOINT_WHITELIST).anyMatch(a -> requestURI.equals(a) && method.equalsIgnoreCase("POST"));
     }
 
-    private boolean isHeaderValid(HttpServletRequest request)
+
+    private boolean headerNotValidate(HttpServletRequest request)
     {
         String header = request.getHeader(AUTHORIZATION);
+        log.info("===headerNotValidate===");
+        log.info("header = {}", header);
 
-        return header != null && header.startsWith("Bearer ");
+        return header == null || !header.startsWith("Bearer ");
+    }
+
+    private String extractAccessToken(HttpServletRequest request)
+    {
+        String header = request.getHeader("Authorization");
+        log.info("===extractAccessToken===");
+        log.info("header = {}", header);
+
+        if(header != null && header.startsWith("Bearer "))
+            return header.substring(7);
+
+        return null;
     }
 
 }
