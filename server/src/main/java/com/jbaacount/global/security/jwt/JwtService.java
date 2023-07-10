@@ -32,11 +32,6 @@ public class JwtService
         this.refreshTokenExpirationMinutes = refreshTokenExpirationMinutes;
     }
 
-    public String encodedBase64SecretKey(String secretKey)
-    {
-        return Encoders.BASE64.encode(secretKey.getBytes(StandardCharsets.UTF_8));
-    }
-
     public String generateAccessToken(String email, List<String> roles)
     {
         Map<String, Object> claims = new HashMap<>();
@@ -61,18 +56,6 @@ public class JwtService
                 .setExpiration(getTokenExpiration(refreshTokenExpirationMinutes))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
-    }
-
-    public String getUserEmail(String jws)
-    {
-        String email = Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .build()
-                .parseClaimsJws(jws)
-                .getBody()
-                .getSubject();
-
-        return email;
     }
 
     public Claims getClaims(String jws)
@@ -115,15 +98,6 @@ public class JwtService
         Date expiration = calendar.getTime();
 
         return expiration;
-    }
-
-    private Key getKeyFromBase64EncodedKey(String base64EncodedSecretKey)
-    {
-        byte keyBytes[] = Decoders.BASE64.decode(base64EncodedSecretKey);
-
-        Key key = Keys.hmacShaKeyFor(keyBytes);
-
-        return key;
     }
 }
 

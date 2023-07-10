@@ -43,7 +43,7 @@ public class AuthService
             return;
         }
 
-        throw new RuntimeException("expired token");
+        throw new RuntimeException("invalid token");
     }
 
     public String reissue(String accessToken, String refreshToken)

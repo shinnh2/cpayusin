@@ -17,6 +17,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -43,11 +44,11 @@ public class JwtVerificationFilter extends OncePerRequestFilter
             log.info("accessToken = {}", accessToken);
         } catch (SignatureException se)
         {
-            request.setAttribute("exception", se);
+            throw new AuthenticationException("Invalid JWT signature");
         } catch (ExpiredJwtException ee) {
-            request.setAttribute("exception", ee);;
+            throw new AuthenticationException("Expired JWT token");
         } catch (Exception e) {
-            request.setAttribute("exception", e);
+            throw new AuthenticationException("Error processing JWT");
         }
 
         filterChain.doFilter(request, response);
