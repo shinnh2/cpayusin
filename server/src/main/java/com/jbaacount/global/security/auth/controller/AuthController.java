@@ -20,7 +20,7 @@ public class AuthController
 {
     private final AuthService authService;
 
-    @PostMapping("/login")
+    /*@PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto)
     {
         String email = loginDto.getEmail();
@@ -28,7 +28,7 @@ public class AuthController
         authService.login(email);
 
         return new ResponseEntity<>("login completed successfully", HttpStatus.OK);
-    }
+    }*/
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(value = "Refresh") String refreshToken)

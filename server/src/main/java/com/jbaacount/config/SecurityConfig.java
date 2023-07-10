@@ -33,10 +33,6 @@ public class SecurityConfig
     private final JwtService jwtService;
     private final RedisRepository redisRepository;
     private final CustomAuthorityUtils authorityUtils;
-    private static final String ENDPOINT_WHITELIST[] = {
-            "/login",
-            "/error"
-    };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
@@ -55,8 +51,10 @@ public class SecurityConfig
                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/member/login", "/member/sign-up").permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/member/**").hasAnyRole("USER", "ADMIN"))
+                        .requestMatchers(HttpMethod.POST, "/members/login", "/members/sign-up").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/members/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH, "/members/**").hasAnyRole("USER", "ADMIN")
+                        .anyRequest().permitAll())
                 .apply(new CustomFilterConfigurer());
 
 
@@ -69,7 +67,6 @@ public class SecurityConfig
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource()
     {
@@ -77,7 +74,7 @@ public class SecurityConfig
         configuration.setAllowedOrigins(List.of("http://localhost:8080"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE"));
-        configuration.setExposedHeaders(List.of("Authorization", "RefreshToken"));
+        configuration.setExposedHeaders(List.of("Authorization", "Refresh"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
@@ -94,7 +91,7 @@ public class SecurityConfig
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtService, redisRepository);
-            jwtAuthenticationFilter.setFilterProcessesUrl("/member/login");
+            jwtAuthenticationFilter.setFilterProcessesUrl("/members/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 
