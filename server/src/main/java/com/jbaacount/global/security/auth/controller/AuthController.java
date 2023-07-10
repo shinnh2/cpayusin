@@ -1,45 +1,49 @@
 package com.jbaacount.global.security.auth.controller;
 
 import com.jbaacount.global.security.auth.service.AuthService;
+import com.jbaacount.global.security.dto.LoginDto;
 import com.jbaacount.global.security.dto.LoginResponseDto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/member")
+@Slf4j
 @RequiredArgsConstructor
+@RequestMapping("/members")
+@RestController
 public class AuthController
 {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody LoginResponseDto responseDto, String refreshToken)
+    public ResponseEntity<?> login(@RequestBody LoginDto loginDto)
     {
-        String email = responseDto.getEmail();
-        authService.login(email, refreshToken);
+        String email = loginDto.getEmail();
 
-        return new ResponseEntity(responseDto, HttpStatus.OK);
+        authService.login(email);
+
+        return new ResponseEntity<>("login completed successfully", HttpStatus.OK);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity logout(String refreshToken)
+    public ResponseEntity<?> logout(@RequestHeader(value = "Refresh") String refreshToken)
     {
         authService.logout(refreshToken);
 
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>("logout completed successfully", HttpStatus.OK);
     }
 
-    @GetMapping("/reissue")
-    public ResponseEntity reissue(@RequestHeader(value = "RefreshToken") String refreshToken,
-                                  Authentication authentication)
+    @PostMapping("/reissue")
+    public ResponseEntity<?> reissue(@RequestHeader(value = "Authorization") String accessToken, @RequestHeader(value = "Refresh") String refreshToken)
     {
-        String accessToken = authService.reissue(refreshToken, authentication);
+        String newAccessToken = authService.reissue(accessToken, refreshToken);
 
-        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken).build();
+        log.info("new access token = {}", newAccessToken);
+        return new ResponseEntity<>(newAccessToken, HttpStatus.OK);
     }
 }

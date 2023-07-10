@@ -33,7 +33,7 @@ public class CustomAuthorityUtils
     public List<GrantedAuthority> createAuthorities(List<String> roles)
     {
         List<GrantedAuthority> authorities = roles.stream()
-                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .map(role -> role.startsWith("ROLE_") ? new SimpleGrantedAuthority(role) : new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toList());
 
         return authorities;

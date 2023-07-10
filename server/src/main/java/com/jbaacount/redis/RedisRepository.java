@@ -18,7 +18,7 @@ public class RedisRepository
     public void saveRefreshToken(String refreshToken, String email)
     {
         ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(refreshToken, email, jwtService.getRefreshTokenExpiration(), TimeUnit.MINUTES);
+        valueOperations.set(refreshToken, email, jwtService.getRefreshTokenExpirationMinutes(), TimeUnit.MINUTES);
     }
 
     public void deleteRefreshToken(String refreshToken)

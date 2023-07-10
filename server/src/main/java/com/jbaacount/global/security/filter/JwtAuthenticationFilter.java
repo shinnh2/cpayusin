@@ -16,9 +16,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -32,43 +35,47 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @SneakyThrows
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
     {
-        ObjectMapper objectMapper = new ObjectMapper();
-        LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class);
+        try
+        {
+            ObjectMapper objectMapper = new ObjectMapper();
+            LoginDto loginDto = objectMapper.readValue(request.getInputStream(), LoginDto.class);
 
-        log.info("===attemptAuthentication===");
-        log.info("loginDto.getEmail = {}", loginDto.getEmail());
+            UsernamePasswordAuthenticationToken authenticationToken
+                    = new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
 
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getPassword());
+            return authenticationManager.authenticate(authenticationToken);
+        }
 
-        return authenticationManager.authenticate(authenticationToken);
+        catch (RuntimeException e)
+        {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws ServletException, IOException
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authResult) throws ServletException, IOException
     {
+        String email = authResult.getName();
+
+        List<String> roles = authResult.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
 
         log.info("===successfulAuthentication===");
-        log.info("authentication.getName = {}", authentication.getName());
+        log.info("authorities = {}", authResult.getAuthorities());
+        String accessToken = jwtService.generateAccessToken(email, roles);
+        String refreshToken = jwtService.generateRefreshToken(email);
 
-        String accessToken = jwtService.generateAccessToken(authentication);
-
-        log.info("accessToken = {}", accessToken);
-        String refreshToken = jwtService.generateRefreshToken();
-
-        //TODO store the refreshToken in redis
-        redisRepository.saveRefreshToken(refreshToken, authentication.getName());
+        redisRepository.saveRefreshToken(refreshToken, email);
 
         response.setHeader("Authorization", "Bearer " + accessToken);
-        response.setHeader("RefreshToken", refreshToken);
+        response.setHeader("Refresh", refreshToken);
 
-        log.info("response.setHeader / refreshToken = {}", refreshToken);
-        log.info("response.setHeader = {}", response.getHeader(AUTHORIZATION));
-        log.info("response status = {}", response.getStatus());
-
-        this.getSuccessHandler().onAuthenticationSuccess(request, response, authentication);
+        this.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
     }
-
 }

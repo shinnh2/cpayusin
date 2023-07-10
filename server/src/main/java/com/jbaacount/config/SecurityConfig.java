@@ -7,6 +7,7 @@ import com.jbaacount.global.handler.CustomAuthenticationSuccessfulHandler;
 import com.jbaacount.global.security.filter.JwtAuthenticationFilter;
 import com.jbaacount.global.security.filter.JwtVerificationFilter;
 import com.jbaacount.global.security.jwt.JwtService;
+import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.redis.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -31,6 +32,7 @@ public class SecurityConfig
 {
     private final JwtService jwtService;
     private final RedisRepository redisRepository;
+    private final CustomAuthorityUtils authorityUtils;
     private static final String ENDPOINT_WHITELIST[] = {
             "/login",
             "/error"
@@ -53,7 +55,8 @@ public class SecurityConfig
                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.POST, "/member/login", "/member/sign-up").permitAll())
+                        .requestMatchers(HttpMethod.POST, "/member/login", "/member/sign-up").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/member/**").hasAnyRole("USER", "ADMIN"))
                 .apply(new CustomFilterConfigurer());
 
 
@@ -95,7 +98,7 @@ public class SecurityConfig
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService, authorityUtils);
 
             builder
                     .addFilter(jwtAuthenticationFilter)

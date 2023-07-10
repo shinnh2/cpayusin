@@ -6,6 +6,7 @@ import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import com.jbaacount.redis.RedisRepository;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,45 +15,60 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class AuthService
 {
-    private final MemberRepository memberRepository;
-    private final JwtService jwtService;
     private final RedisRepository redisRepository;
+    private final JwtService jwtService;
     private final RedisTemplate<String, String> redisTemplate;
-    
-    public void login(String refreshToken, String email)
+
+    public void login(String email)
     {
+        String refreshToken = jwtService.generateRefreshToken(email);
         redisRepository.saveRefreshToken(refreshToken, email);
     }
-    
+
     public void logout(String refreshToken)
     {
-        redisRepository.deleteRefreshToken(refreshToken);
-    }
-    
-    public String reissue(String refreshToken, Authentication authentication)
-    {
-         if(!jwtService.isValidToken(refreshToken))
-             throw new BusinessLogicException(ExceptionMessage.TOKEN_EXPIRED);
+        jwtService.isValidToken(refreshToken);
 
-        ValueOperations<String, String > valueOperations = redisTemplate.opsForValue();
-        
-        if(redisTemplate.hasKey(refreshToken))
+        if(hasKey(refreshToken))
         {
-            String email = valueOperations.get(refreshToken);
-            Member member = memberRepository.findByEmail(email)
-                    .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
-
-            return jwtService.generateAccessToken(authentication);
+            redisRepository.deleteRefreshToken(refreshToken);
+            return;
         }
 
-        else
-            throw new BusinessLogicException(ExceptionMessage.TOKEN_EXPIRED);
-        
+        throw new RuntimeException("expired token");
+    }
+
+    public String reissue(String accessToken, String refreshToken)
+    {
+        if(hasKey(refreshToken))
+        {
+            log.info("===reissue===");
+            log.info("accessToken = {}", accessToken);
+            log.info("refreshToken = {}", refreshToken);
+
+            Claims claims = jwtService.getClaims(accessToken.substring(7));
+            String email = claims.getSubject();
+            List roles = (List) claims.get("roles");
+
+            return jwtService.generateAccessToken(email, roles);
+        }
+
+        throw new RuntimeException("token expired");
+    }
+
+    private Boolean hasKey(String refreshToken)
+    {
+        jwtService.isValidToken(refreshToken);
+
+        Boolean hasKey = redisTemplate.hasKey(refreshToken);
+        return hasKey;
     }
 }

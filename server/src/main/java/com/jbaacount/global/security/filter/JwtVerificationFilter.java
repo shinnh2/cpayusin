@@ -1,18 +1,25 @@
 package com.jbaacount.global.security.filter;
 
 import com.jbaacount.global.security.jwt.JwtService;
+import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
@@ -22,71 +29,54 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class JwtVerificationFilter extends OncePerRequestFilter
 {
     private final JwtService jwtService;
-
-    private String ENDPOINT_WHITELIST[] = {
-            "/member/login",
-            "/member/sign-up",
-            "/member/logout"
-    };
+    private final CustomAuthorityUtils authorityUtils;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
     {
-        String accessToken = extractAccessToken(request);
-
         log.info("===doFilterInternal===");
-        log.info("accessToken = {}", accessToken);
 
+        try {
+            String accessToken = resolveAccessToken(request);
+            jwtService.isValidToken(accessToken);
+            setAuthenticationToContext(jwtService.getClaims(accessToken));
 
-        if(jwtService.isValidToken(accessToken))
-        {
-            Authentication authentication = jwtService.getAuthentication(accessToken);
-            log.info("header is not null");
             log.info("accessToken = {}", accessToken);
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (SignatureException se)
+        {
+            request.setAttribute("exception", se);
+        } catch (ExpiredJwtException ee) {
+            request.setAttribute("exception", ee);;
+        } catch (Exception e) {
+            request.setAttribute("exception", e);
         }
 
-        filterChain.doFilter(request,response);
+        filterChain.doFilter(request, response);
     }
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request)
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException
     {
-        return isSignUpRequest(request) || headerNotValidate(request);
+        String authorization = request.getHeader(AUTHORIZATION);
+        log.info("===shouldNotFilter===");
+        log.info("authorization = {}", authorization);
+
+        return authorization == null || !authorization.startsWith("Bearer ");
     }
 
-
-    private boolean isSignUpRequest(HttpServletRequest request)
+    private void setAuthenticationToContext(Claims claims)
     {
-        String requestURI = request.getRequestURI();
-        String method = request.getMethod();
-        log.info("===isSignUpRequest===");
-        log.info("requestURI = {}", request);
-        log.info("method = {}", method);
+        String email = claims.getSubject();
+        List<GrantedAuthority> authorities = authorityUtils.createAuthorities((List) claims.get("roles"));
 
-        return Arrays.stream(ENDPOINT_WHITELIST).anyMatch(a -> requestURI.equals(a) && method.equalsIgnoreCase("POST"));
+        log.info("===setAuthenticationToContext===");
+        log.info("authorities = {}", authorities);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-
-    private boolean headerNotValidate(HttpServletRequest request)
+    private String resolveAccessToken(HttpServletRequest request)
     {
-        String header = request.getHeader(AUTHORIZATION);
-        log.info("===headerNotValidate===");
-        log.info("header = {}", header);
-
-        return header == null || !header.startsWith("Bearer ");
+        return request.getHeader(AUTHORIZATION).substring(7);
     }
-
-    private String extractAccessToken(HttpServletRequest request)
-    {
-        String header = request.getHeader("Authorization");
-        log.info("===extractAccessToken===");
-        log.info("header = {}", header);
-
-        if(header != null && header.startsWith("Bearer "))
-            return header.substring(7);
-
-        return null;
-    }
-
 }
