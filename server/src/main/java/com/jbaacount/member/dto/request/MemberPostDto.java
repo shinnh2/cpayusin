@@ -1,0 +1,20 @@
+package com.jbaacount.member.dto.request;
+
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
+import org.hibernate.validator.constraints.Length;
+
+@Data
+public class MemberPostDto
+{
+    @Length(min = 3, max = 10)
+    @Pattern(regexp = "[A-z가-힣0-9]", message = "닉네임에는 특수문자 및 공백이 올 수 없습니다.")
+    private String nickname;
+
+    @Email(message = "유효하지 않은 이메일 형식입니다.")
+    private String email;
+
+    @Length(min = 5, max = 20, message = "비밀번호는 5자 이상 20자 이하여야 합니다.")
+    private String password;
+}
