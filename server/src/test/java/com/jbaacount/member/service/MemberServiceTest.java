@@ -11,9 +11,11 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import java.util.Set;
@@ -35,6 +37,25 @@ class MemberServiceTest
 
     @Autowired
     private LocalValidatorFactoryBean validator;
+
+    @BeforeEach
+    void createMember()
+    {
+        Member member1 = Member.builder()
+                .nickname("회원1")
+                .email("aaaa@naver.com")
+                .password("123123")
+                .build();
+
+        Member member2 = Member.builder()
+                .nickname("회원2")
+                .email("bbbb@naver.com")
+                .password("123123")
+                .build();
+
+        memberService.createMember(member1);
+        memberService.createMember(member2);
+    }
 
     @AfterEach
     void deleteAll()
@@ -83,5 +104,37 @@ class MemberServiceTest
         Set<ConstraintViolation<MemberPostDto>> violations = validator.validate(post);
 
         assert(!violations.isEmpty());
+    }
+
+    @Test
+    void SignUpMember_WithDuplicatedEmail()
+    {
+        String email = "aaaa@naver.com";
+        String password = "123123";
+        String nickname = "가나다라";
+
+        Member member = Member.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .build();
+
+        assertThrows(BusinessLogicException.class, () -> memberService.createMember(member));
+    }
+
+    @Test
+    void SignUpMember_WithDuplicatedNickname()
+    {
+        String email = "aaaabb@naver.com";
+        String password = "123123";
+        String nickname = "회원2";
+
+        Member member = Member.builder()
+                .email(email)
+                .password(password)
+                .nickname(nickname)
+                .build();
+
+        assertThrows(BusinessLogicException.class, () -> memberService.createMember(member));
     }
 }
