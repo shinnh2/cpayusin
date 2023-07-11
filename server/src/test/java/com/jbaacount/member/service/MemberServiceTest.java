@@ -6,16 +6,14 @@ import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.member.repository.MemberRepository;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,7 +30,6 @@ class MemberServiceTest
 
     @Autowired
     private MemberRepository memberRepository;
-
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -53,8 +50,8 @@ class MemberServiceTest
                 .password("123123")
                 .build();
 
-        memberRepository.save(member1);
-        memberRepository.save(member2);
+        memberService.createMember(member1);
+        memberService.createMember(member2);
     }
 
     @AfterEach
@@ -70,12 +67,10 @@ class MemberServiceTest
         String email = "ands0927@naver.com";
         String password = "123123";
         String nickname = "가나다라";
-
-
         MemberPostDto post = new MemberPostDto(nickname, email, password);
         Member requestMember = memberMapper.postToMember(post);
-        Member createdMember = memberService.createMember(requestMember);
 
+        Member createdMember = memberService.createMember(requestMember);
 
         assertThat(createdMember.getNickname()).isEqualTo(nickname);
         assertThat(createdMember.getEmail()).isEqualTo(email);
@@ -90,11 +85,10 @@ class MemberServiceTest
         String password = "123123";
         String nickname = "가나다라";
         String firstMemberEmail = "aaaa@naver.com";
-
         MemberPostDto post = new MemberPostDto(nickname, email, password);
         Member requestMember = memberMapper.postToMember(post);
-        Member createdMember = memberService.createMember(requestMember);
 
+        Member createdMember = memberService.createMember(requestMember);
 
         assertThat(createdMember.getNickname()).isNotEqualTo("가나다");
         assertThat(createdMember.getPassword()).isNotEqualTo(password);
@@ -136,13 +130,12 @@ class MemberServiceTest
     @Test
     public void updateTest_WithCorrectInfo()
     {
-        Member member = memberService.getMemberById(1L);
+        Member member = memberRepository.findByEmail("aaaa@naver.com").get();
         MemberPatchDto request = new MemberPatchDto();
         request.setNickname("홍길동");
 
-        Member updatedMember = memberService.updateMember(1L, request, member);
+        Member updatedMember = memberService.updateMember(member.getId(), request, member);
 
-        assertThat(updatedMember.getId()).isEqualTo(1L);
         assertThat(updatedMember.getEmail()).isEqualTo("aaaa@naver.com");
         assertThat(updatedMember.getNickname()).isEqualTo("홍길동");
     }
@@ -156,15 +149,15 @@ class MemberServiceTest
         MemberPatchDto request = new MemberPatchDto();
         request.setNickname("홍길동");
 
-        assertThrows(BusinessLogicException.class, () -> memberService.updateMember(1L, request, member2));
+        assertThrows(BusinessLogicException.class, () -> memberService.updateMember(member1.getId(), request, member2));
     }
 
     @Test
     public void getTest()
     {
-        Member member = memberService.getMemberById(1L);
-
         String rawPassword = "123123";
+
+        Member member = memberRepository.findByEmail("aaaa@naver.com").get();
 
         assertThat(member.getNickname()).isEqualTo("회원1");
         assertTrue(passwordEncoder.matches(rawPassword, member.getPassword()));
@@ -175,20 +168,20 @@ class MemberServiceTest
     @Test
     public void deleteTest()
     {
-        Member firstMember = memberService.getMemberById(1L);
-        Member secondMember = memberService.getMemberById(2L);
+        Member firstMember = memberRepository.findByEmail("aaaa@naver.com").get();
+        Member secondMember = memberRepository.findByEmail("bbbb@naver.com").get();
 
         memberService.deleteById(firstMember.getId(), firstMember);
 
-        Optional<Member> deletedMember = memberRepository.findById(1L);
+        Optional<Member> deletedMember = memberRepository.findById(firstMember.getId());
         assertFalse(deletedMember.isPresent());
     }
 
     @Test
     public void deleteTest_WithDifferentMember()
     {
-        Member firstMember = memberService.getMemberById(1L);
-        Member secondMember = memberService.getMemberById(2L);
+        Member firstMember = memberRepository.findByEmail("aaaa@naver.com").get();
+        Member secondMember = memberRepository.findByEmail("bbbb@naver.com").get();
 
         assertThrows(BusinessLogicException.class, () -> memberService.deleteById(firstMember.getId(), secondMember));
     }
