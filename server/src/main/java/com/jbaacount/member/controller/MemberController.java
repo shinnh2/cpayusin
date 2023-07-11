@@ -25,13 +25,13 @@ public class MemberController
 {
     private final MemberService memberService;
 
-    private final MemberMapper mapper;
+    private final MemberMapper memberMapper;
     @PostMapping("/sign-up")
     public ResponseEntity enrollMember(@RequestBody @Valid MemberPostDto postDto)
     {
-        Member signedUpMember = memberService.createMember(mapper.postToMember(postDto));
+        Member signedUpMember = memberService.createMember(memberMapper.postToMember(postDto));
 
-        MemberResponseDto response = mapper.responseToMember(signedUpMember);
+        MemberResponseDto response = memberMapper.memberToResponse(signedUpMember);
 
         log.info("===enrollMember===");
         log.info("user enrolled successfully");
@@ -44,10 +44,8 @@ public class MemberController
                                        @PathVariable("member-id") @Positive long memberId,
                                        @AuthenticationPrincipal Member currentUser)
     {
-        Member member = mapper.patchToMember(patchDto);
-        member.setId(memberId);
-
-        MemberResponseDto response = mapper.responseToMember(memberService.updateMember(member, currentUser));
+        Member updatedMember = memberService.updateMember(memberId, patchDto, currentUser);
+        MemberResponseDto response = memberMapper.memberToResponse(updatedMember);
 
         log.info("===updateMember===");
         log.info("user updated successfully");
@@ -58,8 +56,8 @@ public class MemberController
     @GetMapping("/{member-id}")
     public ResponseEntity getMember(@PathVariable("member-id") @Positive long memberId)
     {
-        Member member = memberService.getUser(memberId);
-        MemberResponseDto response = mapper.responseToMember(member);
+        Member member = memberService.getMemberById(memberId);
+        MemberResponseDto response = memberMapper.memberToResponse(member);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

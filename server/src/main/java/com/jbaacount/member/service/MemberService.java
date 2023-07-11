@@ -3,6 +3,7 @@ package com.jbaacount.member.service;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
+import com.jbaacount.member.dto.request.MemberPatchDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,24 +44,24 @@ public class MemberService
         return savedMember;
     }
 
-    public Member updateMember(Member member, Member currentMember)
+    public Member updateMember(Long memberId, MemberPatchDto request, Member currentMember)
     {
-        isTheSameUser(member.getId(), currentMember.getId());
+        isTheSameUser(memberId, currentMember.getId());
 
         log.info("===updateMember===");
-        Member findMember = getUser(member.getId());
-        log.info("findMember email = {}", member.getEmail());
+        Member findMember = getMemberById(memberId);
+        log.info("findMember email = {}", findMember.getEmail());
 
-        Optional.ofNullable(member.getNickname())
+        Optional.ofNullable(request.getNickname())
                 .ifPresent(nickname -> findMember.updateNickname(nickname));
-        Optional.ofNullable(member.getPassword())
+        Optional.ofNullable(request.getPassword())
                 .ifPresent(password -> findMember.updatePassword(password));
 
         return findMember;
     }
 
     @Transactional(readOnly = true)
-    public Member getUser(long id)
+    public Member getMemberById(long id)
     {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
@@ -68,7 +69,7 @@ public class MemberService
 
     public void deleteById(long id, Member currentMember)
     {
-        Member member = getUser(id);
+        Member member = getMemberById(id);
         isTheSameUser(id, currentMember.getId());
         memberRepository.deleteById(id);
         log.info("deleted Member nickname = {}", member.getNickname());
