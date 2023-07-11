@@ -7,25 +7,25 @@ public enum ExceptionMessage
     /**
      * member
      */
-    USER_NOT_FOUND("The specified user could not be found"),
-    EMAIL_ALREADY_EXIST("The provided email is already in use"),
-    NICKNAME_ALREADY_EXIST("The provided nickname is already in use"),
+    USER_NOT_FOUND("해당 유저를 찾을 수 없습니다."),
+    EMAIL_ALREADY_EXIST("이미 사용중인 이메일입니다."),
+    NICKNAME_ALREADY_EXIST("이미 사용중인 닉네임입니다."),
 
-    MEMBER_UNAUTHORIZED("This user has no authority"),
+    MEMBER_UNAUTHORIZED("권한이 없습니다."),
 
     /**
      * token
      */
 
-    EXPIRED_TOKEN("The JWT token has expired"),
-    TOKEN_NOT_VALID("The provided JWT token is not valid"),
+    EXPIRED_TOKEN("이미 만료된 토큰입니다."),
+    TOKEN_NOT_VALID("유효하지 않은 토큰입니다."),
 
-    UNSUPPORTED_TOKEN("The JWT token is not supported"),
+    UNSUPPORTED_TOKEN("지원되지 않는 형식의 토큰입니다."),
 
-    CLAIM_EMPTY("The JWT claims string is empty"),
+    CLAIM_EMPTY("토큰의 정보를 찾을 수 없습니다."),
 
-    INVALID_TOKEN_SIGNATURE("The signature of your token is invalid"),
-    TOKEN_NOT_FOUND("The refresh token could not be located in Redis");
+    INVALID_TOKEN_SIGNATURE("토큰의 서명이 유효하지 않습니다."),
+    TOKEN_NOT_FOUND("해당 리프레시 토큰을 찾을 수 없습니다.");
 
 
     @Getter
