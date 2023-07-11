@@ -7,6 +7,7 @@ import com.jbaacount.global.handler.CustomAuthenticationSuccessfulHandler;
 import com.jbaacount.global.security.filter.JwtAuthenticationFilter;
 import com.jbaacount.global.security.filter.JwtVerificationFilter;
 import com.jbaacount.global.security.jwt.JwtService;
+import com.jbaacount.global.security.userdetails.MemberDetailsService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.redis.RedisRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class SecurityConfig
     private final JwtService jwtService;
     private final RedisRepository redisRepository;
     private final CustomAuthorityUtils authorityUtils;
+    private final MemberDetailsService memberDetailsService;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
@@ -95,7 +97,7 @@ public class SecurityConfig
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService, authorityUtils);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService, authorityUtils, memberDetailsService);
 
             builder
                     .addFilter(jwtAuthenticationFilter)

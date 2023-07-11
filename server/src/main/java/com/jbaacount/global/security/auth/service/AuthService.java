@@ -2,6 +2,7 @@ package com.jbaacount.global.security.auth.service;
 
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
+import com.jbaacount.global.exception.InvalidTokenException;
 import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +45,7 @@ public class AuthService
             return;
         }
 
-        throw new RuntimeException("invalid token");
+        throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
     }
 
     public String reissue(String accessToken, String refreshToken)
@@ -61,14 +63,25 @@ public class AuthService
             return jwtService.generateAccessToken(email, roles);
         }
 
-        throw new RuntimeException("token expired");
+        throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
+    }
+
+    public HttpHeaders setHeadersWithNewAccessToken(String newAccessToken)
+    {
+        HttpHeaders response = new HttpHeaders();
+        response.set("Authorization", "Bearer " + newAccessToken);
+        return response;
     }
 
     private Boolean hasKey(String refreshToken)
     {
-        jwtService.isValidToken(refreshToken);
+        try{
+            jwtService.isValidToken(refreshToken);
+        }catch (RuntimeException ex){
+            log.error(ex.getMessage(), ex);
+            return false;
+        }
 
-        Boolean hasKey = redisTemplate.hasKey(refreshToken);
-        return hasKey;
+        return redisTemplate.hasKey(refreshToken);
     }
 }

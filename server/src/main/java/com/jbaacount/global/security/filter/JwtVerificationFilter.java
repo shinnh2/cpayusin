@@ -1,10 +1,10 @@
 package com.jbaacount.global.security.filter;
 
+import com.jbaacount.global.exception.InvalidTokenException;
 import com.jbaacount.global.security.jwt.JwtService;
+import com.jbaacount.global.security.userdetails.MemberDetailsService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +15,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.security.sasl.AuthenticationException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -31,6 +30,7 @@ public class JwtVerificationFilter extends OncePerRequestFilter
 {
     private final JwtService jwtService;
     private final CustomAuthorityUtils authorityUtils;
+    private final MemberDetailsService memberDetailsService;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
     {
@@ -42,15 +42,10 @@ public class JwtVerificationFilter extends OncePerRequestFilter
             setAuthenticationToContext(jwtService.getClaims(accessToken));
 
             log.info("accessToken = {}", accessToken);
-        } catch (SignatureException se)
-        {
-            throw new AuthenticationException("Invalid JWT signature");
-        } catch (ExpiredJwtException ee) {
-            throw new AuthenticationException("Expired JWT token");
-        } catch (Exception e) {
-            throw new AuthenticationException("Error processing JWT");
+        } catch (InvalidTokenException e){
+            log.error("Error processing JWT: {}", e.getMessage());
+            throw e;
         }
-
         filterChain.doFilter(request, response);
     }
 
@@ -67,12 +62,14 @@ public class JwtVerificationFilter extends OncePerRequestFilter
     private void setAuthenticationToContext(Claims claims)
     {
         String email = claims.getSubject();
+        UserDetails userDetails = memberDetailsService.loadUserByUsername(email);
+
         List<GrantedAuthority> authorities = authorityUtils.createAuthorities((List) claims.get("roles"));
 
         log.info("===setAuthenticationToContext===");
         log.info("authorities = {}", authorities);
 
-        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, authorities);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

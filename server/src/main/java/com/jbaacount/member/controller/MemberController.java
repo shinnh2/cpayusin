@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -36,12 +37,13 @@ public class MemberController
 
     @PatchMapping("/{member-id}")
     public ResponseEntity updateMember(@RequestBody MemberPathDto pathDto,
-                                       @PathVariable("member-id") long memberId)
+                                       @PathVariable("member-id") long memberId,
+                                       @AuthenticationPrincipal Member currentUser)
     {
         Member member = mapper.patchToMember(pathDto);
         member.setId(memberId);
 
-        MemberResponseDto response = mapper.responseToMember(memberService.updateMember(member));
+        MemberResponseDto response = mapper.responseToMember(memberService.updateMember(member, currentUser));
 
         log.info("===updateMember===");
         log.info("user updated successfully");
@@ -52,18 +54,19 @@ public class MemberController
     @GetMapping("/{member-id}")
     public ResponseEntity getMember(@PathVariable("member-id") long memberId)
     {
-        Member member = memberService.findById(memberId);
+        Member member = memberService.getUser(memberId);
         MemberResponseDto response = mapper.responseToMember(member);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")
-    public ResponseEntity deleteMember(@PathVariable("member-id") long memberId)
+    public ResponseEntity deleteMember(@PathVariable("member-id") long memberId,
+                                       @AuthenticationPrincipal Member member)
     {
         log.info("===deleteMember===");
         log.info("user deleted successfully, deleted id = {}", memberId);
-        memberService.deleteById(memberId);
+        memberService.deleteById(memberId, member);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }

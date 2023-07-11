@@ -1,5 +1,7 @@
 package com.jbaacount.global.security.jwt;
 
+import com.jbaacount.global.exception.ExceptionMessage;
+import com.jbaacount.global.exception.InvalidTokenException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
@@ -78,17 +80,16 @@ public class JwtService
                     .parseClaimsJws(jws);
             return true;
         } catch (MalformedJwtException ex) {
-            log.error("Invalid JWT token");
+            throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_VALID);
         } catch (ExpiredJwtException ex) {
-            log.error("Expired JWT token");
+            throw new InvalidTokenException(ExceptionMessage.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException ex) {
-            log.error("Unsupported JWT token");
+            throw new InvalidTokenException(ExceptionMessage.UNSUPPORTED_TOKEN);
         } catch (IllegalArgumentException ex) {
-            log.error("JWT claims string is empty");
+            throw new InvalidTokenException(ExceptionMessage.CLAIM_EMPTY);
         } catch (SignatureException e) {
-            log.error("there is an error with the signature of you token ");
+            throw new InvalidTokenException(ExceptionMessage.INVALID_TOKEN_SIGNATURE);
         }
-        return false;
     }
 
     public Date getTokenExpiration(int expirationMinutes)

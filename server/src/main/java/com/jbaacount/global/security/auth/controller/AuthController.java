@@ -20,7 +20,7 @@ public class AuthController
 {
     private final AuthService authService;
 
-    /*@PostMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginDto loginDto)
     {
         String email = loginDto.getEmail();
@@ -28,7 +28,7 @@ public class AuthController
         authService.login(email);
 
         return new ResponseEntity<>("login completed successfully", HttpStatus.OK);
-    }*/
+    }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(value = "Refresh") String refreshToken)
@@ -42,8 +42,10 @@ public class AuthController
     public ResponseEntity<?> reissue(@RequestHeader(value = "Authorization") String accessToken, @RequestHeader(value = "Refresh") String refreshToken)
     {
         String newAccessToken = authService.reissue(accessToken, refreshToken);
-
         log.info("new access token = {}", newAccessToken);
-        return new ResponseEntity<>(newAccessToken, HttpStatus.OK);
+
+        HttpHeaders response = authService.setHeadersWithNewAccessToken(newAccessToken);
+
+        return ResponseEntity.ok().headers(response).body("New accessToken has been issued successfully");
     }
 }

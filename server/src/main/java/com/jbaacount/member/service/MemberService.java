@@ -7,7 +7,6 @@ import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,12 +43,13 @@ public class MemberService
         return savedMember;
     }
 
-    public Member updateMember(Member member)
+    public Member updateMember(Member member, Member currentMember)
     {
-        log.info("===updateMember");
-        Member findMember = findById(member.getId());
-        log.info("findMember email = {}", member.getEmail());
+        isTheSameUser(member.getId(), currentMember.getId());
 
+        log.info("===updateMember===");
+        Member findMember = getUser(member.getId());
+        log.info("findMember email = {}", member.getEmail());
 
         Optional.ofNullable(member.getNickname())
                 .ifPresent(nickname -> findMember.updateNickname(nickname));
@@ -60,16 +60,16 @@ public class MemberService
     }
 
     @Transactional(readOnly = true)
-    public Member findById(long id)
+    public Member getUser(long id)
     {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
     }
 
-    public void deleteById(long id)
+    public void deleteById(long id, Member currentMember)
     {
-        Member member = findById(id);
-
+        Member member = getUser(id);
+        isTheSameUser(id, currentMember.getId());
         memberRepository.deleteById(id);
         log.info("deleted Member nickname = {}", member.getNickname());
     }
@@ -86,6 +86,12 @@ public class MemberService
     {
          memberRepository.findByNickname(nickname)
                  .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.NICKNAME_ALREADY_EXIST);});
+    }
+
+    private void isTheSameUser(Long memberId, Long loggedInMemberId)
+    {
+        if(memberId != loggedInMemberId)
+            throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
     }
 
 }
