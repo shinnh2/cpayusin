@@ -73,12 +73,6 @@ class MemberServiceTest
         String password = "123123";
         String nickname = "가나다라";
 
-        Member member1 = Member.builder()
-                .email(email)
-                .password(password)
-                .nickname(nickname)
-                .build();
-
         MemberPostDto post = new MemberPostDto(nickname, email, password);
         Member requestMember = memberMapper.postToMember(post);
         memberService.createMember(requestMember);
