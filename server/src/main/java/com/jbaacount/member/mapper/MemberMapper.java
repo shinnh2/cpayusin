@@ -1,7 +1,6 @@
 package com.jbaacount.member.mapper;
 
 import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.dto.request.MemberPatchDto;
 import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
 import org.springframework.stereotype.Component;
@@ -23,21 +22,7 @@ public class MemberMapper
         return member;
     }
 
-    public Member patchToMember(MemberPatchDto patchDto)
-    {
-        if(patchDto == null)
-            return null;
-
-        Member member = Member.builder()
-                .id(patchDto.getId())
-                .nickname(patchDto.getNickname())
-                .password(patchDto.getPassword())
-                .build();
-
-        return member;
-    }
-
-    public MemberResponseDto responseToMember(Member member)
+    public MemberResponseDto memberToResponse(Member member)
     {
         MemberResponseDto response = MemberResponseDto.builder()
                 .id(member.getId())
