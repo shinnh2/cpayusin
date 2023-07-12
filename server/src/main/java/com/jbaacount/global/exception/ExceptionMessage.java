@@ -25,7 +25,14 @@ public enum ExceptionMessage
     CLAIM_EMPTY("토큰의 정보를 찾을 수 없습니다."),
 
     INVALID_TOKEN_SIGNATURE("토큰의 서명이 유효하지 않습니다."),
-    TOKEN_NOT_FOUND("해당 리프레시 토큰을 찾을 수 없습니다.");
+    TOKEN_NOT_FOUND("해당 리프레시 토큰을 찾을 수 없습니다."),
+
+
+    /**
+     * post
+     */
+
+    POST_NOT_FOUND("해당 게시물을 찾을 수 없습니다.");
 
 
     @Getter
