@@ -54,8 +54,9 @@ public class SecurityConfig
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(HttpMethod.POST, "/members/login", "/members/sign-up").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/members/**").hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/members/**").hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PATCH).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE).hasAnyRole("USER", "ADMIN")
                         .anyRequest().permitAll())
                 .apply(new CustomFilterConfigurer());
 

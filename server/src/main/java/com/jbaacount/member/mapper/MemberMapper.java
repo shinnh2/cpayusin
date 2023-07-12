@@ -1,5 +1,6 @@
 package com.jbaacount.member.mapper;
 
+import com.jbaacount.member.dto.response.MemberInfoResponseDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
@@ -29,6 +30,20 @@ public class MemberMapper
                 .nickname(member.getNickname())
                 .email(member.getEmail())
                 .password(member.getPassword())
+                .roles(member.getRoles())
+                .createdAt(member.getCreatedAt())
+                .modifiedAt(member.getModifiedAt())
+                .build();
+
+        return response;
+    }
+
+    public MemberInfoResponseDto memberToInfoResponse(Member member)
+    {
+        MemberInfoResponseDto response = MemberInfoResponseDto.builder()
+                .id(member.getId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
                 .roles(member.getRoles())
                 .build();
 

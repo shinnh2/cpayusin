@@ -3,6 +3,7 @@ package com.jbaacount.member.service;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
+import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.dto.request.MemberPatchDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
@@ -24,6 +25,7 @@ public class MemberService
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final CustomAuthorityUtils authorityUtils;
+    private final AuthorizationService authorizationService;
 
     public Member createMember(Member member)
     {
@@ -46,7 +48,7 @@ public class MemberService
 
     public Member updateMember(Long memberId, MemberPatchDto request, Member currentMember)
     {
-        isTheSameUser(memberId, currentMember.getId());
+        authorizationService.checkPermission(memberId, currentMember);
 
         log.info("===updateMember===");
         Member findMember = getMemberById(memberId);
@@ -67,11 +69,11 @@ public class MemberService
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
     }
 
-    public void deleteById(long id, Member currentMember)
+    public void deleteById(long memberId, Member currentMember)
     {
-        Member member = getMemberById(id);
-        isTheSameUser(id, currentMember.getId());
-        memberRepository.deleteById(id);
+        Member member = getMemberById(memberId);
+        authorizationService.checkPermission(memberId, currentMember);
+        memberRepository.deleteById(memberId);
         log.info("deleted Member nickname = {}", member.getNickname());
     }
 
@@ -88,11 +90,4 @@ public class MemberService
          memberRepository.findByNickname(nickname)
                  .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.NICKNAME_ALREADY_EXIST);});
     }
-
-    private void isTheSameUser(Long memberId, Long loggedInMemberId)
-    {
-        if(memberId != loggedInMemberId)
-            throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
-    }
-
 }

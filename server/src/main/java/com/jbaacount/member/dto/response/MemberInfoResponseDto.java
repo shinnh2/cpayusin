@@ -1,15 +1,16 @@
 package com.jbaacount.member.dto.response;
 
-import lombok.Builder;
-import lombok.Data;
+import com.jbaacount.member.entity.Member;
+import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Data
 @Builder
-public class MemberResponseDto
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+public class MemberInfoResponseDto
 {
     private Long id;
 
@@ -17,11 +18,6 @@ public class MemberResponseDto
 
     private String email;
 
-    private String password;
-
     private List<String> roles = new ArrayList<>();
 
-    private LocalDateTime createdAt;
-
-    private LocalDateTime modifiedAt;
 }

@@ -1,6 +1,7 @@
 package com.jbaacount.member.entity;
 
 import com.jbaacount.global.audit.BaseEntity;
+import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,6 +30,8 @@ public class Member extends BaseEntity
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
+    private List<Post> posts = new ArrayList<>();
     public void updatePassword(String password)
     {
         this.password = password;
