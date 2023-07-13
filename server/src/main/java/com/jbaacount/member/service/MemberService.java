@@ -48,10 +48,10 @@ public class MemberService
 
     public Member updateMember(Long memberId, MemberPatchDto request, Member currentMember)
     {
+        Member findMember = getMemberById(memberId);
         authorizationService.checkPermission(memberId, currentMember);
 
         log.info("===updateMember===");
-        Member findMember = getMemberById(memberId);
         log.info("findMember email = {}", findMember.getEmail());
 
         Optional.ofNullable(request.getNickname())

@@ -35,7 +35,9 @@ public class PostService
     public Post updatePost(Long postId, PostPatchDto request, Member currentMember)
     {
         Post post = getPostById(postId);
-        authorizationService.checkPermission(post.getMember().getId(), currentMember);
+
+        //Only the owner of the post has the authority to update
+        authorizationService.isTheSameUser(post.getMember().getId(), currentMember.getId());
 
         Optional.ofNullable(request.getTitle())
                 .ifPresent(title -> post.updateTitle(title));

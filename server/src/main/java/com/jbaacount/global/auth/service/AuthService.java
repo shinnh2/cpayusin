@@ -1,4 +1,4 @@
-package com.jbaacount.global.security.auth.service;
+package com.jbaacount.global.auth.service;
 
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;

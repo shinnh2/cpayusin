@@ -18,7 +18,7 @@ public class AuthorizationService
         isTheSameUser(memberId, currentMember.getId());
     }
 
-    private void isTheSameUser(Long memberId, Long loggedInMemberId)
+    public void isTheSameUser(Long memberId, Long loggedInMemberId)
     {
         if(memberId != loggedInMemberId)
             throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
