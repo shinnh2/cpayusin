@@ -1,5 +1,6 @@
 package com.jbaacount.post.controller;
 
+import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.dto.request.PostPatchDto;
 import com.jbaacount.post.dto.request.PostPostDto;
@@ -31,7 +32,7 @@ public class PostController
         Post post = postMapper.postDtoToPostEntity(request);
         PostResponseDto response = postMapper.postEntityToResponse(postService.createPost(post, currentMember));
 
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{post-id}")
@@ -42,7 +43,7 @@ public class PostController
         Post post = postService.updatePost(postId, request, currentMember);
         PostResponseDto response = postMapper.postEntityToResponse(post);
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
     @GetMapping("/{post-id}")
@@ -50,7 +51,7 @@ public class PostController
     {
         PostResponseDto response = postMapper.postEntityToResponse(postService.getPostById(postId));
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
     @DeleteMapping("/{post-id}")

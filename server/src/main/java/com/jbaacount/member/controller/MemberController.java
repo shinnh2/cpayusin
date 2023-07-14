@@ -1,5 +1,6 @@
 package com.jbaacount.member.controller;
 
+import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.member.dto.request.MemberPatchDto;
@@ -35,7 +36,7 @@ public class MemberController
 
         log.info("===enrollMember===");
         log.info("user enrolled successfully");
-        return new ResponseEntity(response, HttpStatus.CREATED);
+        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
 
@@ -49,7 +50,7 @@ public class MemberController
 
         log.info("===updateMember===");
         log.info("user updated successfully");
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
 
@@ -59,7 +60,7 @@ public class MemberController
         Member member = memberService.getMemberById(memberId);
         MemberResponseDto response = memberMapper.memberToResponse(member);
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")
