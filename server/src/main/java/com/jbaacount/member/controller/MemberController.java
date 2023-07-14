@@ -1,6 +1,7 @@
 package com.jbaacount.member.controller;
 
 import com.jbaacount.global.dto.SingleResponseDto;
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.member.dto.request.MemberPatchDto;
@@ -11,11 +12,16 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @Validated
@@ -61,6 +67,18 @@ public class MemberController
         MemberResponseDto response = memberMapper.memberToResponse(member);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+    }
+
+    @GetMapping
+    public ResponseEntity getAllMembers(@RequestParam(value = "keyword", required = false) String keyword,
+                                        @RequestParam(required = false) Long last,
+                                        @PageableDefault(size = 8)Pageable pageable)
+
+    {
+        log.info("===getAllMembers===");
+        Slice<MemberResponseDto> response = memberService.getAllMembers(keyword, last, pageable);
+
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{member-id}")

@@ -5,10 +5,13 @@ import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.dto.request.MemberPatchDto;
+import com.jbaacount.member.dto.response.MemberResponseDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,6 +70,14 @@ public class MemberService
     {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public Slice<MemberResponseDto> getAllMembers(String keyword, Long memberId, Pageable pageable)
+    {
+        log.info("===geAllMembers in service===");
+
+        return memberRepository.findAllMembers(keyword, memberId, pageable);
     }
 
     public void deleteById(long memberId, Member currentMember)

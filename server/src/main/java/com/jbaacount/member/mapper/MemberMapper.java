@@ -25,15 +25,14 @@ public class MemberMapper
 
     public MemberResponseDto memberToResponse(Member member)
     {
-        MemberResponseDto response = MemberResponseDto.builder()
-                .id(member.getId())
-                .nickname(member.getNickname())
-                .email(member.getEmail())
-                .password(member.getPassword())
-                .roles(member.getRoles())
-                .createdAt(member.getCreatedAt())
-                .modifiedAt(member.getModifiedAt())
-                .build();
+        MemberResponseDto response = new MemberResponseDto(
+                member.getId(),
+                member.getEmail(),
+                member.getPassword(),
+                member.getNickname(),
+                member.getCreatedAt(),
+                member.getModifiedAt()
+        );
 
         return response;
     }
