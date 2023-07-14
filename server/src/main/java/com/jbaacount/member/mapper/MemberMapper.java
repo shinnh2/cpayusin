@@ -30,6 +30,7 @@ public class MemberMapper
                 member.getEmail(),
                 member.getPassword(),
                 member.getNickname(),
+                member.getRoles(),
                 member.getCreatedAt(),
                 member.getModifiedAt()
         );
