@@ -1,5 +1,6 @@
 package com.jbaacount.post.entity;
 
+import com.jbaacount.category.entity.Category;
 import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.member.entity.Member;
 import jakarta.persistence.*;
@@ -26,8 +27,12 @@ public class Post extends BaseEntity
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Category category;
+
     @Builder
-    public Post(String title, String content, Member member)
+    public Post(String title, String content)
     {
         this.title = title;
         this.content = content;
@@ -44,6 +49,19 @@ public class Post extends BaseEntity
             member.setPosts(new ArrayList<>());
 
         member.getPosts().add(this);
+    }
+
+    public void addCategory(Category category)
+    {
+        if(this.category != null)
+            this.category.getPosts().remove(this);
+
+        this.category = category;
+
+        if(category.getPosts() == null)
+            category.setPosts(new ArrayList<>());
+
+        category.getPosts().add(this);
     }
 
     public void updateTitle(String title)
