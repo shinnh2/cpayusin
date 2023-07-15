@@ -1,5 +1,7 @@
 package com.jbaacount.post.service;
 
+import com.jbaacount.category.entity.Category;
+import com.jbaacount.category.service.CategoryService;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
@@ -23,11 +25,16 @@ public class PostService
 {
     private final PostRepository postRepository;
     private final AuthorizationService authorizationService;
+    private final CategoryService categoryService;
 
-    public Post createPost(Post request, Member currentMember)
+    public Post createPost(Post request, Long categoryId, Member currentMember)
     {
+        Category category = categoryService.getCategory(categoryId);
+        authorizationService.isUserAllowed(category.isAdminOnly());
+
         Post savedPost = postRepository.save(request);
         savedPost.addMember(currentMember);
+        savedPost.addCategory(category);
 
         return savedPost;
     }

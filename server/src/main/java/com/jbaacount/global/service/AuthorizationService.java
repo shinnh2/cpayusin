@@ -29,4 +29,10 @@ public class AuthorizationService
         if(!currentMember.getRoles().contains("ADMIN"))
             throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
     }
+
+    public void isUserAllowed(boolean isAdminOnly)
+    {
+        if(isAdminOnly)
+            throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
+    }
 }
