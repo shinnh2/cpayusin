@@ -29,8 +29,11 @@ public class PostController
     public ResponseEntity savePost(@RequestBody PostPostDto request,
                                    @AuthenticationPrincipal Member currentMember)
     {
+        Long categoryId = request.getCategoryId();
+
         Post post = postMapper.postDtoToPostEntity(request);
-        PostResponseDto response = postMapper.postEntityToResponse(postService.createPost(post, currentMember));
+        Post savedPost = postService.createPost(post, categoryId, currentMember);
+        PostResponseDto response = postMapper.postEntityToResponse(savedPost);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }

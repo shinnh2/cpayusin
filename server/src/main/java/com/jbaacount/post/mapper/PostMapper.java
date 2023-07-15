@@ -9,6 +9,9 @@ import com.jbaacount.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Component
 public class PostMapper
@@ -42,5 +45,12 @@ public class PostMapper
                 .build();
 
         return response;
+    }
+
+    public List<PostResponseDto> postEntityToListResponse(List<Post> entities)
+    {
+        return entities.stream()
+                .map(entity -> postEntityToResponse(entity))
+                .collect(Collectors.toList());
     }
 }

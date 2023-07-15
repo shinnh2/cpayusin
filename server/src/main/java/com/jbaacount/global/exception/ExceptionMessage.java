@@ -32,7 +32,13 @@ public enum ExceptionMessage
      * post
      */
 
-    POST_NOT_FOUND("해당 게시물을 찾을 수 없습니다.");
+    POST_NOT_FOUND("해당 게시물을 찾을 수 없습니다."),
+
+
+    /**
+     * category
+     */
+    CATEGORY_NOT_FOUND("해당 카테고리를 찾을 수 없습니다.");
 
 
     @Getter
