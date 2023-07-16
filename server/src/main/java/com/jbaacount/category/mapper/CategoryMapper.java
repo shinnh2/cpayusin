@@ -21,7 +21,7 @@ public class CategoryMapper
         Category category = Category
                 .builder()
                 .name(request.getName())
-                .isAdminOnly(request.isAdminOnly())
+                .isAdminOnly(request.getIsAdminOnly())
                 .build();
 
         return category;
@@ -33,7 +33,7 @@ public class CategoryMapper
         CategoryResponseDto response = CategoryResponseDto.builder()
                 .id(entity.getId())
                 .categoryName(entity.getName())
-                .isAdminOnly(entity.isAdminOnly())
+                .isAdminOnly(entity.getIsAdminOnly())
                 .posts(postMapper.postEntityToListResponse(entity.getPosts()))
                 .build();
 

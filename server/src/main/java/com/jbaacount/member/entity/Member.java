@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Setter
-@AllArgsConstructor @Builder
 @NoArgsConstructor
 @Getter
 @Entity
@@ -32,6 +31,15 @@ public class Member extends BaseEntity
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
+
+    @Builder
+    public Member(String nickname, String email, String password)
+    {
+        this.nickname = nickname;
+        this.email = email;
+        this.password = password;
+    }
+
     public void updatePassword(String password)
     {
         this.password = password;

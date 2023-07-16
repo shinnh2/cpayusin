@@ -30,9 +30,9 @@ public class AuthorizationService
             throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
     }
 
-    public void isUserAllowed(boolean isAdminOnly)
+    public void isUserAllowed(Boolean isAdminOnly, Member currentMember)
     {
         if(isAdminOnly)
-            throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
+            isAdmin(currentMember);
     }
 }

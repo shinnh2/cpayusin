@@ -40,6 +40,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         return paginationUtils.toSlice(pageable, memberDto);
     }
 
+
+
     public ConstructorExpression<MemberResponseDto> memberToResponse()
     {
         log.info("===memberToResponse===");
