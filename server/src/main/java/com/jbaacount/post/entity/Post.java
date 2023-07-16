@@ -28,7 +28,7 @@ public class Post extends BaseEntity
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @Builder
