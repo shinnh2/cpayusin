@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class PostPatchDto
 {
+    private Long categoryId;
     private String title;
     private String content;
 }
