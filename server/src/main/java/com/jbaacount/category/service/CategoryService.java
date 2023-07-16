@@ -1,13 +1,16 @@
 package com.jbaacount.category.service;
 
-import com.jbaacount.category.dto.CategoryPatchDto;
+import com.jbaacount.board.entity.Board;
+import com.jbaacount.board.repository.BoardRepository;
+import com.jbaacount.category.dto.request.CategoryPatchDto;
+import com.jbaacount.category.dto.response.CategoryInfoForResponse;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
-import com.jbaacount.post.dto.response.PostInfoForCategory;
+import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.jbaacount.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,13 +28,16 @@ import java.util.Optional;
 public class CategoryService
 {
     private final CategoryRepository categoryRepository;
-
+    private final BoardRepository boardRepository;
     private final AuthorizationService authorizationService;
     private final PostService postService;
 
-    public Category createCategory(Category category, Member currentMember)
+    public Category createCategory(Category category, Long boardId, Member currentMember)
     {
         authorizationService.isAdmin(currentMember);
+        Board board = getBoard(boardId);
+
+        category.addBoard(board);
 
         return categoryRepository.save(category);
     }
@@ -51,7 +57,7 @@ public class CategoryService
     }
 
     @Transactional(readOnly = true)
-    public Page<PostInfoForCategory> getCategoryInfo(Long categoryId, Pageable pageable)
+    public Page<PostInfoForResponse> getCategoryInfo(Long categoryId, Pageable pageable)
     {
         getCategory(categoryId);
 
@@ -64,6 +70,12 @@ public class CategoryService
         return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
     }
 
+    @Transactional(readOnly = true)
+    public Page<CategoryInfoForResponse> getCategoryInfoForBoardResponse(Long boardId, Pageable pageable)
+    {
+        return categoryRepository.getAllCategoryInfo(boardId, pageable);
+    }
+
 
     public void deleteCategory(Long categoryId, Member currentMember)
     {
@@ -72,4 +84,8 @@ public class CategoryService
         categoryRepository.deleteById(categoryId);
     }
 
+    private Board getBoard(Long boardId)
+    {
+        return boardRepository.findById(boardId).orElseThrow();
+    }
 }

@@ -6,18 +6,24 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class PostInfoForCategory
+public class PostInfoForResponse
 {
     private Long postId;
+    private Long boardId;
+    private String boardName;
+    private Long categoryId;
     private String categoryName;
     private String title;
     private String memberNickname;
     private LocalDateTime createdAt;
 
     @QueryProjection
-    public PostInfoForCategory(Long postId, String categoryName, String title, String memberNickname, LocalDateTime createdAt)
+    public PostInfoForResponse(Long postId, Long boardId, String boardName, Long categoryId, String categoryName, String title, String memberNickname, LocalDateTime createdAt)
     {
         this.postId = postId;
+        this.boardId = boardId;
+        this.boardName = boardName;
+        this.categoryId = categoryId;
         this.categoryName = categoryName;
         this.title = title;
         this.memberNickname = memberNickname;

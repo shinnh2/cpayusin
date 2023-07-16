@@ -1,4 +1,4 @@
-package com.jbaacount.category.dto;
+package com.jbaacount.category.dto.response;
 
 import com.jbaacount.post.dto.response.PostResponseDto;
 import lombok.AllArgsConstructor;

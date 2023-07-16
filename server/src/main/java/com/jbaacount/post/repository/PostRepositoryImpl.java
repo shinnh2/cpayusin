@@ -1,6 +1,6 @@
 package com.jbaacount.post.repository;
 
-import com.jbaacount.post.dto.response.PostInfoForCategory;
+import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -19,9 +19,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private final JPAQueryFactory query;
 
     @Override
-    public Page<PostInfoForCategory> getAllPostsForCategory(Long categoryId, Pageable pageable)
+    public Page<PostInfoForResponse> getAllPostsForCategory(Long categoryId, Pageable pageable)
     {
-        List<PostInfoForCategory> postInfoResult = query
+        List<PostInfoForResponse> postInfoResult = query
                 .select(getPosts())
                 .from(post)
                 .where(post.category.id.eq(categoryId))
@@ -34,10 +34,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom
         return new PageImpl<>(postInfoResult, pageable, postInfoResult.size());
     }
 
-    public ConstructorExpression<PostInfoForCategory> getPosts()
+    private ConstructorExpression<PostInfoForResponse> getPosts()
     {
-        return Projections.constructor(PostInfoForCategory.class,
+        return Projections.constructor(PostInfoForResponse.class,
                 post.id,
+                post.board.id,
+                post.board.name,
+                post.category.id,
                 post.category.name,
                 post.title,
                 post.member.nickname,

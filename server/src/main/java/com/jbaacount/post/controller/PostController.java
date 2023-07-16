@@ -30,9 +30,13 @@ public class PostController
                                    @AuthenticationPrincipal Member currentMember)
     {
         Long categoryId = request.getCategoryId();
+        Long boardId = request.getBoardId();
+
+        log.info("category id = {}", categoryId);
+        log.info("board Id = {}", boardId);
 
         Post post = postMapper.postDtoToPostEntity(request);
-        Post savedPost = postService.createPost(post, categoryId, currentMember);
+        Post savedPost = postService.createPost(post, categoryId, boardId, currentMember);
         PostResponseDto response = postMapper.postEntityToResponse(savedPost);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
