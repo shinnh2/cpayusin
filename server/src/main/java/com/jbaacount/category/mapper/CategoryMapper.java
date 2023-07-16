@@ -1,7 +1,7 @@
 package com.jbaacount.category.mapper;
 
-import com.jbaacount.category.dto.CategoryPostDto;
-import com.jbaacount.category.dto.CategoryResponseDto;
+import com.jbaacount.category.dto.request.CategoryPostDto;
+import com.jbaacount.category.dto.response.CategoryResponseDto;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.post.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;

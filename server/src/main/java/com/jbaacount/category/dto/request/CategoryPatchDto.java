@@ -1,4 +1,4 @@
-package com.jbaacount.category.dto;
+package com.jbaacount.category.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;

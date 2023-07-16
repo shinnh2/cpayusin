@@ -1,5 +1,6 @@
 package com.jbaacount.post.entity;
 
+import com.jbaacount.board.entity.Board;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.member.entity.Member;
@@ -31,12 +32,18 @@ public class Post extends BaseEntity
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "board_id")
+    private Board board;
+
     @Builder
     public Post(String title, String content)
     {
         this.title = title;
         this.content = content;
     }
+
+
 
     public void addMember(Member member)
     {
@@ -62,6 +69,15 @@ public class Post extends BaseEntity
             category.setPosts(new ArrayList<>());
 
         category.getPosts().add(this);
+    }
+
+    public void addBoard(Board board)
+    {
+        if(this.board != null)
+            this.board.getPosts().remove(this);
+
+        this.board = board;
+        board.getPosts().add(this);
     }
 
     public void updateTitle(String title)

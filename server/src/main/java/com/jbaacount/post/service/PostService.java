@@ -1,14 +1,15 @@
 package com.jbaacount.post.service;
 
+import com.jbaacount.board.entity.Board;
+import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
-import com.jbaacount.category.service.CategoryService;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.dto.request.PostPatchDto;
-import com.jbaacount.post.dto.response.PostInfoForCategory;
+import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -30,16 +30,22 @@ public class PostService
     private final PostRepository postRepository;
     private final AuthorizationService authorizationService;
     private final CategoryRepository categoryRepository;
+    private final BoardRepository boardRepository;
 
-    public Post createPost(Post request, Long categoryId, Member currentMember)
+    public Post createPost(Post request, Long categoryId, Long boardId, Member currentMember)
     {
         Category category = getCategory(categoryId);
+        Board board = getBoard(boardId);
 
         authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
 
         Post savedPost = postRepository.save(request);
         savedPost.addMember(currentMember);
         savedPost.addCategory(category);
+        savedPost.addBoard(board);
+
+        log.info("===createPost in service===");
+        log.info("board id = {}", board.getId());
 
         return savedPost;
     }
@@ -72,7 +78,7 @@ public class PostService
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND));
     }
 
-    public Page<PostInfoForCategory> getPostInfoForCategory(Long categoryId, Pageable pageable)
+    public Page<PostInfoForResponse> getPostInfoForCategory(Long categoryId, Pageable pageable)
     {
         return postRepository.getAllPostsForCategory(categoryId, pageable);
     }
@@ -88,5 +94,11 @@ public class PostService
     private Category getCategory(Long categoryId)
     {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
+    }
+
+
+    private Board getBoard(Long boardId)
+    {
+        return boardRepository.findById(boardId).orElseThrow();
     }
 }

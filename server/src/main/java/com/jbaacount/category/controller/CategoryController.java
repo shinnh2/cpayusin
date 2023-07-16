@@ -1,20 +1,19 @@
 package com.jbaacount.category.controller;
 
-import com.jbaacount.category.dto.CategoryPatchDto;
-import com.jbaacount.category.dto.CategoryPostDto;
-import com.jbaacount.category.dto.CategoryResponseDto;
+import com.jbaacount.category.dto.request.CategoryPatchDto;
+import com.jbaacount.category.dto.request.CategoryPostDto;
+import com.jbaacount.category.dto.response.CategoryResponseDto;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.mapper.CategoryMapper;
 import com.jbaacount.category.service.CategoryService;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
-import com.jbaacount.post.dto.response.PostInfoForCategory;
+import com.jbaacount.post.dto.response.PostInfoForResponse;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,13 +29,14 @@ public class CategoryController
     private final CategoryMapper categoryMapper;
 
     @PostMapping("/manage/category")
-    public ResponseEntity createCategory(@RequestBody CategoryPostDto postDto,
+    public ResponseEntity createCategory(@RequestBody CategoryPostDto request,
                                          @AuthenticationPrincipal Member currentMember)
     {
-        Category category = categoryMapper.postToCategory(postDto);
+        Category category = categoryMapper.postToCategory(request);
+        Long boardId = request.getBoardId();
 
-        log.info("postDto is admin = {}", postDto.getIsAdminOnly());
-        Category savedCategory = categoryService.createCategory(category, currentMember);
+        log.info("postDto is admin = {}", request.getIsAdminOnly());
+        Category savedCategory = categoryService.createCategory(category, boardId, currentMember);
         CategoryResponseDto response = categoryMapper.categoryToResponse(savedCategory);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
@@ -57,7 +57,7 @@ public class CategoryController
     @GetMapping("/category/{category-id}")
     public ResponseEntity getCategory(@PathVariable("category-id") @Positive Long categoryId, Pageable pageable)
     {
-        Page<PostInfoForCategory> category = categoryService.getCategoryInfo(categoryId, pageable);
+        Page<PostInfoForResponse> category = categoryService.getCategoryInfo(categoryId, pageable);
 
         return new ResponseEntity(category, HttpStatus.OK);
     }

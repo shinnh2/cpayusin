@@ -1,7 +1,9 @@
 package com.jbaacount.category.entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jbaacount.board.entity.Board;
 import com.jbaacount.global.audit.BaseEntity;
+import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -26,15 +28,32 @@ public class Category extends BaseEntity
     @JsonProperty("isAdminOnly")
     private Boolean isAdminOnly;
 
+    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
+    private List<Post> posts = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @ManyToOne
+    @JoinColumn(name = "board_id")
+    private Board board;
+
+    public void addBoard(Board board)
+    {
+        if(board.getCategories() != null)
+            board.getCategories().remove(this);
+
+        this.board = board;
+        board.getCategories().add(this);
+    }
+
     @Builder
     public Category(String name, boolean isAdminOnly)
     {
         this.name = name;
         this.isAdminOnly = isAdminOnly;
     }
-
-    @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
-    private List<Post> posts = new ArrayList<>();
 
     public void setPosts(List<Post> posts)
     {

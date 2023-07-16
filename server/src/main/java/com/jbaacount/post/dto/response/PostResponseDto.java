@@ -17,6 +17,10 @@ import java.time.LocalDateTime;
 @Data
 public class PostResponseDto
 {
+    private Long boardId;
+    private String boardName;
+    private Long categoryId;
+    private String categoryName;
     private Long id;
     private String title;
     private String content;
