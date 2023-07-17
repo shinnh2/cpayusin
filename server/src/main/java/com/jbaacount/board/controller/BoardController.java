@@ -55,13 +55,16 @@ public class BoardController
     }
 
     @GetMapping("/{board-id}")
-    public ResponseEntity getBoard(@PathVariable("board-id") @Positive Long boardId,
-                                   Pageable pageable)
+    public ResponseEntity getBoardInfo(@PathVariable("board-id") @Positive Long boardId,
+                                       Pageable pageable)
     {
-        Page<CategoryInfoForResponse> response = categoryService.getCategoryInfoForBoardResponse(boardId, pageable);
+        Page<CategoryInfoForResponse> response =
+                categoryService.getAllCategoryResponseInfo(boardId, pageable);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
+
 
     @DeleteMapping("/{board-id}")
     public ResponseEntity deleteBoard(@PathVariable("board-id") @Positive Long boardId,

@@ -34,7 +34,6 @@ public class CategoryMapper
                 .id(entity.getId())
                 .categoryName(entity.getName())
                 .isAdminOnly(entity.getIsAdminOnly())
-                .posts(postMapper.postEntityToListResponse(entity.getPosts()))
                 .build();
 
         return response;

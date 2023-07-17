@@ -34,18 +34,19 @@ public class PostService
 
     public Post createPost(Post request, Long categoryId, Long boardId, Member currentMember)
     {
-        Category category = getCategory(categoryId);
         Board board = getBoard(boardId);
-
-        authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
-
         Post savedPost = postRepository.save(request);
-        savedPost.addMember(currentMember);
-        savedPost.addCategory(category);
-        savedPost.addBoard(board);
 
-        log.info("===createPost in service===");
-        log.info("board id = {}", board.getId());
+        if(categoryId != null)
+        {
+            Category category = getCategory(categoryId);
+            checkBoardHasCategory(board, category);
+            authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
+            savedPost.addCategory(category);
+        }
+
+        savedPost.addMember(currentMember);
+        savedPost.addBoard(board);
 
         return savedPost;
     }
@@ -78,11 +79,6 @@ public class PostService
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND));
     }
 
-    public Page<PostInfoForResponse> getPostInfoForCategory(Long categoryId, Pageable pageable)
-    {
-        return postRepository.getAllPostsForCategory(categoryId, pageable);
-    }
-
     public void deletePostById(Long postId, Member currentMember)
     {
         Post post = getPostById(postId);
@@ -96,9 +92,14 @@ public class PostService
         return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
     }
 
-
     private Board getBoard(Long boardId)
     {
         return boardRepository.findById(boardId).orElseThrow();
+    }
+
+    private void checkBoardHasCategory(Board board, Category category)
+    {
+        if(!board.getCategories().contains(category))
+            throw new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND);
     }
 }

@@ -2,13 +2,13 @@ package com.jbaacount.category.controller;
 
 import com.jbaacount.category.dto.request.CategoryPatchDto;
 import com.jbaacount.category.dto.request.CategoryPostDto;
+import com.jbaacount.category.dto.response.CategoryInfoForResponse;
 import com.jbaacount.category.dto.response.CategoryResponseDto;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.mapper.CategoryMapper;
 import com.jbaacount.category.service.CategoryService;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
-import com.jbaacount.post.dto.response.PostInfoForResponse;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,11 +55,11 @@ public class CategoryController
 
 
     @GetMapping("/category/{category-id}")
-    public ResponseEntity getCategory(@PathVariable("category-id") @Positive Long categoryId, Pageable pageable)
+    public ResponseEntity getCategoryInfo(@PathVariable("category-id") @Positive Long categoryId, Pageable pageable)
     {
-        Page<PostInfoForResponse> category = categoryService.getCategoryInfo(categoryId, pageable);
+        CategoryInfoForResponse response = categoryService.getCategoryResponseInfo(categoryId, pageable);
 
-        return new ResponseEntity(category, HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/manage/category/{category-id}")

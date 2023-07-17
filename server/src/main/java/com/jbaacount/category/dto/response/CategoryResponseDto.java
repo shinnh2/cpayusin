@@ -18,5 +18,4 @@ public class CategoryResponseDto
     private Long id;
     private String categoryName;
     private boolean isAdminOnly;
-    private List<PostResponseDto> posts = new ArrayList<>();
 }

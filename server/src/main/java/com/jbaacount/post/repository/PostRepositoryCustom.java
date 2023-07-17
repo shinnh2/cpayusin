@@ -6,5 +6,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface PostRepositoryCustom
 {
-    Page<PostInfoForResponse> getAllPostsForCategory(Long categoryId, Pageable pageable);
+    Page<PostInfoForResponse> getAllPostsInfoForCategory(Long categoryId, Pageable pageable);
+
+    Page<PostInfoForResponse> getAllPostsInfoForBoard(Long boardId, Pageable pageable);
 }

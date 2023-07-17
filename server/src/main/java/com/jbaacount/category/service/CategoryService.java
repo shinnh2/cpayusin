@@ -10,7 +10,6 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
-import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.jbaacount.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -57,11 +56,15 @@ public class CategoryService
     }
 
     @Transactional(readOnly = true)
-    public Page<PostInfoForResponse> getCategoryInfo(Long categoryId, Pageable pageable)
+    public CategoryInfoForResponse getCategoryResponseInfo(Long categoryId, Pageable pageable)
     {
-        getCategory(categoryId);
+        return categoryRepository.getCategoryInfo(categoryId, pageable);
+    }
 
-        return postService.getPostInfoForCategory(categoryId, pageable);
+    @Transactional(readOnly = true)
+    public Page<CategoryInfoForResponse> getAllCategoryResponseInfo(Long boardId, Pageable pageable)
+    {
+        return categoryRepository.getAllCategoryInfo(boardId, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -70,12 +73,7 @@ public class CategoryService
         return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
     }
 
-    @Transactional(readOnly = true)
-    public Page<CategoryInfoForResponse> getCategoryInfoForBoardResponse(Long boardId, Pageable pageable)
-    {
-        return categoryRepository.getAllCategoryInfo(boardId, pageable);
-    }
-
+    @Transactional
 
     public void deleteCategory(Long categoryId, Member currentMember)
     {

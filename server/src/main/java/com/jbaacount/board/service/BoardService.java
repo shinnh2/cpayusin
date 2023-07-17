@@ -1,12 +1,14 @@
 package com.jbaacount.board.service;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
+import com.jbaacount.board.dto.response.BoardInfoForResponse;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,12 @@ public class BoardService
                 .ifPresent(name -> board.updateName(name));
 
         return board;
+    }
+
+    @Transactional(readOnly = true)
+    public BoardInfoForResponse getBoardInfoForResponse(Long boardId, Pageable pageable)
+    {
+        return boardRepository.getBoardResponseInfo(boardId, pageable);
     }
 
     @Transactional(readOnly = true)

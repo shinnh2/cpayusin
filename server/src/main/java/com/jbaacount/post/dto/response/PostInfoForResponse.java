@@ -1,5 +1,6 @@
 package com.jbaacount.post.dto.response;
 
+import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 
@@ -8,25 +9,16 @@ import java.time.LocalDateTime;
 @Data
 public class PostInfoForResponse
 {
-    private Long postId;
-    private Long boardId;
-    private String boardName;
-    private Long categoryId;
-    private String categoryName;
+    private Long id;
     private String title;
-    private String memberNickname;
     private LocalDateTime createdAt;
-
+    private MemberInfoForResponse member;
     @QueryProjection
-    public PostInfoForResponse(Long postId, Long boardId, String boardName, Long categoryId, String categoryName, String title, String memberNickname, LocalDateTime createdAt)
+    public PostInfoForResponse(Long id, String title, LocalDateTime createdAt, MemberInfoForResponse member)
     {
-        this.postId = postId;
-        this.boardId = boardId;
-        this.boardName = boardName;
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
+        this.id = id;
         this.title = title;
-        this.memberNickname = memberNickname;
         this.createdAt = createdAt;
+        this.member = member;
     }
 }

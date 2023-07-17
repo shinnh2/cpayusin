@@ -1,7 +1,8 @@
 package com.jbaacount.category.repository;
 
 import com.jbaacount.category.dto.response.CategoryInfoForResponse;
-
+import com.jbaacount.post.dto.response.PostInfoForResponse;
+import com.jbaacount.post.repository.PostRepository;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,28 +19,44 @@ import static com.jbaacount.category.entity.QCategory.category;
 public class CategoryRepositoryImpl implements CategoryRepositoryCustom
 {
     private final JPAQueryFactory query;
+    private final PostRepository postRepository;
+    @Override
+    public CategoryInfoForResponse getCategoryInfo(Long categoryId, Pageable pageable)
+    {
+        CategoryInfoForResponse categoryInfo = query
+                .select(extractCategoryInfo())
+                .from(category)
+                .where(category.id.eq(categoryId))
+                .fetchOne();
+
+        Page<PostInfoForResponse> posts = postRepository.getAllPostsInfoForCategory(categoryId, pageable);
+
+        categoryInfo.setPosts(posts);
+
+        return categoryInfo;
+    }
 
     @Override
     public Page<CategoryInfoForResponse> getAllCategoryInfo(Long boardId, Pageable pageable)
     {
-        List<CategoryInfoForResponse> categoryResponse = query
-                .select(getCategoryResponse())
+        List<CategoryInfoForResponse> categories = query
+                .select(extractCategoryInfo())
                 .from(category)
                 .where(category.board.id.eq(boardId))
-                .orderBy(category.id.desc())
+                .orderBy(category.name.asc())
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .fetch();
 
-        return new PageImpl<>(categoryResponse, pageable, categoryResponse.size());
+
+        return new PageImpl<>(categories, pageable, categories.size());
     }
 
-    private ConstructorExpression<CategoryInfoForResponse> getCategoryResponse()
+    private ConstructorExpression<CategoryInfoForResponse> extractCategoryInfo()
     {
         return Projections.constructor(CategoryInfoForResponse.class,
                 category.id,
-                category.name,
-                category.board.id,
-                category.board.name);
+                category.name);
     }
+
 }
