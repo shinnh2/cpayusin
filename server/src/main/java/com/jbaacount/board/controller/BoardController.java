@@ -2,7 +2,9 @@ package com.jbaacount.board.controller;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
 import com.jbaacount.board.dto.request.BoardPostDto;
+import com.jbaacount.board.dto.response.BoardInfoForResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
+import com.jbaacount.board.dto.response.BoardResponseWithCategory;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.mapper.BoardMapper;
 import com.jbaacount.board.service.BoardService;
@@ -58,12 +60,11 @@ public class BoardController
     public ResponseEntity getBoardInfo(@PathVariable("board-id") @Positive Long boardId,
                                        Pageable pageable)
     {
-        Page<CategoryInfoForResponse> response =
-                categoryService.getAllCategoryResponseInfo(boardId, pageable);
+        Board board = boardService.getBoardById(boardId);
 
-        return new ResponseEntity(response, HttpStatus.OK);
+         BoardInfoForResponse response = boardService.getBoardInfoWithAllPosts(boardId, pageable);
+         return new ResponseEntity(response, HttpStatus.OK);
     }
-
 
 
     @DeleteMapping("/{board-id}")

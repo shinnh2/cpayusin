@@ -1,5 +1,6 @@
 package com.jbaacount.category.dto.response;
 
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
@@ -10,7 +11,7 @@ public class CategoryInfoForResponse
 {
     private Long id;
     private String name;
-    private Page<PostInfoForResponse> posts;
+    private PageDto<PostInfoForResponse> posts;
 
     @QueryProjection
     public CategoryInfoForResponse(Long id, String name)

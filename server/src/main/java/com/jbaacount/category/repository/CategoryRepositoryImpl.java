@@ -1,6 +1,7 @@
 package com.jbaacount.category.repository;
 
 import com.jbaacount.category.dto.response.CategoryInfoForResponse;
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.jbaacount.post.repository.PostRepository;
 import com.querydsl.core.types.ConstructorExpression;
@@ -31,7 +32,8 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
 
         Page<PostInfoForResponse> posts = postRepository.getAllPostsInfoForCategory(categoryId, pageable);
 
-        categoryInfo.setPosts(posts);
+        PageDto postsToPageDto = new PageDto(posts);
+        categoryInfo.setPosts(postsToPageDto);
 
         return categoryInfo;
     }

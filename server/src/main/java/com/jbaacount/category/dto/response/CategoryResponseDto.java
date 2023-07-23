@@ -1,13 +1,10 @@
 package com.jbaacount.category.dto.response;
 
-import com.jbaacount.post.dto.response.PostResponseDto;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @Builder
@@ -18,4 +15,11 @@ public class CategoryResponseDto
     private Long id;
     private String categoryName;
     private boolean isAdminOnly;
+
+    @QueryProjection
+    public CategoryResponseDto(Long id, String categoryName)
+    {
+        this.id = id;
+        this.categoryName = categoryName;
+    }
 }

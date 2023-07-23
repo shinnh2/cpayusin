@@ -29,12 +29,10 @@ public class CategoryMapper
 
     public CategoryResponseDto categoryToResponse(Category entity)
     {
-
-        CategoryResponseDto response = CategoryResponseDto.builder()
-                .id(entity.getId())
-                .categoryName(entity.getName())
-                .isAdminOnly(entity.getIsAdminOnly())
-                .build();
+        CategoryResponseDto response = new CategoryResponseDto();
+        response.setId(entity.getId());
+        response.setCategoryName(entity.getName());
+        response.setAdminOnly(entity.getIsAdminOnly());
 
         return response;
     }
