@@ -2,6 +2,7 @@ package com.jbaacount.board.service;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
 import com.jbaacount.board.dto.response.BoardInfoForResponse;
+import com.jbaacount.board.dto.response.BoardResponseWithCategory;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.global.service.AuthorizationService;
@@ -43,9 +44,9 @@ public class BoardService
     }
 
     @Transactional(readOnly = true)
-    public BoardInfoForResponse getBoardInfoForResponse(Long boardId, Pageable pageable)
+    public BoardInfoForResponse getBoardInfoWithAllPosts(Long boardId, Pageable pageable)
     {
-        return boardRepository.getBoardResponseInfo(boardId, pageable);
+        return boardRepository.getBoardWithAllPostsInfo(boardId, pageable);
     }
 
     @Transactional(readOnly = true)

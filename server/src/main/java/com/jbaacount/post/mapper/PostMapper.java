@@ -36,10 +36,6 @@ public class PostMapper
         MemberInfoResponseDto memberResponse = memberMapper.memberToInfoResponse(entity.getMember());
 
         PostResponseDto response = PostResponseDto.builder()
-                .boardId(entity.getBoard().getId())
-                .boardName(entity.getBoard().getName())
-                .categoryId(entity.getCategory() != null ? entity.getCategory().getId() : null)
-                .categoryName(entity.getCategory() != null ? entity.getCategory().getName() : null)
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
