@@ -2,6 +2,7 @@ package com.jbaacount.post.entity;
 
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.category.entity.Category;
+import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.member.entity.Member;
 import jakarta.persistence.*;
@@ -11,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
@@ -36,14 +38,15 @@ public class Post extends BaseEntity
     @JoinColumn(name = "board_id")
     private Board board;
 
+    @OneToMany(mappedBy = "post")
+    private List<Comment> comments = new ArrayList<>();
+
     @Builder
     public Post(String title, String content)
     {
         this.title = title;
         this.content = content;
     }
-
-
 
     public void addMember(Member member)
     {
