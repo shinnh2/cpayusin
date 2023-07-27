@@ -43,8 +43,8 @@ public class Board extends BaseEntity
         this.name = name;
     }
 
-    public void changeBoardAuthority(Boolean adminOnly)
+    public void changeBoardAuthority(Boolean isAdminOnly)
     {
-        isAdminOnly = adminOnly;
+        this.isAdminOnly = isAdminOnly;
     }
 }

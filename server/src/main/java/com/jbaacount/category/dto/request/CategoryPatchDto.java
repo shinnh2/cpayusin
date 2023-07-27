@@ -12,4 +12,5 @@ public class CategoryPatchDto
 {
     private String name;
     private boolean isAdminOnly;
+    private Long boardId;
 }

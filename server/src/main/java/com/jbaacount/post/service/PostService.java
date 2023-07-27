@@ -41,6 +41,8 @@ public class PostService
         {
             Category category = getCategory(categoryId);
             checkBoardHasCategory(board, category);
+
+            authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
             authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
             savedPost.addCategory(category);
         }
@@ -66,7 +68,11 @@ public class PostService
                 .ifPresent(categoryId ->
                 {
                     Category category = getCategory(categoryId);
+                    authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
+                    Board board = category.getBoard();
+
                     post.addCategory(category);
+                    post.addBoard(board);
                 });
 
         return post;

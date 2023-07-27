@@ -1,9 +1,7 @@
 package com.jbaacount.utils;
 
-import com.jbaacount.board.service.BoardService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.service.MemberService;
-import com.jbaacount.post.entity.Post;
 
 public class TestUtil
 {
@@ -29,4 +27,5 @@ public class TestUtil
 
         return memberService.createMember(user);
     }
+
 }

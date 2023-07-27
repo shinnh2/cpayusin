@@ -67,10 +67,6 @@ public class Post extends BaseEntity
             this.category.getPosts().remove(this);
 
         this.category = category;
-
-        if(category.getPosts() == null)
-            category.setPosts(new ArrayList<>());
-
         category.getPosts().add(this);
     }
 

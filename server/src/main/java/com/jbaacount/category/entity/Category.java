@@ -41,8 +41,8 @@ public class Category extends BaseEntity
 
     public void addBoard(Board board)
     {
-        if(board.getCategories() != null)
-            board.getCategories().remove(this);
+        if(this.board != null)
+            this.board.getCategories().remove(this);
 
         this.board = board;
         board.getCategories().add(this);
@@ -55,18 +55,17 @@ public class Category extends BaseEntity
         this.isAdminOnly = isAdminOnly;
     }
 
-    public void setPosts(List<Post> posts)
-    {
-        this.posts = posts;
-    }
-
     public void updateName(String name)
     {
         this.name = name;
     }
 
-    public void changeCategoryAuthority(boolean adminOnly)
+    public void changeCategoryAuthority(Boolean isAdminOnly)
     {
-        isAdminOnly = adminOnly;
+        if(board.getIsAdminOnly() == true)
+            this.isAdminOnly = true;
+
+        else
+            this.isAdminOnly = isAdminOnly;
     }
 }

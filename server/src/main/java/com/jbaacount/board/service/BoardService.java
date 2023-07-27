@@ -2,7 +2,6 @@ package com.jbaacount.board.service;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
 import com.jbaacount.board.dto.response.BoardInfoForResponse;
-import com.jbaacount.board.dto.response.BoardResponseWithCategory;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.global.service.AuthorizationService;

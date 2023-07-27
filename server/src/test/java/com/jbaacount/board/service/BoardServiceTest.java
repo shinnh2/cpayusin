@@ -38,7 +38,7 @@ class BoardServiceTest
     private static final String adminEmail = "mike@ticonsys.com";
     private static final String userEmail = "aaa@naver.com";
     @BeforeEach
-    void createMember()
+    void beforeEach()
     {
         Member admin = TestUtil.createAdminMember(memberService);
         Member user = TestUtil.createUserMember(memberService);

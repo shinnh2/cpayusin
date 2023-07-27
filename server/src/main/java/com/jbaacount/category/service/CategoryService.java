@@ -10,7 +10,6 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
-import com.jbaacount.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,7 +28,6 @@ public class CategoryService
     private final CategoryRepository categoryRepository;
     private final BoardRepository boardRepository;
     private final AuthorizationService authorizationService;
-    private final PostService postService;
 
     public Category createCategory(Category category, Long boardId, Member currentMember)
     {
@@ -46,11 +44,21 @@ public class CategoryService
         authorizationService.isAdmin(currentMember);
 
         Category category = getCategory(categoryId);
+        Optional.ofNullable(request.getBoardId())
+                .ifPresent(boardId ->
+                {
+                    Board board = getBoard(boardId);
+                    category.addBoard(board);
+                    category.changeCategoryAuthority(request.isAdminOnly());
+                });
 
         Optional.ofNullable(request.getName())
                 .ifPresent(name -> category.updateName(name));
+
         Optional.ofNullable(request.isAdminOnly())
                 .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
+
+
 
         return category;
     }
