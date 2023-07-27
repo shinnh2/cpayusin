@@ -8,6 +8,7 @@ import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.member.repository.MemberRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +37,7 @@ class MemberServiceTest
 
 
     @BeforeEach
-    public void createMember()
+    void createMember()
     {
         Member member1 = Member.builder()
                 .nickname("회원1")
@@ -55,14 +56,15 @@ class MemberServiceTest
     }
 
     @AfterEach
-    public void deleteAll()
+    void deleteAll()
     {
         memberRepository.deleteAll();
         memberRepository.flush();
     }
 
+    @DisplayName("회원 가입 - 유효한 정보")
     @Test
-    public void SignUp_WithValidInfo()
+    void SignUp_validInfo()
     {
         String email = "ands0927@naver.com";
         String password = "123123";
@@ -78,8 +80,9 @@ class MemberServiceTest
         assertTrue(passwordEncoder.matches(password, createdMember.getPassword()));
     }
 
+    @DisplayName("회원가입 - 잘못된 정보")
     @Test
-    public void SignUp_WithInvalidInfo()
+    void SignUp_invalidInfo()
     {
         String email = "ands0927@naver.com";
         String password = "123123";
@@ -95,8 +98,9 @@ class MemberServiceTest
         assertThat(createdMember.getEmail()).isNotEqualTo(firstMemberEmail);
     }
 
+    @DisplayName("회원 가입 - 중복 이메일")
     @Test
-    public void SignUp_WithDuplicatedEmail()
+    void SignUp_duplicatedEmail()
     {
         String email = "aaaa@naver.com";
         String password = "123123";
@@ -111,8 +115,9 @@ class MemberServiceTest
         assertThrows(BusinessLogicException.class, () -> memberService.createMember(member));
     }
 
+    @DisplayName("회원 가입 - 중복 닉네임")
     @Test
-    public void SignUp_WithDuplicatedNickname()
+    void SignUp_duplicatedNickname()
     {
         String email = "aaaabb@naver.com";
         String password = "123123";
@@ -127,8 +132,9 @@ class MemberServiceTest
         assertThrows(BusinessLogicException.class, () -> memberService.createMember(member));
     }
 
+    @DisplayName("회원 수정 - 해당 유저가 시도")
     @Test
-    public void updateTest_WithCorrectInfo()
+    void updateTest_sameUser()
     {
         Member member = memberRepository.findByEmail("aaaa@naver.com").get();
         MemberPatchDto request = new MemberPatchDto();
@@ -140,8 +146,9 @@ class MemberServiceTest
         assertThat(updatedMember.getNickname()).isEqualTo("홍길동");
     }
 
+    @DisplayName("회원 수정 - 다른 유저가 수정 시도")
     @Test
-    public void updateTest_WithDifferentMember()
+    void updateTest_differentMember()
     {
         Member member1 = memberService.getMemberById(1L);
         Member member2 = memberService.getMemberById(2L);
@@ -152,8 +159,9 @@ class MemberServiceTest
         assertThrows(BusinessLogicException.class, () -> memberService.updateMember(member1.getId(), request, member2));
     }
 
+    @DisplayName("회원 조회")
     @Test
-    public void getTest()
+    void getTest()
     {
         String rawPassword = "123123";
 
@@ -165,8 +173,9 @@ class MemberServiceTest
         assertThat(member.getRoles()).contains("USER");
     }
 
+    @DisplayName("회원 조회 - 해당 유저")
     @Test
-    public void deleteTest()
+    void deleteTest()
     {
         Member firstMember = memberRepository.findByEmail("aaaa@naver.com").get();
         Member secondMember = memberRepository.findByEmail("bbbb@naver.com").get();
@@ -177,8 +186,9 @@ class MemberServiceTest
         assertFalse(deletedMember.isPresent());
     }
 
+    @DisplayName("회원 조회 - 다른 유저가 시도")
     @Test
-    public void deleteTest_WithDifferentMember()
+    void deleteTest_WithDifferentMember()
     {
         Member firstMember = memberRepository.findByEmail("aaaa@naver.com").get();
         Member secondMember = memberRepository.findByEmail("bbbb@naver.com").get();
