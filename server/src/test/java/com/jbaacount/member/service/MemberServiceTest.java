@@ -35,19 +35,20 @@ class MemberServiceTest
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
+    private static String user1Email = "aaaa@naver.com";
+    private static String user2Email = "bbbb@naver.com";
     @BeforeEach
     void createMember()
     {
         Member member1 = Member.builder()
                 .nickname("회원1")
-                .email("aaaa@naver.com")
+                .email(user1Email)
                 .password("123123")
                 .build();
 
         Member member2 = Member.builder()
                 .nickname("회원2")
-                .email("bbbb@naver.com")
+                .email(user2Email)
                 .password("123123")
                 .build();
 
@@ -150,8 +151,8 @@ class MemberServiceTest
     @Test
     void updateTest_differentMember()
     {
-        Member member1 = memberService.getMemberById(1L);
-        Member member2 = memberService.getMemberById(2L);
+        Member member1 = memberRepository.findByEmail(user1Email).get();
+        Member member2 = memberRepository.findByEmail(user2Email).get();
 
         MemberPatchDto request = new MemberPatchDto();
         request.setNickname("홍길동");
