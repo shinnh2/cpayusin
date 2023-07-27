@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 public class Member extends BaseEntity

@@ -16,6 +16,7 @@ public class BoardMapper
 
         Board board = Board.builder()
                 .name(request.getName())
+                .isAdminOnly(request.getIsAdminOnly())
                 .build();
 
         return board;

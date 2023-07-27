@@ -8,4 +8,5 @@ import lombok.Data;
 public class BoardPatchDto
 {
     private String name;
+    private Boolean isAdminOnly;
 }

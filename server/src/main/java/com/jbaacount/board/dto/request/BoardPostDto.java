@@ -10,4 +10,6 @@ import lombok.NoArgsConstructor;
 public class BoardPostDto
 {
     private String name;
+
+    private Boolean isAdminOnly;
 }

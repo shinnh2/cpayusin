@@ -39,7 +39,8 @@ public class BoardService
 
         Optional.ofNullable(request.getName())
                 .ifPresent(name -> board.updateName(name));
-
+        Optional.ofNullable(request.getIsAdminOnly())
+                .ifPresent(authority -> board.changeBoardAuthority(authority));
         return board;
     }
 
