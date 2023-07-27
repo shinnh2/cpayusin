@@ -7,6 +7,7 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import com.jbaacount.member.service.MemberService;
+import com.jbaacount.utils.TestUtil;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,26 +40,14 @@ class BoardServiceTest
     @BeforeEach
     void createMember()
     {
-        Member admin = Member.builder()
-                .nickname("관리자")
-                .email(adminEmail)
-                .password("123123")
-                .build();
-
-        Member user = Member.builder()
-                .nickname("유저")
-                .email(userEmail)
-                .password("123123")
-                .build();
+        Member admin = TestUtil.createAdminMember(memberService);
+        Member user = TestUtil.createUserMember(memberService);
 
         Board board = Board.builder()
                 .name("첫번째 게시판")
                 .isAdminOnly(true)
                 .build();
 
-
-        memberService.createMember(admin);
-        memberService.createMember(user);
         boardService.createBoard(board, admin);
     }
 
