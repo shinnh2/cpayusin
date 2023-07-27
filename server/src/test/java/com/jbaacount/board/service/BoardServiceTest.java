@@ -61,7 +61,7 @@ class BoardServiceTest
         boardRepository.flush();
     }
 
-    @DisplayName("관리자 권한으로 게시판 생성 테스트")
+    @DisplayName("게시판 생성 - 관리자")
     @Test
     void createBoard_WithAdmin()
     {
@@ -78,7 +78,7 @@ class BoardServiceTest
         assertThat(savedBoard.getIsAdminOnly()).isEqualTo(true);
     }
 
-    @DisplayName("유저 권한으로 게시판 생성 테스트")
+    @DisplayName("게시판 생성 - 유저")
     @Test
     void createBoard_WithUser()
     {
@@ -92,7 +92,7 @@ class BoardServiceTest
         assertThrows(BusinessLogicException.class, () -> boardService.createBoard(board, user));
     }
 
-    @DisplayName("관리자 권한으로 게시판 수정 테스트")
+    @DisplayName("게시판 수정 - 관리자")
     @Test
     void updateBoard_WithAdmin()
     {
@@ -106,7 +106,7 @@ class BoardServiceTest
         assertThat(updatedBoard.getIsAdminOnly()).isEqualTo(false);
     }
 
-    @DisplayName("유저 권한으로 게시판 수정 테스트")
+    @DisplayName("게시판 수정 - 유저")
     @Test
     void updateBoard_WithUser()
     {
@@ -117,7 +117,7 @@ class BoardServiceTest
         assertThrows(BusinessLogicException.class, () -> boardService.updateBoard(board.getId(), request, user));
     }
 
-    @DisplayName("관리자 권한으로 게시판 삭제 테스트")
+    @DisplayName("게시판 삭제 - 관리자")
     @Test
     void deleteBoard_WithAdmin()
     {
@@ -129,7 +129,7 @@ class BoardServiceTest
         assertThat(boardRepository.findBoardByName("첫번째 게시판")).isEmpty();
     }
 
-    @DisplayName("유저 권한으로 게시판 삭제 테스트")
+    @DisplayName("게시판 삭제 - 유저")
     @Test
     void deleteBoard_WithUser()
     {

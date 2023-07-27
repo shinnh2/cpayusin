@@ -194,6 +194,7 @@ class CategoryServiceTest
     }
 
     @DisplayName("카테고리 삭제 - 유저")
+    @Test
     void deleteCategory_user()
     {
         Member user = getUser();
