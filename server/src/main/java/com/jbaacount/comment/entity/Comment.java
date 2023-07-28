@@ -21,12 +21,14 @@ public class Comment
     private String text;
 
     @ManyToOne
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment parent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @OneToMany(mappedBy = "parent", orphanRemoval = true)
