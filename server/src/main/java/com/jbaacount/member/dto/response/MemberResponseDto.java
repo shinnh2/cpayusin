@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Data
 public class MemberResponseDto
@@ -22,7 +23,6 @@ public class MemberResponseDto
 
     private String email;
 
-    private String password;
 
     private List<String> roles = new ArrayList<>();
 
@@ -32,12 +32,11 @@ public class MemberResponseDto
 
 
     @QueryProjection
-    public MemberResponseDto(Long id, String nickname, String email, String password,  LocalDateTime createdAt, LocalDateTime modifiedAt)
+    public MemberResponseDto(Long id, String nickname, String email, LocalDateTime createdAt, LocalDateTime modifiedAt)
     {
         this.id = id;
         this.nickname = nickname;
         this.email = email;
-        this.password = password;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }
