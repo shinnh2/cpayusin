@@ -25,10 +25,10 @@ public class Board extends BaseEntity
 
     private Boolean isAdminOnly;
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<Category> categories = new ArrayList<>();
 
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
     @Builder

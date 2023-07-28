@@ -6,20 +6,20 @@ import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.member.repository.MemberRepository;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Transactional
 @SpringBootTest
 class MemberServiceTest
 {
@@ -54,13 +54,6 @@ class MemberServiceTest
 
         memberService.createMember(member1);
         memberService.createMember(member2);
-    }
-
-    @AfterEach
-    void deleteAll()
-    {
-        memberRepository.deleteAll();
-        memberRepository.flush();
     }
 
     @DisplayName("회원 가입 - 유효한 정보")

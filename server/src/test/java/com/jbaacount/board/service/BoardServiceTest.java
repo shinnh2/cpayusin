@@ -8,18 +8,17 @@ import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import com.jbaacount.member.service.MemberService;
 import com.jbaacount.utils.TestUtil;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Transactional
 @SpringBootTest
 class BoardServiceTest
 {
@@ -49,16 +48,6 @@ class BoardServiceTest
                 .build();
 
         boardService.createBoard(board, admin);
-    }
-
-    @AfterEach
-    void deleteAll()
-    {
-        memberRepository.deleteAll();
-        memberRepository.flush();
-
-        boardRepository.deleteAll();
-        boardRepository.flush();
     }
 
     @DisplayName("게시판 생성 - 관리자")

@@ -11,17 +11,17 @@ import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import com.jbaacount.member.service.MemberService;
 import com.jbaacount.utils.TestUtil;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+@Transactional
 @SpringBootTest
 class CategoryServiceTest
 {
@@ -67,20 +67,6 @@ class CategoryServiceTest
                 .build();
 
         categoryService.createCategory(category, board.getId(), admin);
-    }
-
-    @AfterEach
-    void afterEach()
-    {
-        categoryRepository.deleteAll();
-        categoryRepository.flush();
-
-        boardRepository.deleteAll();
-        boardRepository.flush();
-
-
-        memberRepository.deleteAll();
-        memberRepository.flush();
     }
 
     @DisplayName("카테고리 생성 - 관리자")
