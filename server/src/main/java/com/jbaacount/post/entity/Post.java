@@ -38,7 +38,7 @@ public class Post extends BaseEntity
     @JoinColumn(name = "board_id")
     private Board board;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
     @Builder
@@ -54,10 +54,6 @@ public class Post extends BaseEntity
             this.member.getPosts().remove(this);
 
         this.member = member;
-
-        if(member.getPosts() == null)
-            member.setPosts(new ArrayList<>());
-
         member.getPosts().add(this);
     }
 

@@ -9,13 +9,10 @@ import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.dto.request.PostPatchDto;
-import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,12 +34,13 @@ public class PostService
         Board board = getBoard(boardId);
         Post savedPost = postRepository.save(request);
 
+        authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
+
         if(categoryId != null)
         {
             Category category = getCategory(categoryId);
             checkBoardHasCategory(board, category);
 
-            authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
             authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
             savedPost.addCategory(category);
         }
