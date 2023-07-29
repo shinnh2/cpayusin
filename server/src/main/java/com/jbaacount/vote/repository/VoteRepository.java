@@ -15,18 +15,11 @@ import java.util.Optional;
 public interface VoteRepository extends JpaRepository<Vote, Long>
 {
     @Lock(value = LockModeType.OPTIMISTIC)
-    @Query("select v from Vote v where v.member = :member and v.post = :Post")
+    @Query("select v from Vote v where v.member = :member and v.post = :post")
     Optional<Vote> findByMemberAndPost(Member member, Post post);
 
     @Lock(value = LockModeType.OPTIMISTIC)
-    @Query("select v from Vote v where v.member = :member and v.post = :post")
+    @Query("select v from Vote v where v.member = :member and v.comment = :comment")
     Optional<Vote> findByMemberAndComment(Member member, Comment comment);
 
-    @Modifying
-    @Query("delete from Vote v where v.member = :member and v.post = :post")
-    void deleteByMemberAndPost(Member member, Post post);
-
-    @Modifying
-    @Query("delete from Vote v where v.member = :member and v.comment = :comment")
-    void deleteByMemberAndComment(Member member, Comment comment);
 }

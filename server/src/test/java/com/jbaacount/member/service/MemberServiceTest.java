@@ -74,7 +74,7 @@ class MemberServiceTest
         assertTrue(passwordEncoder.matches(password, createdMember.getPassword()));
     }
 
-    @DisplayName("회원가입 - 잘못된 정보")
+    @DisplayName("회원 가입 - 잘못된 정보")
     @Test
     void SignUp_invalidInfo()
     {
