@@ -20,7 +20,7 @@ public class Vote
     private Long id;
 
     @Version
-    private int version;
+    private Integer version;
 
     @ManyToOne
     @JoinColumn(name = "member_id")

@@ -21,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -75,13 +77,8 @@ class VoteFacadeTest
                 .isAdminOnly(false)
                 .build();
 
-        Board board2 = Board.builder()
-                .name("게시판2")
-                .isAdminOnly(true)
-                .build();
 
         boardService.createBoard(board1, admin);
-        boardService.createBoard(board2, admin);
 
         Category category = Category.builder()
                 .name(categoryName)
@@ -96,60 +93,69 @@ class VoteFacadeTest
                 .content("내용 테스트용1")
                 .build();
 
-        Post post2 = Post
-                .builder()
-                .title(post2Title)
-                .content("내용 테스트용2")
-                .build();
-
         postService.createPost(post1, category.getId(), board1.getId(), user);
-        postService.createPost(post2, null, board1.getId(), admin);
+    }
 
+    @Test
+    void vote_singleThread() throws InterruptedException
+    {
+        Member user = getUser();
+        Member admin = getAdmin();
+
+        Post post = getPost();
+
+        voteFacade.votePost(user, post.getId());
+        voteFacade.votePost(admin, post.getId());
+
+        assertThat(post.getVoteCount()).isEqualTo(2);
     }
 
     @Test
     void vote_multiThread() throws InterruptedException
     {
-        int threadCount = 2;
-        ExecutorService executorService = Executors.newFixedThreadPool(2);
+        int threadCount = 30;
+        ExecutorService executorService = Executors.newFixedThreadPool(22);
         CountDownLatch countDownLatch = new CountDownLatch(threadCount);
         Post post = getPost();
-        Member admin = getAdmin();
-        Member user = getUser();
 
-        executorService.submit(() -> {
-            logger.info("===thread start===");
-            try{
-                logger.info("into vote facade logic ");
-                voteFacade.votePost(admin, post.getId());
-            } catch (InterruptedException e)
-            {
-                System.out.println("exception happens");
-                throw new RuntimeException(e);
-            } finally
-            {
-                countDownLatch.countDown();
-            }
-        });
+        List<Member> members = new ArrayList<>();
 
-        executorService.submit(() -> {
-            logger.info("===thread start===");
-            try{
-                logger.info("into vote facade logic ");
-                voteFacade.votePost(user, post.getId());
-            } catch (InterruptedException e)
-            {
-                System.out.println("exception happens");
-                throw new RuntimeException(e);
-            } finally
-            {
-                countDownLatch.countDown();
-            }
-        });
+        for(int i = 0; i < threadCount; i++)
+        {
+            String email = "asdd@naver.com" + i;
+            String nickname = "member_" + i;
+            System.out.println("email = " + email + i);
+
+
+            members.add(memberService.createMember(Member.builder()
+                    .email(email)
+                    .nickname(nickname)
+                    .password("123")
+                    .build()));
+        }
+
+        for(Member member : members)
+        {
+            executorService.submit(() -> {
+                logger.info("===thread start===");
+                try{
+                    logger.info("into vote facade logic ");
+                    voteFacade.votePost(member, post.getId());
+                } catch (InterruptedException e)
+                {
+                    System.out.println("exception happens");
+                    throw new RuntimeException(e);
+                } finally
+                {
+                    countDownLatch.countDown();
+                }
+            });
+
+        }
 
         countDownLatch.await();
 
-        assertThat(getPost().getVoteCount()).isEqualTo(2);
+        assertThat(getPost().getVoteCount()).isEqualTo(100);
     }
 
     private Post getPost()
