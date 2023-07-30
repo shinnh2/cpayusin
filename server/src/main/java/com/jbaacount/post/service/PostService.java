@@ -45,6 +45,9 @@ public class PostService
             savedPost.addCategory(category);
         }
 
+        log.info("===postService - createPost===");
+        log.info("post saved successfully = {}", savedPost.getTitle());
+
         savedPost.addMember(currentMember);
         savedPost.addBoard(board);
 

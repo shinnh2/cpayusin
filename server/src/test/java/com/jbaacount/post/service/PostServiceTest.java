@@ -64,15 +64,13 @@ class PostServiceTest
     private static final String post1Title = "게시판1";
     private static final String post2Title = "게시판2";
 
-
-    @PersistenceContext
-    private EntityManager em;
-
     @BeforeEach
     void beforeEach()
     {
         Member admin = TestUtil.createAdminMember(memberService);
         Member user = TestUtil.createUserMember(memberService);
+
+        System.out.println("admin nickname = " + admin.getNickname());
 
         Board board1 = Board.builder()
                 .name(boardName)
