@@ -22,4 +22,6 @@ public interface VoteRepository extends JpaRepository<Vote, Long>
     @Query("select v from Vote v where v.member = :member and v.comment = :comment")
     Optional<Vote> findByMemberAndComment(Member member, Comment comment);
 
+    @Query("select v from Vote v where v.member = :member and v.post = :post")
+    Optional<Vote> checkMemberVotedOrNot(Member member, Post post);
 }
