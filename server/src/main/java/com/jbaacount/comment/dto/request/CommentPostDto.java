@@ -7,5 +7,6 @@ import lombok.Data;
 @Data
 public class CommentPostDto
 {
+    private Long parentId;
     private String text;
 }
