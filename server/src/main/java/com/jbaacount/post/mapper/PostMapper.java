@@ -2,14 +2,18 @@ package com.jbaacount.post.mapper;
 
 import com.jbaacount.member.dto.response.MemberInfoResponseDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
+import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.post.dto.request.PostPostDto;
 import com.jbaacount.post.dto.response.PostResponseDto;
 import com.jbaacount.post.entity.Post;
+import com.jbaacount.vote.entity.Vote;
+import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -17,6 +21,7 @@ import java.util.stream.Collectors;
 public class PostMapper
 {
     private final MemberMapper memberMapper;
+    private final VoteRepository voteRepository;
 
     public Post postDtoToPostEntity(PostPostDto request)
     {
@@ -31,14 +36,23 @@ public class PostMapper
         return post;
     }
 
-    public PostResponseDto postEntityToResponse(Post entity)
+    public PostResponseDto postEntityToResponse(Post entity, Member currentMember)
     {
         MemberInfoResponseDto memberResponse = memberMapper.memberToInfoResponse(entity.getMember());
+        boolean voteStatus = false;
+
+        if(currentMember != null)
+        {
+            Optional<Vote> vote = voteRepository.checkMemberVotedOrNot(currentMember, entity);
+            voteStatus = vote.isPresent();
+        }
 
         PostResponseDto response = PostResponseDto.builder()
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
+                .voteCount(entity.getVoteCount())
+                .voteStatus(voteStatus)
                 .createdAt(entity.getCreatedAt())
                 .modifiedAt(entity.getModifiedAt())
                 .member(memberResponse)
@@ -47,10 +61,4 @@ public class PostMapper
         return response;
     }
 
-    public List<PostResponseDto> postEntityToListResponse(List<Post> entities)
-    {
-        return entities.stream()
-                .map(entity -> postEntityToResponse(entity))
-                .collect(Collectors.toList());
-    }
 }

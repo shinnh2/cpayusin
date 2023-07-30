@@ -1,5 +1,6 @@
 package com.jbaacount.comment.service;
 
+import com.jbaacount.comment.dto.request.CommentPatchDto;
 import com.jbaacount.comment.dto.request.CommentPostDto;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.repository.CommentRepository;
@@ -41,8 +42,9 @@ public class CommentService
         return savedComment;
     }
 
-    public Comment updateComment(CommentPostDto request, Long commentId, Member currentMember)
+    public Comment updateComment(CommentPatchDto request, Long postId, Long commentId, Member currentMember)
     {
+        verifyPost(postId);
         Comment comment = getComment(commentId);
         authService.isTheSameUser(comment.getMember().getId(), currentMember.getId());
 
@@ -69,7 +71,7 @@ public class CommentService
 
     private Post verifyPost(Long postId)
     {
-        return postRepository.findById(postId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND));
+        return postRepository.findById(postId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.COMMENT_NOT_FOUND));
     }
 
 

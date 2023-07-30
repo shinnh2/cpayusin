@@ -8,30 +8,41 @@ import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Slf4j
-@Transactional
 @RequiredArgsConstructor
 @Service
 public class VoteService
 {
     private final VoteRepository voteRepository;
+
+    @Transactional
     public boolean votePost(Member currentMember, Post post)
     {
+        log.info("===vote service ===");
         Optional<Vote> optionalVote = voteRepository.findByMemberAndPost(currentMember, post);
 
         if(optionalVote.isPresent())
         {
             voteRepository.delete(optionalVote.get());
+            log.info("===voteService===");
+            log.info("vote deleted successfully");
+            post.downVote();
             return false;
         }
 
         else
         {
-            voteRepository.save(new Vote(currentMember, post));
+            log.info("===voteService===");
+            log.info("vote saved successfully");
+            Vote savedVote = voteRepository.save(new Vote(currentMember, post));
+            post.upVote();
+
+            log.info("voted post = {}", savedVote.getPost().getTitle());
             return true;
         }
     }

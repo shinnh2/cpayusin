@@ -19,6 +19,9 @@ public class Vote
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Integer version;
+
     @ManyToOne
     @JoinColumn(name = "member_id")
     private Member member;

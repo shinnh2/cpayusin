@@ -36,7 +36,7 @@ public class PostController
 
         Post post = postMapper.postDtoToPostEntity(request);
         Post savedPost = postService.createPost(post, categoryId, boardId, currentMember);
-        PostResponseDto response = postMapper.postEntityToResponse(savedPost);
+        PostResponseDto response = postMapper.postEntityToResponse(savedPost, currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
@@ -47,15 +47,16 @@ public class PostController
                                      @AuthenticationPrincipal Member currentMember)
     {
         Post post = postService.updatePost(postId, request, currentMember);
-        PostResponseDto response = postMapper.postEntityToResponse(post);
+        PostResponseDto response = postMapper.postEntityToResponse(post, currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
     @GetMapping("/{post-id}")
-    public ResponseEntity getPost(@PathVariable("post-id") @Positive Long postId)
+    public ResponseEntity getPost(@PathVariable("post-id") @Positive Long postId,
+                                  @AuthenticationPrincipal Member currentMember)
     {
-        PostResponseDto response = postMapper.postEntityToResponse(postService.getPostById(postId));
+        PostResponseDto response = postMapper.postEntityToResponse(postService.getPostById(postId), currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }

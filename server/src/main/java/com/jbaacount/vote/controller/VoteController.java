@@ -1,6 +1,8 @@
 package com.jbaacount.vote.controller;
 
 import com.jbaacount.member.entity.Member;
+import com.jbaacount.post.repository.PostRepository;
+import com.jbaacount.post.service.PostService;
 import com.jbaacount.vote.service.VoteFacade;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,6 @@ public class VoteController
                                       @PathVariable("post-id") @Positive Long postId) throws InterruptedException
     {
         boolean response = voteFacade.votePost(currentMember, postId);
-
         if(response)
             return new ResponseEntity<>("좋아요 성공", HttpStatus.CREATED);
 

@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,9 @@ public class Post extends BaseEntity
     private String title;
 
     private String content;
+
+    @Column(nullable = false)
+    private int voteCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -46,6 +50,7 @@ public class Post extends BaseEntity
     {
         this.title = title;
         this.content = content;
+        this.voteCount = 0;
     }
 
     public void addMember(Member member)
@@ -83,5 +88,15 @@ public class Post extends BaseEntity
     public void updateContent(String content)
     {
         this.content = content;
+    }
+
+    public void upVote()
+    {
+        this.voteCount++;
+    }
+
+    public void downVote()
+    {
+        this.voteCount--;
     }
 }

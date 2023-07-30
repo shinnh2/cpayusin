@@ -38,7 +38,14 @@ public enum ExceptionMessage
     /**
      * category
      */
-    CATEGORY_NOT_FOUND("해당 카테고리를 찾을 수 없습니다.");
+    CATEGORY_NOT_FOUND("해당 카테고리를 찾을 수 없습니다."),
+
+    /**
+     * comment
+     */
+
+    COMMENT_NOT_FOUND("해당 댓글을 찾을 수 없습니다.");
+
 
 
     @Getter
