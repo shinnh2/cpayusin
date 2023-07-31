@@ -35,7 +35,7 @@ public class PostMapper
 
     public PostResponseDto postEntityToResponse(Post entity, Member currentMember)
     {
-        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(currentMember);
+        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(entity.getMember());
         boolean voteStatus = false;
 
         if(currentMember != null)
