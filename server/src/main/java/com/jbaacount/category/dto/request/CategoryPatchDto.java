@@ -1,6 +1,6 @@
 package com.jbaacount.category.dto.request;
 
-import jakarta.validation.constraints.NotNull;
+import com.jbaacount.global.validation.notspace.NotSpace;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoryPatchDto
 {
+    @NotSpace
     private String name;
+
     private boolean isAdminOnly;
     private Long boardId;
 }

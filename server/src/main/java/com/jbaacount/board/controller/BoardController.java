@@ -4,18 +4,15 @@ import com.jbaacount.board.dto.request.BoardPatchDto;
 import com.jbaacount.board.dto.request.BoardPostDto;
 import com.jbaacount.board.dto.response.BoardInfoForResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
-import com.jbaacount.board.dto.response.BoardResponseWithCategory;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.mapper.BoardMapper;
 import com.jbaacount.board.service.BoardService;
-import com.jbaacount.category.dto.response.CategoryInfoForResponse;
-import com.jbaacount.category.service.CategoryService;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +29,7 @@ public class BoardController
     private final BoardMapper boardMapper;
 
     @PostMapping
-    public ResponseEntity saveBoard(@RequestBody BoardPostDto request,
+    public ResponseEntity saveBoard(@RequestBody @Valid BoardPostDto request,
                                     @AuthenticationPrincipal Member curentMember)
     {
         log.info("name = {}", request.getName());
@@ -46,7 +43,7 @@ public class BoardController
 
     @PatchMapping("/{board-id}")
     public ResponseEntity updateBoard(@PathVariable("board-id") @Positive Long boardId,
-                                      @RequestBody BoardPatchDto request,
+                                      @RequestBody @Valid BoardPatchDto request,
                                       @AuthenticationPrincipal Member currentMember)
     {
         Board updatedBoard = boardService.updateBoard(boardId, request, currentMember);

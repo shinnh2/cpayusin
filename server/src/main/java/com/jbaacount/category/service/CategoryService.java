@@ -66,12 +66,14 @@ public class CategoryService
     @Transactional(readOnly = true)
     public CategoryInfoForResponse getCategoryResponseInfo(Long categoryId, Pageable pageable)
     {
+        getCategory(categoryId);
         return categoryRepository.getCategoryInfo(categoryId, pageable);
     }
 
     @Transactional(readOnly = true)
     public Page<CategoryInfoForResponse> getAllCategoryResponseInfo(Long boardId, Pageable pageable)
     {
+        getBoard(boardId);
         return categoryRepository.getAllCategoryInfo(boardId, pageable);
     }
 
@@ -80,8 +82,6 @@ public class CategoryService
     {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
     }
-
-    @Transactional
 
     public void deleteCategory(Long categoryId, Member currentMember)
     {

@@ -9,10 +9,10 @@ import com.jbaacount.category.mapper.CategoryMapper;
 import com.jbaacount.category.service.CategoryService;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +29,7 @@ public class CategoryController
     private final CategoryMapper categoryMapper;
 
     @PostMapping("/manage/category")
-    public ResponseEntity createCategory(@RequestBody CategoryPostDto request,
+    public ResponseEntity createCategory(@RequestBody @Valid CategoryPostDto request,
                                          @AuthenticationPrincipal Member currentMember)
     {
         Category category = categoryMapper.postToCategory(request);
@@ -44,7 +44,7 @@ public class CategoryController
 
     @PatchMapping("/manage/category/{category-id}")
     public ResponseEntity updateCategory(@PathVariable("category-id") @Positive Long categoryId,
-                                         @RequestBody CategoryPatchDto request,
+                                         @RequestBody @Valid CategoryPatchDto request,
                                          @AuthenticationPrincipal Member currentMember)
     {
         Category category = categoryService.updateCategory(categoryId, request, currentMember);

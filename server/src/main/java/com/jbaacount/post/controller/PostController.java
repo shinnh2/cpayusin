@@ -8,6 +8,7 @@ import com.jbaacount.post.dto.response.PostResponseDto;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.mapper.PostMapper;
 import com.jbaacount.post.service.PostService;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class PostController
     private final PostMapper postMapper;
 
     @PostMapping
-    public ResponseEntity savePost(@RequestBody PostPostDto request,
+    public ResponseEntity savePost(@RequestBody @Valid PostPostDto request,
                                    @AuthenticationPrincipal Member currentMember)
     {
         Long categoryId = request.getCategoryId();
@@ -42,7 +43,7 @@ public class PostController
     }
 
     @PatchMapping("/{post-id}")
-    public ResponseEntity updatePost(@RequestBody PostPatchDto request,
+    public ResponseEntity updatePost(@RequestBody @Valid PostPatchDto request,
                                      @PathVariable("post-id") @Positive Long postId,
                                      @AuthenticationPrincipal Member currentMember)
     {

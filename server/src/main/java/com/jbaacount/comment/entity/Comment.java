@@ -19,11 +19,14 @@ public class Comment extends BaseEntity
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Lob
+    @Column(nullable = false)
     private String text;
 
     @Column(nullable = false)
     private int voteCount;
 
+    @Column(nullable = false)
     private boolean isRemoved = false;
 
     @ManyToOne

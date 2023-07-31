@@ -10,6 +10,7 @@ import com.jbaacount.comment.service.CommentService;
 import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class CommentController
 
     @PostMapping("/{post-id}/comment")
     public ResponseEntity saveComment(@PathVariable("post-id") @Positive Long postId,
-                                      @RequestBody CommentPostDto request,
+                                      @RequestBody @Valid CommentPostDto request,
                                       @AuthenticationPrincipal Member currentMember)
     {
         Comment comment = commentMapper.postToComment(request);
@@ -44,7 +45,7 @@ public class CommentController
 
     @PatchMapping("/{post-id}/comment/{comment-id}")
     public ResponseEntity updateComment(@PathVariable("post-id") @Positive Long postId,
-                                        @RequestBody CommentPatchDto request,
+                                        @RequestBody @Valid CommentPatchDto request,
                                         @PathVariable("comment-id") @Positive Long commentId,
                                         @AuthenticationPrincipal Member currentMember)
     {

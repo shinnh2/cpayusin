@@ -3,14 +3,12 @@ package com.jbaacount.category.entity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.global.audit.BaseEntity;
-import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +28,6 @@ public class Category extends BaseEntity
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
-
-    @ManyToOne
-    @JoinColumn(name = "member_id")
-    private Member member;
 
     @ManyToOne
     @JoinColumn(name = "board_id")
