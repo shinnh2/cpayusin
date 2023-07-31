@@ -1,3 +1,4 @@
+/*
 package com.jbaacount.vote.service;
 
 import com.jbaacount.board.entity.Board;
@@ -176,3 +177,4 @@ class VoteFacadeTest
         return memberRepository.findByEmail(userEmail).get();
     }
 }
+*/

@@ -2,7 +2,9 @@ package com.jbaacount.member.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Data
 public class MemberInfoForResponse
 {

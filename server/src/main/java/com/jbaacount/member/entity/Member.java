@@ -1,5 +1,6 @@
 package com.jbaacount.member.entity;
 
+import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
@@ -31,6 +32,9 @@ public class Member extends BaseEntity
 
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Member(String nickname, String email, String password)

@@ -3,6 +3,7 @@ package com.jbaacount.comment.mapper;
 import com.jbaacount.comment.dto.request.CommentPostDto;
 import com.jbaacount.comment.dto.response.CommentSingleResponse;
 import com.jbaacount.comment.entity.Comment;
+import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.jbaacount.member.dto.response.MemberInfoResponseDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
@@ -37,12 +38,13 @@ public class CommentMapper
             parentId = entity.getParent().getId();
         }
 
-        MemberInfoResponseDto memberResponse = memberMapper.memberToInfoResponse(entity.getMember());
+        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(currentMember);
+
         boolean voteStatus = false;
 
         if(currentMember != null)
         {
-            Optional<Vote> optionalVote = voteRepository.checkMemberVotedCommentOrNot(currentMember, entity);
+            Optional<Vote> optionalVote = voteRepository.checkMemberVotedCommentOrNot(currentMember.getId(), entity.getId());
             voteStatus = optionalVote.isPresent();
         }
 
@@ -50,7 +52,9 @@ public class CommentMapper
                 .id(entity.getId())
                 .parentId(parentId)
                 .text(entity.getText())
+                .voteCount(entity.getVoteCount())
                 .voteStatus(voteStatus)
+                .createdAt(entity.getCreatedAt())
                 .member(memberResponse)
                 .build();
 

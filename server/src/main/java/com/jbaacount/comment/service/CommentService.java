@@ -2,6 +2,7 @@ package com.jbaacount.comment.service;
 
 import com.jbaacount.comment.dto.request.CommentPatchDto;
 import com.jbaacount.comment.dto.request.CommentPostDto;
+import com.jbaacount.comment.dto.response.CommentMultiResponse;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.repository.CommentRepository;
 import com.jbaacount.global.exception.BusinessLogicException;
@@ -10,8 +11,12 @@ import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
+import com.jbaacount.vote.entity.Vote;
+import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,6 +42,11 @@ public class CommentService
         if(parentId != null)
         {
             Comment parent = getComment(parentId);
+            if(parent.getParent() != null)
+            {
+                throw new RuntimeException();
+            }
+
             savedComment.addParent(parent);
         }
         return savedComment;
@@ -60,6 +70,13 @@ public class CommentService
         return commentRepository.findById(commentId).orElseThrow();
     }
 
+
+    @Transactional(readOnly = true)
+    public Page<CommentMultiResponse> getAllComments(Long postId, Member currentMember, Pageable pageable)
+    {
+        return commentRepository.getAllComments(postId, pageable, currentMember);
+    }
+
     public void deleteComment(Long commentId, Member currentMember)
     {
         Comment comment = getComment(commentId);
@@ -73,6 +90,5 @@ public class CommentService
     {
         return postRepository.findById(postId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.COMMENT_NOT_FOUND));
     }
-
 
 }

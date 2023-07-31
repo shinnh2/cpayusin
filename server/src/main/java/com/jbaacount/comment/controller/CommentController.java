@@ -2,15 +2,19 @@ package com.jbaacount.comment.controller;
 
 import com.jbaacount.comment.dto.request.CommentPatchDto;
 import com.jbaacount.comment.dto.request.CommentPostDto;
+import com.jbaacount.comment.dto.response.CommentMultiResponse;
 import com.jbaacount.comment.dto.response.CommentSingleResponse;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.mapper.CommentMapper;
 import com.jbaacount.comment.service.CommentService;
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -59,6 +63,18 @@ public class CommentController
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
+
+    @GetMapping("/{post-id}/comment")
+    public ResponseEntity getAllComments(@PathVariable("post-id") @Positive Long postId,
+                                         @AuthenticationPrincipal Member currentMember,
+                                         Pageable pageable)
+    {
+        Page<CommentMultiResponse> response = commentService.getAllComments(postId, currentMember, pageable);
+
+        return new ResponseEntity(new PageDto<>(response), HttpStatus.OK);
+    }
+
+
 
     @DeleteMapping("/comment/{comment-id}")
     public ResponseEntity deleteComment(@PathVariable("comment-id") @Positive Long commentId,

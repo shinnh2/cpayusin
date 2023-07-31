@@ -1,5 +1,6 @@
 package com.jbaacount.comment.entity;
 
+import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
@@ -13,12 +14,15 @@ import java.util.List;
 @NoArgsConstructor
 @Getter
 @Entity
-public class Comment
+public class Comment extends BaseEntity
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String text;
+
+    @Column(nullable = false)
+    private int voteCount;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
@@ -38,6 +42,7 @@ public class Comment
     public Comment(String text)
     {
         this.text = text;
+        this.voteCount = 0;
     }
 
     public void addPost(Post post)
@@ -60,11 +65,25 @@ public class Comment
 
     public void addMember(Member member)
     {
+        if(this.member != null)
+            this.member.getComments().remove(this);
+
         this.member = member;
+        member.getComments().add(this);
     }
 
     public void updateText(String text)
     {
         this.text = text;
+    }
+
+    public void upVote()
+    {
+        this.voteCount++;
+    }
+
+    public void downVote()
+    {
+        this.voteCount--;
     }
 }

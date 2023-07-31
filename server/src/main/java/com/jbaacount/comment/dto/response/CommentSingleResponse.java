@@ -1,9 +1,12 @@
 package com.jbaacount.comment.dto.response;
 
+import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.jbaacount.member.dto.response.MemberInfoResponseDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 
 @Builder
 @AllArgsConstructor
@@ -13,6 +16,8 @@ public class CommentSingleResponse
     private Long id;
     private Long parentId;
     private String text;
+    private int voteCount;
     private boolean voteStatus;
-    private MemberInfoResponseDto member;
+    private LocalDateTime createdAt;
+    private MemberInfoForResponse member;
 }

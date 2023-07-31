@@ -23,7 +23,6 @@ public class VoteService
     @Transactional
     public boolean votePost(Member currentMember, Post post)
     {
-        log.info("===vote service ===");
         Optional<Vote> optionalVote = voteRepository.findByMemberAndPost(currentMember, post);
 
         if(optionalVote.isPresent())
@@ -47,6 +46,7 @@ public class VoteService
         }
     }
 
+    @Transactional
     public boolean voteComment(Member currentMember, Comment comment)
     {
         Optional<Vote> optionalVote = voteRepository.findByMemberAndComment(currentMember, comment);
@@ -54,12 +54,23 @@ public class VoteService
         if(optionalVote.isPresent())
         {
             voteRepository.delete(optionalVote.get());
+            comment.downVote();
+
+            log.info("===voteService===");
+            log.info("vote deleted successfully");
+
             return false;
         }
 
         else
         {
             voteRepository.save(new Vote(currentMember, comment));
+            comment.upVote();
+
+            log.info("===voteService===");
+            log.info("vote saved successfully");
+            log.info("voted comment = {}", comment.getText());
+
             return true;
         }
     }

@@ -30,7 +30,6 @@ public class BoardController
 {
     private final BoardService boardService;
     private final BoardMapper boardMapper;
-    private final CategoryService categoryService;
 
     @PostMapping
     public ResponseEntity saveBoard(@RequestBody BoardPostDto request,
@@ -60,10 +59,8 @@ public class BoardController
     public ResponseEntity getBoardInfo(@PathVariable("board-id") @Positive Long boardId,
                                        Pageable pageable)
     {
-        Board board = boardService.getBoardById(boardId);
-
-         BoardInfoForResponse response = boardService.getBoardInfoWithAllPosts(boardId, pageable);
-         return new ResponseEntity(response, HttpStatus.OK);
+        BoardInfoForResponse response = boardService.getBoardInfoWithAllPosts(boardId, pageable);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
 

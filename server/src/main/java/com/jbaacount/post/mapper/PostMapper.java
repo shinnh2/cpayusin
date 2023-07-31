@@ -1,7 +1,6 @@
 package com.jbaacount.post.mapper;
 
 import com.jbaacount.member.dto.response.MemberInfoResponseDto;
-import com.jbaacount.member.dto.response.MemberResponseDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.post.dto.request.PostPostDto;
@@ -12,9 +11,7 @@ import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Component
@@ -43,7 +40,7 @@ public class PostMapper
 
         if(currentMember != null)
         {
-            Optional<Vote> vote = voteRepository.checkMemberVotedOrNot(currentMember, entity);
+            Optional<Vote> vote = voteRepository.checkMemberVotedPostOrNot(currentMember, entity);
             voteStatus = vote.isPresent();
         }
 
