@@ -1,7 +1,6 @@
 package com.jbaacount.comment.service;
 
 import com.jbaacount.comment.dto.request.CommentPatchDto;
-import com.jbaacount.comment.dto.request.CommentPostDto;
 import com.jbaacount.comment.dto.response.CommentMultiResponse;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.repository.CommentRepository;
@@ -11,8 +10,6 @@ import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
-import com.jbaacount.vote.entity.Vote;
-import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -83,7 +80,11 @@ public class CommentService
 
         authService.checkPermission(comment.getMember().getId(), currentMember);
 
-        commentRepository.deleteById(commentId);
+        if(comment.getChildren().isEmpty())
+            commentRepository.deleteById(commentId);
+
+        else
+            comment.deleteComment();
     }
 
     private Post verifyPost(Long postId)

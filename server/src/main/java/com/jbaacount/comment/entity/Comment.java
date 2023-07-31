@@ -24,6 +24,8 @@ public class Comment extends BaseEntity
     @Column(nullable = false)
     private int voteCount;
 
+    private boolean isRemoved = false;
+
     @ManyToOne
     @JoinColumn(name = "post_id")
     private Post post;
@@ -75,6 +77,11 @@ public class Comment extends BaseEntity
     public void updateText(String text)
     {
         this.text = text;
+    }
+    public void deleteComment()
+    {
+        this.text = "삭제된 댓글입니다.";
+        this.isRemoved = true;
     }
 
     public void upVote()

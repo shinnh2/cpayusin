@@ -81,7 +81,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 member.nickname);
     }
 
-    public boolean checkMemberVotedCommentOrNot(Member member, Long commentId)
+    private boolean checkMemberVotedCommentOrNot(Member member, Long commentId)
     {
         if(member == null)
             return false;
