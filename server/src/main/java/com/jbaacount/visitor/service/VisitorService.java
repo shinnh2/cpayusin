@@ -48,6 +48,7 @@ public class VisitorService
                 visitorRepository.save(visitor);
             }
 
+            log.info("visitor info terminated in redis");
             redisTemplate.delete(key);
         }
     }
