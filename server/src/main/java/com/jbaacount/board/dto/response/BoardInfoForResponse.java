@@ -5,7 +5,6 @@ import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.post.dto.response.PostInfoForResponse;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
