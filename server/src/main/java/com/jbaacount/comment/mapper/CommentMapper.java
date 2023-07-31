@@ -4,7 +4,6 @@ import com.jbaacount.comment.dto.request.CommentPostDto;
 import com.jbaacount.comment.dto.response.CommentSingleResponse;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.member.dto.response.MemberInfoForResponse;
-import com.jbaacount.member.dto.response.MemberInfoResponseDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.vote.entity.Vote;

@@ -1,9 +1,7 @@
 package com.jbaacount.post.repository;
 
 import com.jbaacount.member.dto.response.MemberInfoForResponse;
-import com.jbaacount.member.dto.response.QMemberInfoForResponse;
 import com.jbaacount.post.dto.response.PostInfoForResponse;
-import com.jbaacount.post.dto.response.QPostInfoForResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 

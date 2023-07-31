@@ -1,12 +1,9 @@
 package com.jbaacount.member.dto.response;
 
-import com.jbaacount.member.entity.Member;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.context.annotation.Bean;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

@@ -1,6 +1,6 @@
 package com.jbaacount.post.mapper;
 
-import com.jbaacount.member.dto.response.MemberInfoResponseDto;
+import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.post.dto.request.PostPostDto;
@@ -35,7 +35,7 @@ public class PostMapper
 
     public PostResponseDto postEntityToResponse(Post entity, Member currentMember)
     {
-        MemberInfoResponseDto memberResponse = memberMapper.memberToInfoResponse(entity.getMember());
+        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(currentMember);
         boolean voteStatus = false;
 
         if(currentMember != null)

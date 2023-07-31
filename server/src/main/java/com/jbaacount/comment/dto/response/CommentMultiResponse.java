@@ -1,7 +1,6 @@
 package com.jbaacount.comment.dto.response;
 
 import com.jbaacount.member.dto.response.MemberInfoForResponse;
-import com.jbaacount.member.dto.response.MemberInfoResponseDto;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 

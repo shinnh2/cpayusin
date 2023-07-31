@@ -2,7 +2,6 @@ package com.jbaacount.global.security.utiles;
 
 import com.jbaacount.global.exception.ErrorResponse;
 import com.nimbusds.jose.shaded.gson.Gson;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;

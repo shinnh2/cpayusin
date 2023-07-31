@@ -1,6 +1,6 @@
 package com.jbaacount.post.dto.response;
 
-import com.jbaacount.member.dto.response.MemberInfoResponseDto;
+import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +19,7 @@ public class PostResponseDto
     private String content;
     private Integer voteCount;
     private boolean voteStatus;
-    private MemberInfoResponseDto member;
+    private MemberInfoForResponse member;
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;
 }
