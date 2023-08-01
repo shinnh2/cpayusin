@@ -1,71 +1,108 @@
 package com.jbaacount.board.repository;
 
-import com.jbaacount.board.dto.response.BoardInfoForResponse;
-import com.jbaacount.board.dto.response.BoardResponseWithCategory;
-import com.jbaacount.category.dto.response.CategoryInfoForResponse;
-import com.jbaacount.category.dto.response.CategoryResponseDto;
-import com.jbaacount.category.entity.QCategory;
-import com.jbaacount.category.repository.CategoryRepository;
+import com.jbaacount.board.dto.response.BoardWithAllCategoriesResponse;
+import com.jbaacount.board.dto.response.BoardWithAllPostsResponse;
+import com.jbaacount.category.dto.response.CategoryResponseForBoard;
 import com.jbaacount.global.dto.PageDto;
-import com.jbaacount.post.dto.response.PostInfoForResponse;
+import com.jbaacount.post.dto.response.PostInfoForOtherResponse;
 import com.jbaacount.post.repository.PostRepository;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 import static com.jbaacount.board.entity.QBoard.board;
 import static com.jbaacount.category.entity.QCategory.category;
-import static com.jbaacount.post.entity.QPost.post;
 
 @RequiredArgsConstructor
 public class BoardRepositoryImpl implements BoardRepositoryCustom
 {
     private final JPAQueryFactory query;
     private final PostRepository postRepository;
+
     @Override
-    public BoardInfoForResponse getBoardWithAllPostsInfo(Long boardId, Pageable pageable)
+    public BoardWithAllPostsResponse getBoardWithAllPostsInfo(Long boardId, Pageable pageable)
     {
-        BoardInfoForResponse boardResult = query
+        BoardWithAllPostsResponse boardResult = query
                 .select(extractBoardWithPostsInfo())
                 .from(board)
                 .where(board.id.eq(boardId))
                 .fetchOne();
 
-        Page<PostInfoForResponse> postResult = postRepository.getAllPostsInfoForBoard(boardId, pageable);
-        List<CategoryResponseDto> categoryList = getCategoryResponseList(boardId);
+        Page<PostInfoForOtherResponse> postResult = postRepository.getAllPostsInfoForBoard(boardId, pageable);
 
-        PageDto<PostInfoForResponse> posts = new PageDto<>(postResult);
-        boardResult.setCategory(categoryList);
+        PageDto<PostInfoForOtherResponse> posts = new PageDto<>(postResult);
         boardResult.setPosts(posts);
         return boardResult;
     }
 
-    private List<CategoryResponseDto> getCategoryResponseList(Long boardId)
+
+    @Override
+    public BoardWithAllCategoriesResponse getBoardWithAllCatetoriesInfo(Long boardId)
     {
-        List<CategoryResponseDto> categoryList = query
+        BoardWithAllCategoriesResponse boardResult = query
+                .select(extractBoardWithCategoriesInfo())
+                .from(board)
+                .where(board.id.eq(boardId))
+                .fetchOne();
+
+        List<CategoryResponseForBoard> categories = getAllCategories(boardId);
+        boardResult.setCategory(categories);
+
+        return boardResult;
+    }
+
+    @Override
+    public Page<BoardWithAllCategoriesResponse> getAllBoardsAndCategories(Pageable pageable)
+    {
+        List<BoardWithAllCategoriesResponse> boardResult = query
+                .select(extractBoardWithCategoriesInfo())
+                .from(board)
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .fetch();
+
+        for (BoardWithAllCategoriesResponse boardResponse : boardResult)
+        {
+            List<CategoryResponseForBoard> categories = getAllCategories(boardResponse.getId());
+            boardResponse.setCategory(categories);
+        }
+
+        return new PageImpl<>(boardResult, pageable, boardResult.size());
+    }
+
+    private List<CategoryResponseForBoard> getAllCategories(Long boardId)
+    {
+        return query
                 .select(extractCategoryInfo())
                 .from(category)
                 .where(category.board.id.eq(boardId))
+                .orderBy(category.name.asc())
                 .fetch();
-        return categoryList;
     }
 
-
-    private ConstructorExpression<BoardInfoForResponse> extractBoardWithPostsInfo()
+    private ConstructorExpression<BoardWithAllPostsResponse> extractBoardWithPostsInfo()
     {
-        return Projections.constructor(BoardInfoForResponse.class,
+        return Projections.constructor(BoardWithAllPostsResponse.class,
                 board.id,
                 board.name);
     }
 
-    private ConstructorExpression<CategoryResponseDto> extractCategoryInfo()
+    private ConstructorExpression<BoardWithAllCategoriesResponse> extractBoardWithCategoriesInfo()
     {
-        return Projections.constructor(CategoryResponseDto.class,
+        return Projections.constructor(BoardWithAllCategoriesResponse.class,
+                board.id,
+                board.name);
+    }
+
+    private ConstructorExpression<CategoryResponseForBoard> extractCategoryInfo()
+    {
+        return Projections.constructor(CategoryResponseForBoard.class,
                 category.id,
                 category.name);
     }

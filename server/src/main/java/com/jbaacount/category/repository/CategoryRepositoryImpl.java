@@ -2,7 +2,7 @@ package com.jbaacount.category.repository;
 
 import com.jbaacount.category.dto.response.CategoryInfoForResponse;
 import com.jbaacount.global.dto.PageDto;
-import com.jbaacount.post.dto.response.PostInfoForResponse;
+import com.jbaacount.post.dto.response.PostInfoForOtherResponse;
 import com.jbaacount.post.repository.PostRepository;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
@@ -30,7 +30,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
                 .where(category.id.eq(categoryId))
                 .fetchOne();
 
-        Page<PostInfoForResponse> posts = postRepository.getAllPostsInfoForCategory(categoryId, pageable);
+        Page<PostInfoForOtherResponse> posts = postRepository.getAllPostsInfoForCategory(categoryId, pageable);
 
         PageDto postsToPageDto = new PageDto(posts);
         categoryInfo.setPosts(postsToPageDto);
@@ -46,8 +46,6 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
                 .from(category)
                 .where(category.board.id.eq(boardId))
                 .orderBy(category.name.asc())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
                 .fetch();
 
 

@@ -14,20 +14,19 @@ import com.jbaacount.post.dto.request.PostPatchDto;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
 import com.jbaacount.utils.TestUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
-import static org.assertj.core.api.Assertions.as;
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Transactional
 @SpringBootTest
@@ -104,8 +103,10 @@ class PostServiceTest
                 .content("내용 테스트용2")
                 .build();
 
-        postService.createPost(post1, category.getId(), board1.getId(), user);
-        postService.createPost(post2, null, board1.getId(), admin);
+        List<MultipartFile> files = new ArrayList<>();
+
+        postService.createPost(post1, files, category.getId(), board1.getId(), user);
+        postService.createPost(post2, files, null, board1.getId(), admin);
 
     }
 
@@ -127,7 +128,8 @@ class PostServiceTest
                 .content(content)
                 .build();
 
-        Post savedPost = postService.createPost(post, null, board.getId(), user);
+        List<MultipartFile> files = new ArrayList<>();
+        Post savedPost = postService.createPost(post, files, null, board.getId(), user);
 
         assertThat(savedPost.getTitle()).isEqualTo("첫번째게시물");
         assertThat(savedPost.getContent()).isEqualTo("내용");
@@ -152,7 +154,8 @@ class PostServiceTest
                 .content(content)
                 .build();
 
-        Post savedPost = postService.createPost(post, category.getId(), board.getId(), user);
+        List<MultipartFile> files = new ArrayList<>();
+        Post savedPost = postService.createPost(post, files, category.getId(), board.getId(), user);
 
         assertThat(savedPost.getCategory()).isNotNull();
         assertThat(savedPost.getBoard()).isEqualTo(board);
@@ -172,7 +175,8 @@ class PostServiceTest
                 .content("내용1")
                 .build();
 
-        assertThrows(BusinessLogicException.class, () -> postService.createPost(post, null, board.getId(), user));
+        List<MultipartFile> files = new ArrayList<>();
+        assertThrows(BusinessLogicException.class, () -> postService.createPost(post, files, null, board.getId(), user));
     }
 
 
@@ -185,7 +189,9 @@ class PostServiceTest
 
         PostPatchDto patchDto = new PostPatchDto();
         patchDto.setTitle("제목 수정 테스트 1");
-        Post updatedPost = postService.updatePost(userPost.getId(), patchDto, user);
+
+        List<MultipartFile> files = new ArrayList<>();
+        Post updatedPost = postService.updatePost(userPost.getId(), patchDto, files, user);
 
         assertThat(updatedPost.getTitle()).isEqualTo("제목 수정 테스트 1");
         assertThat(updatedPost.getMember().getNickname()).isEqualTo(user.getNickname());
@@ -204,7 +210,8 @@ class PostServiceTest
         PostPatchDto patchDto = new PostPatchDto();
         patchDto.setTitle("제목 수정 테스트 2");
 
-        assertThrows(BusinessLogicException.class, () -> postService.updatePost(adminPost.getId(), patchDto, user));
+        List<MultipartFile> files = new ArrayList<>();
+        assertThrows(BusinessLogicException.class, () -> postService.updatePost(adminPost.getId(), patchDto, files, user));
     }
 
     @DisplayName("게시글 삭제 - 해당 유저가 시도")

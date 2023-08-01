@@ -9,13 +9,13 @@ import lombok.Data;
 public class FileResponseDto
 {
     private String originalFileName;
-    private String storedfileName;
+    private String storedFileName;
     private String url;
 
     public FileResponseDto(File file)
     {
         this.originalFileName = file.getUploadFileName();
-        this.storedfileName = file.getStoreFileName();
+        this.storedFileName = file.getStoreFileName();
         this.url = file.getUrl();
     }
 }

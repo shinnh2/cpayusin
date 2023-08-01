@@ -1,7 +1,7 @@
 package com.jbaacount.post.repository;
 
 import com.jbaacount.member.dto.response.MemberInfoForResponse;
-import com.jbaacount.post.dto.response.PostInfoForResponse;
+import com.jbaacount.post.dto.response.PostInfoForOtherResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,9 +21,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private final JPAQueryFactory query;
 
     @Override
-    public Page<PostInfoForResponse> getAllPostsInfoForCategory(Long categoryId, Pageable pageable)
+    public Page<PostInfoForOtherResponse> getAllPostsInfoForCategory(Long categoryId, Pageable pageable)
     {
-        List<PostInfoForResponse> postInfoResult = query
+        List<PostInfoForOtherResponse> postInfoResult = query
                 .select(extractPostsInfo())
                 .from(post)
                 .join(post.member, member)
@@ -37,9 +37,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom
         return new PageImpl<>(postInfoResult, pageable, postInfoResult.size());
     }
 
-    public Page<PostInfoForResponse> getAllPostsInfoForBoard(Long boardId, Pageable pageable)
+    public Page<PostInfoForOtherResponse> getAllPostsInfoForBoard(Long boardId, Pageable pageable)
     {
-        List<PostInfoForResponse> postInfoResult = query
+        List<PostInfoForOtherResponse> postInfoResult = query
                 .select(extractPostsInfo())
                 .from(post)
                 .join(post.member, member)
@@ -52,9 +52,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom
         return new PageImpl<>(postInfoResult, pageable, postInfoResult.size());
     }
 
-    private ConstructorExpression<PostInfoForResponse> extractPostsInfo()
+    private ConstructorExpression<PostInfoForOtherResponse> extractPostsInfo()
     {
-        return Projections.constructor(PostInfoForResponse.class,
+        return Projections.constructor(PostInfoForOtherResponse.class,
                 post.id,
                 post.title,
                 post.createdAt,

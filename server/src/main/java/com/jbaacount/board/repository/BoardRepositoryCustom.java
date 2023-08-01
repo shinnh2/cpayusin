@@ -1,10 +1,15 @@
 package com.jbaacount.board.repository;
 
-import com.jbaacount.board.dto.response.BoardInfoForResponse;
-import com.jbaacount.board.dto.response.BoardResponseWithCategory;
+import com.jbaacount.board.dto.response.BoardWithAllCategoriesResponse;
+import com.jbaacount.board.dto.response.BoardWithAllPostsResponse;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface BoardRepositoryCustom
 {
-    BoardInfoForResponse getBoardWithAllPostsInfo(Long boardId, Pageable pageable);
+    BoardWithAllPostsResponse getBoardWithAllPostsInfo(Long boardId, Pageable pageable);
+
+    BoardWithAllCategoriesResponse getBoardWithAllCatetoriesInfo(Long boardId);
+
+    Page<BoardWithAllCategoriesResponse> getAllBoardsAndCategories(Pageable pageable);
 }

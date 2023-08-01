@@ -7,14 +7,14 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class PostInfoForResponse
+public class PostInfoForOtherResponse
 {
     private Long id;
     private String title;
     private LocalDateTime createdAt;
     private MemberInfoForResponse member;
     @QueryProjection
-    public PostInfoForResponse(Long id, String title, LocalDateTime createdAt, MemberInfoForResponse member)
+    public PostInfoForOtherResponse(Long id, String title, LocalDateTime createdAt, MemberInfoForResponse member)
     {
         this.id = id;
         this.title = title;
