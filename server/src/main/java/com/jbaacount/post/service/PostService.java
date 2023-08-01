@@ -41,7 +41,7 @@ public class PostService
         Post savedPost = postRepository.save(request);
         authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
 
-        if(!files.isEmpty())
+        if(files != null && !files.isEmpty())
         {
             fileService.storeFiles(files, savedPost);
         }

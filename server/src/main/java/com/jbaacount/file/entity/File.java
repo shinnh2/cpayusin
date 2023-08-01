@@ -1,5 +1,6 @@
 package com.jbaacount.file.entity;
 
+import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
-public class File
+public class File extends BaseEntity
 {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
