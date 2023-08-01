@@ -46,7 +46,7 @@ public class FileService
     {
         List<File> files = fileRepository.findByPostId(post.getId());
 
-        if(!files.isEmpty())
+        if(files != null && !files.isEmpty())
         {
             for (File file : files)
             {
