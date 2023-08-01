@@ -29,7 +29,7 @@ public class Category extends BaseEntity
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private Board board;
 

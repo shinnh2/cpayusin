@@ -23,6 +23,7 @@ public class Board extends BaseEntity
     @Column(nullable = false)
     private String name;
 
+    @Column(nullable = false)
     private Boolean isAdminOnly;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)

@@ -22,15 +22,15 @@ public class Vote
     @Version
     private Integer version;
 
-    @ManyToOne
-    @JoinColumn(name = "member_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_id")
     private Comment comment;
 

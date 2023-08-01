@@ -23,7 +23,7 @@ public class VisitorService
     private final RedisTemplate<String, String> redisTemplate;
     private final VisitorRepository visitorRepository;
 
-    @Scheduled(initialDelay = 180000, fixedDelay = 180000)
+    @Scheduled(initialDelay = 1800000, fixedDelay = 1800000)
     public void updateVisitorData()
     {
         Set<String> keys = redisTemplate.keys("*_*");
