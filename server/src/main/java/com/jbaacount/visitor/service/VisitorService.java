@@ -11,6 +11,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Set;
 
 @Slf4j
@@ -28,9 +30,21 @@ public class VisitorService
 
         for (String key : keys)
         {
+            log.info("key = {}", key);
             String[] parts = key.split("_");
             String ipAddress = parts[0];
-            LocalDate date = LocalDate.parse(parts[1]);
+            LocalDate date = null;
+
+            if(isValideDate(parts[1]))
+            {
+                date = LocalDate.parse(parts[1]);
+            }
+            else
+                continue;
+
+            log.info("===visitor service & updateVisitorData()===");
+            log.info("ipAddress = {}", ipAddress);
+            log.info("date = {}", date);
 
             ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
             String userAgent = valueOperations.get(key);
@@ -85,5 +99,16 @@ public class VisitorService
         Long count = visitorRepository.count();
 
         return count != null ? count : 0;
+    }
+
+    private boolean isValideDate(String dateString)
+    {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        try{
+            formatter.parse(dateString);
+            return true;
+        } catch (DateTimeParseException e){
+            return false;
+        }
     }
 }
