@@ -13,9 +13,13 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -25,8 +29,9 @@ public class PostController
     private final PostService postService;
     private final PostMapper postMapper;
 
-    @PostMapping
-    public ResponseEntity savePost(@RequestBody @Valid PostPostDto request,
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity savePost(@RequestPart(value = "data") @Valid PostPostDto request,
+                                   @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                    @AuthenticationPrincipal Member currentMember)
     {
         Long categoryId = request.getCategoryId();
@@ -36,18 +41,19 @@ public class PostController
         log.info("board Id = {}", boardId);
 
         Post post = postMapper.postDtoToPostEntity(request);
-        Post savedPost = postService.createPost(post, categoryId, boardId, currentMember);
+        Post savedPost = postService.createPost(post, files, categoryId, boardId, currentMember);
         PostResponseDto response = postMapper.postEntityToResponse(savedPost, currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
     @PatchMapping("/{post-id}")
-    public ResponseEntity updatePost(@RequestBody @Valid PostPatchDto request,
+    public ResponseEntity updatePost(@RequestPart(value = "data") @Valid PostPatchDto request,
                                      @PathVariable("post-id") @Positive Long postId,
+                                     @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                      @AuthenticationPrincipal Member currentMember)
     {
-        Post post = postService.updatePost(postId, request, currentMember);
+        Post post = postService.updatePost(postId, request, files, currentMember);
         PostResponseDto response = postMapper.postEntityToResponse(post, currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);

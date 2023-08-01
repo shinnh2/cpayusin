@@ -7,7 +7,9 @@ import com.jbaacount.vote.entity.Vote;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -26,4 +28,12 @@ public interface VoteRepository extends JpaRepository<Vote, Long>
 
     @Query("select v from Vote v where v.member.id = :memberId and v.comment.id = :commentId")
     Optional<Vote> checkMemberVotedCommentOrNot(Long memberId, Long commentId);
+
+    @Transactional
+    @Modifying
+    void deleteByPostId(Long postId);
+
+    @Transactional
+    @Modifying
+    void deleteByCommentId(Long commentId);
 }

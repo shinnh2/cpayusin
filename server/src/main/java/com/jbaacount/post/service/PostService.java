@@ -4,6 +4,7 @@ import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
+import com.jbaacount.file.service.FileService;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
@@ -11,11 +12,14 @@ import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.dto.request.PostPatchDto;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
+import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -26,15 +30,21 @@ public class PostService
 {
     private final PostRepository postRepository;
     private final AuthorizationService authorizationService;
+    private final VoteRepository voteRepository;
     private final CategoryRepository categoryRepository;
     private final BoardRepository boardRepository;
+    private final FileService fileService;
 
-    public Post createPost(Post request, Long categoryId, Long boardId, Member currentMember)
+    public Post createPost(Post request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
     {
         Board board = getBoard(boardId);
         Post savedPost = postRepository.save(request);
-
         authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
+
+        if(!files.isEmpty())
+        {
+            fileService.storeFiles(files, savedPost);
+        }
 
         if(categoryId != null)
         {
@@ -54,7 +64,7 @@ public class PostService
         return savedPost;
     }
 
-    public Post updatePost(Long postId, PostPatchDto request, Member currentMember)
+    public Post updatePost(Long postId, PostPatchDto request, List<MultipartFile> files, Member currentMember)
     {
         Post post = getPostById(postId);
         //Only the owner of the post has the authority to update
@@ -76,6 +86,12 @@ public class PostService
                     post.addBoard(board);
                 });
 
+        if(!files.isEmpty())
+        {
+            fileService.deleteUploadedFile(post);
+            fileService.storeFiles(files, post);
+        }
+
         return post;
     }
 
@@ -90,6 +106,9 @@ public class PostService
     {
         Post post = getPostById(postId);
         authorizationService.checkPermission(post.getMember().getId(), currentMember);
+
+        voteRepository.deleteByPostId(postId);
+        fileService.deleteUploadedFile(post);
 
         postRepository.deleteById(postId);
     }

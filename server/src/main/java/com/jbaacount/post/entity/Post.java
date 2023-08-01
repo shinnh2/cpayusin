@@ -3,8 +3,10 @@ package com.jbaacount.post.entity;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.comment.entity.Comment;
+import com.jbaacount.file.entity.File;
 import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.member.entity.Member;
+import com.jbaacount.vote.entity.Vote;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -44,8 +46,13 @@ public class Post extends BaseEntity
     private Board board;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<File> files = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Vote> votes = new ArrayList<>();
     @Builder
     public Post(String title, String content)
     {
@@ -99,5 +106,10 @@ public class Post extends BaseEntity
     public void downVote()
     {
         this.voteCount--;
+    }
+
+    public void removeFile(File file)
+    {
+        this.files.remove(file);
     }
 }

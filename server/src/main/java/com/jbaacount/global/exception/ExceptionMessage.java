@@ -44,8 +44,13 @@ public enum ExceptionMessage
      * comment
      */
 
-    COMMENT_NOT_FOUND("해당 댓글을 찾을 수 없습니다.");
+    COMMENT_NOT_FOUND("해당 댓글을 찾을 수 없습니다."),
 
+
+    /**
+     * file
+     */
+    FILE_NOT_STORE("파일을 저장할 수 없습니다.");
 
 
     @Getter
