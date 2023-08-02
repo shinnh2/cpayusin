@@ -16,7 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -46,13 +46,20 @@ public class SecurityConfig
                 .cors(cors -> cors.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(formLogin -> formLogin.disable())
-
+                .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(endpoint -> endpoint
+                                .baseUri("/oauth2/authorize"))
+                        .redirectionEndpoint(endpoint -> endpoint
+                                .baseUri("/oauth2/callback/*")))
+                .sessionManagement(management -> management
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptionHandling ->
                         exceptionHandling
                                 .accessDeniedHandler(new CustomAccessDeniedHandler())
                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET).permitAll()
+                        .requestMatchers("/oauth2/authorize/**", "/oauth2/callback/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/members/login", "/members/sign-up").permitAll()
                         .requestMatchers(HttpMethod.POST).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH).hasAnyRole("USER", "ADMIN")

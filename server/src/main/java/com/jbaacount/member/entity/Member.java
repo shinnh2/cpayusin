@@ -8,6 +8,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -30,6 +31,10 @@ public class Member extends BaseEntity
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
+    @Enumerated(value = EnumType.STRING)
+    @Column(nullable = false)
+    private Platform platform = Platform.HOME;
+
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
 
@@ -42,6 +47,16 @@ public class Member extends BaseEntity
         this.nickname = nickname;
         this.email = email;
         this.password = password;
+        this.platform = Platform.HOME;
+    }
+
+    public Member(String nickname, String email, List<String> roles, Platform platform)
+    {
+        this.nickname = nickname;
+        this.password = UUID.randomUUID().toString();
+        this.email = email;
+        this.roles = roles;
+        this.platform = platform;
     }
 
     public void updatePassword(String password)
