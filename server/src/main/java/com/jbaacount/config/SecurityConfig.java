@@ -46,11 +46,11 @@ public class SecurityConfig
                 .cors(cors -> cors.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(formLogin -> formLogin.disable())
-                .oauth2Login(oauth2 -> oauth2
+                /*.oauth2Login(oauth2 -> oauth2
                         .authorizationEndpoint(endpoint -> endpoint
                                 .baseUri("/oauth2/authorize"))
                         .redirectionEndpoint(endpoint -> endpoint
-                                .baseUri("/oauth2/callback/*")))
+                                .baseUri("/oauth2/callback/*")))*/
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptionHandling ->
@@ -59,7 +59,6 @@ public class SecurityConfig
                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers("/oauth2/authorize/**", "/oauth2/callback/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/members/login", "/members/sign-up").permitAll()
                         .requestMatchers(HttpMethod.POST).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH).hasAnyRole("USER", "ADMIN")

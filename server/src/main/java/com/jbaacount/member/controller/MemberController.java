@@ -18,6 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -90,5 +91,17 @@ public class MemberController
         memberService.deleteById(memberId, member);
 
         return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/exist/email/{email}")
+    public ResponseEntity checkExistEmail(@PathVariable("email") String email)
+    {
+        return ResponseEntity.ok(memberService.checkExistEmail(email));
+    }
+
+    @GetMapping("/exist/nickname/{nickname}")
+    public ResponseEntity checkExistNickname(@PathVariable("nickname") String nickname)
+    {
+        return ResponseEntity.ok(memberService.checkExistNickname(nickname));
     }
 }
