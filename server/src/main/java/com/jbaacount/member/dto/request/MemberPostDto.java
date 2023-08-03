@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class MemberPostDto
 {
-    @Length(min = 3, max = 10, message = "닉네임은 3자 이상 10자 이하여야 합니다.")
+    @Length(min = 2, max = 10, message = "닉네임은 2자 이상 10자 이하여야 합니다.")
     @Pattern(regexp = "^[A-z가-힣0-9 ]{3,10}", message = "닉네임에는 특수문자 및 공백이 올 수 없습니다.")
     @NotSpace
     private String nickname;
@@ -19,6 +19,6 @@ public class MemberPostDto
     @Email(message = "유효하지 않은 이메일 형식입니다.")
     private String email;
 
-    @Length(min = 5, max = 20, message = "비밀번호는 5자 이상 20자 이하여야 합니다.")
+    @Length(min = 8, max = 20, message = "비밀번호는 8자 이상 20자 이하여야 합니다.")
     private String password;
 }

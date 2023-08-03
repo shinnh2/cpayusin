@@ -40,7 +40,7 @@ public class Comment extends BaseEntity
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "parent", orphanRemoval = true)
+    @OneToMany(mappedBy = "parent")
     private List<Comment> children = new ArrayList<>();
 
     @Builder

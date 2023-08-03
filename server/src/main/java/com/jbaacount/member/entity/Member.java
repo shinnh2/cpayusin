@@ -33,7 +33,7 @@ public class Member extends BaseEntity
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private Platform platform = Platform.HOME;
+    private Platform platform;
 
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();

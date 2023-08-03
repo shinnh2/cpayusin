@@ -88,17 +88,28 @@ public class MemberService
         log.info("deleted Member nickname = {}", member.getNickname());
     }
 
-    @Transactional(readOnly = true)
-    public void verifyExistEmail(String email)
+    private void verifyExistEmail(String email)
     {
         memberRepository.findByEmail(email)
                 .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.EMAIL_ALREADY_EXIST);});
     }
 
-    @Transactional(readOnly = true)
-    public void verifyExistNickname(String nickname)
+    private void verifyExistNickname(String nickname)
     {
          memberRepository.findByNickname(nickname)
                  .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.NICKNAME_ALREADY_EXIST);});
     }
+
+    @Transactional(readOnly = true)
+    public boolean checkExistEmail(String email)
+    {
+        return memberRepository.findByEmail(email).isPresent();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean checkExistNickname(String nickname)
+    {
+        return memberRepository.findByNickname(nickname).isPresent();
+    }
+
 }
