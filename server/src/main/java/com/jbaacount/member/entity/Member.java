@@ -6,6 +6,7 @@ import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +28,12 @@ public class Member extends BaseEntity
 
     @Column(nullable = false)
     private String password;
+
+    @Column(name = "verification_code")
+    private String verificationCode;
+
+    @Column(name = "verification_code_expiry")
+    private LocalDateTime verificationCodeExpiry;
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
@@ -68,4 +75,11 @@ public class Member extends BaseEntity
     {
         this.nickname = nickname;
     }
+
+    public void setVerificationCode(String verificationCode)
+    {
+        this.verificationCode = verificationCode;
+        this.verificationCodeExpiry = LocalDateTime.now().plusMinutes(3);
+    }
+
 }
