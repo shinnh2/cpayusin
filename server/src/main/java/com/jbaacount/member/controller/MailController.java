@@ -1,6 +1,5 @@
 package com.jbaacount.member.controller;
 
-import com.jbaacount.global.validation.notspace.NotSpace;
 import com.jbaacount.member.dto.request.MemberMailDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
 import com.jbaacount.member.mapper.MemberMapper;
