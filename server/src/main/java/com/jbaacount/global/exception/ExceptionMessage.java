@@ -13,8 +13,9 @@ public enum ExceptionMessage
 
     MEMBER_UNAUTHORIZED("권한이 없습니다."),
 
-
     INVALID_VERIFICATION_CODE("인증코드가 일치하지 않습니다."),
+
+    EXPIRED_VERIFICATION_CODE("만료된 인증코드입니다."),
     /**
      * token
      */

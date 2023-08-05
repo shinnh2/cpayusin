@@ -67,9 +67,19 @@ public class MailService
     {
         Member member = findMemberByEmail(email);
 
-        if((member.getVerificationCode().equals(inputCode)) && (member.getVerificationCodeExpiry().isAfter(LocalDateTime.now())))
+        if((member.getVerificationCode().equals(inputCode)))
         {
-            return true;
+            if(member.getVerificationCodeExpiry().isAfter(LocalDateTime.now()))
+            {
+                member.setVerificationCode(null);
+                member.setVerificationCodeExpiry(null);
+                return true;
+            }
+
+            else
+            {
+                throw new BusinessLogicException(ExceptionMessage.EXPIRED_VERIFICATION_CODE);
+            }
         }
 
         throw new BusinessLogicException(ExceptionMessage.INVALID_VERIFICATION_CODE);
