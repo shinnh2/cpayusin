@@ -43,14 +43,9 @@ public class SecurityConfig
                 .headers((headers) ->
                         headers.frameOptions((frameOptions) -> frameOptions.disable()))
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(formLogin -> formLogin.disable())
-                /*.oauth2Login(oauth2 -> oauth2
-                        .authorizationEndpoint(endpoint -> endpoint
-                                .baseUri("/oauth2/authorize"))
-                        .redirectionEndpoint(endpoint -> endpoint
-                                .baseUri("/oauth2/callback/*")))*/
                 .sessionManagement(management -> management
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exceptionHandling ->
@@ -77,7 +72,7 @@ public class SecurityConfig
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
     }
 
-    @Bean
+
     public CorsConfigurationSource corsConfigurationSource()
     {
         CorsConfiguration configuration = new CorsConfiguration();

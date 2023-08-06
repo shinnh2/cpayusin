@@ -93,14 +93,14 @@ public class MemberController
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
-    @GetMapping("/exist/email/{email}")
-    public ResponseEntity checkExistEmail(@PathVariable("email") String email)
+    @GetMapping("/exist/email")
+    public ResponseEntity checkExistEmail(@RequestParam String email)
     {
         return ResponseEntity.ok(memberService.checkExistEmail(email));
     }
 
-    @GetMapping("/exist/nickname/{nickname}")
-    public ResponseEntity checkExistNickname(@PathVariable("nickname") String nickname)
+    @GetMapping("/exist/nickname")
+    public ResponseEntity checkExistNickname(@RequestParam String nickname)
     {
         return ResponseEntity.ok(memberService.checkExistNickname(nickname));
     }
