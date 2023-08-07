@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
-@AllArgsConstructor
 @Data
 public class MemberResponseDto
 {
@@ -20,8 +19,6 @@ public class MemberResponseDto
 
     private String email;
 
-
-    private List<String> roles = new ArrayList<>();
 
     private LocalDateTime createdAt;
 

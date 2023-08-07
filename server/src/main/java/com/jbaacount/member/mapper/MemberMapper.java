@@ -29,7 +29,6 @@ public class MemberMapper
         response.setId(member.getId());
         response.setNickname(member.getNickname());
         response.setEmail(member.getEmail());
-        response.setRoles(member.getRoles());
         response.setCreatedAt(member.getCreatedAt());
         response.setModifiedAt(member.getModifiedAt());
 

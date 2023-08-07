@@ -1,6 +1,7 @@
 package com.jbaacount.member.entity;
 
 import com.jbaacount.comment.entity.Comment;
+import com.jbaacount.file.entity.File;
 import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
@@ -48,6 +49,9 @@ public class Member extends BaseEntity
     @OneToMany(mappedBy = "member")
     private List<Comment> comments = new ArrayList<>();
 
+    @OneToOne(mappedBy = "member")
+    private File file;
+
     @Builder
     public Member(String nickname, String email, String password)
     {
@@ -82,4 +86,8 @@ public class Member extends BaseEntity
         this.verificationCodeExpiry = LocalDateTime.now().plusMinutes(3);
     }
 
+    public void setFile(File file)
+    {
+        this.file = file;
+    }
 }

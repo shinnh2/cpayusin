@@ -25,9 +25,9 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.utils.AppDocumentUtils.getRequestPreProcessor;
@@ -37,12 +37,12 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -110,7 +110,6 @@ class MemberControllerTest
         response.setId(member.getId());
         response.setNickname(member.getNickname());
         response.setEmail(member.getEmail());
-        response.setRoles(member.getRoles());
         response.setCreatedAt(member.getCreatedAt());
         response.setModifiedAt(member.getModifiedAt());
 
@@ -139,19 +138,18 @@ class MemberControllerTest
                         getResponsePreProcessor(),
                         requestFields(
                                 List.of(
-                                        fieldWithPath("nickname").description("유저 닉네임"),
-                                        fieldWithPath("email").description("유저 이메일"),
-                                        fieldWithPath("password").description("유저 비밀번호"))
+                                        fieldWithPath("nickname").description("회원 닉네임"),
+                                        fieldWithPath("email").description("회원 이메일"),
+                                        fieldWithPath("password").description("회원 비밀번호"))
                                 ),
                         responseFields(
                                 List.of(
                                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("유저 식별자"),
-                                        fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
-                                        fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
-                                        fieldWithPath("data.roles").type(JsonFieldType.ARRAY).description("유저 권한"),
+                                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
+                                        fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                        fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
-                                        fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("유저 정보 수정 일자")
+                                        fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("회원 정보 수정 일자")
                                 )
                         )));
     }
@@ -182,7 +180,6 @@ class MemberControllerTest
         response.setId(memberId);
         response.setEmail("mike@ticonsys.com");
         response.setNickname(nickname);
-        response.setRoles(List.of("ADMIN", "USER"));
         response.setCreatedAt(LocalDateTime.now());
         response.setModifiedAt(LocalDateTime.now());
 
@@ -207,24 +204,134 @@ class MemberControllerTest
                         getRequestPreProcessor(),
                         getResponsePreProcessor(),
                         pathParameters(
-                                parameterWithName("member-id").description("유저 식별자")
+                                parameterWithName("member-id").description("회원 식별자")
                         ),
                         requestFields(
                                 List.of(
-                                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임")
+                                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("회원 닉네임")
                                 )
                         ),
                         responseFields(
                                 List.of(
                                         fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
-                                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("유저 식별자"),
-                                        fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
-                                        fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
-                                        fieldWithPath("data.roles").type(JsonFieldType.ARRAY).description("유저 권한"),
+                                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
+                                        fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                        fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
-                                        fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("유저 정보 수정일자")
+                                        fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description(" 정보 수정일자")
                                 )
                         )
                 ));
+    }
+
+
+    @DisplayName("회원 정보 조회 - 1명")
+    @Test
+    void getMember() throws Exception
+    {
+        Long memberId = 1L;
+        LocalDateTime createdAt = LocalDateTime.now();
+        LocalDateTime modifiedAt = LocalDateTime.now();
+
+        Member member = Member.builder()
+                .email("mike@ticonsys.com")
+                .password("123456789")
+                .nickname("홍길동")
+                .build();
+
+        given(memberService.createMember(any(Member.class))).willReturn(member);
+
+        Member createdMember = memberService.createMember(member);
+
+        given(memberService.getMemberById(Mockito.anyLong())).willReturn(member);
+
+
+        MemberResponseDto response = new MemberResponseDto();
+        response.setId(memberId);
+        response.setEmail(createdMember.getEmail());
+        response.setNickname(createdMember.getNickname());
+        response.setCreatedAt(createdAt);
+        response.setModifiedAt(modifiedAt);
+
+        given(memberMapper.memberToResponse(createdMember)).willReturn(response);
+
+        System.out.println("response id = " + response.getId());
+        System.out.println("response nickname = " + response.getNickname());
+
+        ResultActions actions =
+                mockMvc.perform(get("/members/{member-id}", memberId)
+                        .with(csrf())
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON));
+
+        actions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(response.getId()))
+                .andExpect(jsonPath("$.data.email").value(response.getEmail()))
+                .andExpect(jsonPath("$.data.nickname").value(response.getNickname()))
+                .andDo(document("get-member",
+                        getResponsePreProcessor(),
+                        pathParameters(
+                                parameterWithName("member-id").description("회원 식별자")
+                        ),
+                        responseFields(
+                                List.of(
+                                        fieldWithPath("data").type(JsonFieldType.OBJECT).description("결과 데이터"),
+                                        fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
+                                        fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                        fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                                        fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
+                                        fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description(" 정보 수정일자")
+                        ))));
+    }
+
+    @DisplayName("회원 정보 조회 - 다수")
+    @Test
+    void getMembers()
+    {
+        LocalDateTime createdAt = LocalDateTime.now();
+        LocalDateTime modifiedAt = LocalDateTime.now();
+
+        Member member1 = Member.builder()
+                .email("mike@ticonsys.com")
+                .password("123456789")
+                .nickname("홍길동")
+                .build();
+
+        Member member2 = Member.builder()
+                .email("aaa@naver.com")
+                .password("123456789")
+                .nickname("홍길동")
+                .build();
+
+
+    }
+
+
+    @DisplayName("회원 정보 삭제")
+    @Test
+    void deleteMember() throws Exception
+    {
+        Long memberId = 1L;
+        Member member = Member.builder()
+                .email("mike@ticonsys.com")
+                .password("123456789")
+                .nickname("홍길동")
+                .build();
+
+        given(memberService.getMemberById(Mockito.anyLong())).willReturn(member);
+
+        ResultActions actions =
+                mockMvc.perform(
+                        delete("/members/{member-id}", memberId)
+                                .with(csrf())
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.APPLICATION_JSON));
+
+        actions
+                .andExpect(status().isNoContent())
+                .andDo(document("delete-member",
+                        pathParameters(
+                                parameterWithName("member-id").description("회원 식별자"))));
     }
 }

@@ -48,11 +48,11 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         return Projections.constructor(MemberResponseDto.class,
                 member.id,
                 member.email,
-                member.password,
                 member.nickname,
                 member.createdAt,
                 member.modifiedAt);
     }
+
 
     private BooleanExpression ltMemberId(Long memberId)
     {

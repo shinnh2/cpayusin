@@ -1,6 +1,7 @@
 package com.jbaacount.file.entity;
 
 import com.jbaacount.global.audit.BaseEntity;
+import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -29,8 +30,12 @@ public class File extends BaseEntity
     private String contentType;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", nullable = false)
+    @JoinColumn(name = "post_id")
     private Post post;
+
+    @OneToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
 
     @Builder
     public File(String uploadFileName, String storeFileName, String url, String contentType)
@@ -48,5 +53,11 @@ public class File extends BaseEntity
 
         this.post = post;
         post.getFiles().add(this);
+    }
+
+    public void addMember(Member member)
+    {
+        this.member = member;
+        member.setFile(this);
     }
 }
