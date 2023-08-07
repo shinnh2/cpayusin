@@ -60,7 +60,7 @@ public class MemberService
         Optional.ofNullable(request.getNickname())
                 .ifPresent(nickname -> findMember.updateNickname(nickname));
         Optional.ofNullable(request.getPassword())
-                .ifPresent(password -> findMember.updatePassword(password));
+                .ifPresent(password -> findMember.updatePassword(passwordEncoder.encode(password)));
 
         return findMember;
     }

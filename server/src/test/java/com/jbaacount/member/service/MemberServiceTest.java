@@ -132,12 +132,12 @@ class MemberServiceTest
     {
         Member member = memberRepository.findByEmail("aaaa@naver.com").get();
         MemberPatchDto request = new MemberPatchDto();
-        request.setNickname("홍길동");
+        request.setNickname("고길동");
 
         Member updatedMember = memberService.updateMember(member.getId(), request, member);
 
         assertThat(updatedMember.getEmail()).isEqualTo("aaaa@naver.com");
-        assertThat(updatedMember.getNickname()).isEqualTo("홍길동");
+        assertThat(updatedMember.getNickname()).isEqualTo("고길동");
     }
 
     @DisplayName("회원 수정 - 다른 유저가 수정 시도")

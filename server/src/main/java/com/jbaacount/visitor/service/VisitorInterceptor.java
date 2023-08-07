@@ -28,8 +28,9 @@ public class VisitorInterceptor implements HandlerInterceptor
 
         ValueOperations valueOperations = redisTemplate.opsForValue();
 
-        if(!valueOperations.getOperations().hasKey(key))
-            valueOperations.set(key, userAgent);
+        if(!redisTemplate.hasKey(key)) {
+            redisTemplate.opsForValue().set(key, userAgent);
+        }
 
         log.info("ip address = {}", ipAddress);
         log.info("key = {}", key);
