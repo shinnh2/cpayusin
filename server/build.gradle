@@ -86,9 +86,13 @@ tasks.named('asciidoctor') {
     dependsOn test
 }
 
-tasks.named('build') {
-    dependsOn asciidoctor
+if (!project.hasProperty('noAsciidoctor')) {
+    tasks.named('build') {
+        dependsOn asciidoctor
+    }
 }
+
+
 
 task copyDocument(type: Copy){
     dependsOn asciidoctorj

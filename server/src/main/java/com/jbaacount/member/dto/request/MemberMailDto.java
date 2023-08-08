@@ -1,11 +1,13 @@
 package com.jbaacount.member.dto.request;
 
 import com.jbaacount.global.validation.notspace.NotSpace;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 
 @Data
 public class MemberMailDto
 {
+    @Email
     private String email;
     private String verificationCode;
 

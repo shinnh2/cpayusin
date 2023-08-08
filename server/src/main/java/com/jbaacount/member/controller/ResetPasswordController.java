@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @Slf4j
 @RequestMapping("/members/help")
-public class MailController
+public class ResetPasswordController
 {
     private final MailService mailService;
     private final MemberMapper memberMapper;
@@ -23,7 +23,7 @@ public class MailController
     @GetMapping("/password")
     public ResponseEntity verifyEmail(@RequestBody MemberMailDto mailDto)
     {
-        String verificationCode = mailService.sendMail(mailDto.getEmail());
+        String verificationCode = mailService.sendMailForRestPassword(mailDto.getEmail());
 
         return new ResponseEntity(verificationCode, HttpStatus.OK);
     }
@@ -31,12 +31,12 @@ public class MailController
     @GetMapping("/verification-code")
     public ResponseEntity verifyCode(@RequestBody MemberMailDto mailDto)
     {
-        boolean response = mailService.verifyCode(mailDto.getEmail(), mailDto.getVerificationCode());
+        boolean response = mailService.verifyCodeForResetPassword(mailDto.getEmail(), mailDto.getVerificationCode());
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @PatchMapping("/reset")
+    @PatchMapping("/reset-password")
     public ResponseEntity resetPassword(@RequestBody @Valid MemberMailDto mailDto)
     {
         MemberResponseDto response = memberMapper.memberToResponse(mailService.resetPassword(mailDto.getEmail(), mailDto.getPassword()));
