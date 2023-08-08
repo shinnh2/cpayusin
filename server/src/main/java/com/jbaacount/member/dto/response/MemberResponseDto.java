@@ -1,13 +1,10 @@
 package com.jbaacount.member.dto.response;
 
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor
 @Data
@@ -19,6 +16,7 @@ public class MemberResponseDto
 
     private String email;
 
+    private String profileImage;
 
     private LocalDateTime createdAt;
 
@@ -26,11 +24,12 @@ public class MemberResponseDto
 
 
     @QueryProjection
-    public MemberResponseDto(Long id, String nickname, String email, LocalDateTime createdAt, LocalDateTime modifiedAt)
+    public MemberResponseDto(Long id, String nickname, String email, String profileImage, LocalDateTime createdAt, LocalDateTime modifiedAt)
     {
         this.id = id;
         this.nickname = nickname;
         this.email = email;
+        this.profileImage = profileImage;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
     }

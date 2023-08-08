@@ -53,7 +53,9 @@ public enum ExceptionMessage
     /**
      * file
      */
-    FILE_NOT_STORE("파일을 저장할 수 없습니다.");
+    FILE_NOT_STORED("파일을 저장할 수 없습니다."),
+
+    EXT_NOT_ACCEPTED("이미지 확장자만 사용할 수 있습니다.");
 
 
     @Getter

@@ -27,7 +27,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.utils.AppDocumentUtils.getRequestPreProcessor;
@@ -42,7 +41,6 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -163,6 +161,7 @@ class MemberControllerTest
         long memberId = 1L;
 
         String nickname = "홍길동";
+        String password = "123456789!";
 
         Member memberRequest = Member.builder()
                 .nickname("nickname")
@@ -174,6 +173,7 @@ class MemberControllerTest
 
         MemberPatchDto patch = new MemberPatchDto();
         patch.setNickname(nickname);
+        patch.setPassword(password);
         String content = gson.toJson(patch);
 
         MemberResponseDto response = new MemberResponseDto();
@@ -183,7 +183,7 @@ class MemberControllerTest
         response.setCreatedAt(LocalDateTime.now());
         response.setModifiedAt(LocalDateTime.now());
 
-        given(memberService.updateMember(anyLong(), any(MemberPatchDto.class), any(Member.class))).willReturn(member);
+        given(memberService.updateMember(anyLong(), any(MemberPatchDto.class), null, any(Member.class))).willReturn(member);
 
         System.out.println("returned Member = " + member);
 
@@ -199,7 +199,7 @@ class MemberControllerTest
 
         actions
                 .andExpect(status().isOk())
-                //.andExpect(jsonPath("$.data.nickname").value(nickname))
+                .andExpect(jsonPath("$.data.nickname").value(nickname))
                 .andDo(document("patch-member",
                         getRequestPreProcessor(),
                         getResponsePreProcessor(),
@@ -208,7 +208,8 @@ class MemberControllerTest
                         ),
                         requestFields(
                                 List.of(
-                                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("회원 닉네임")
+                                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
+                                        fieldWithPath("password").type(JsonFieldType.STRING).description("회원 비밀번호")
                                 )
                         ),
                         responseFields(

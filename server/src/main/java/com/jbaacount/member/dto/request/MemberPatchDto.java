@@ -11,8 +11,6 @@ import org.hibernate.validator.constraints.Length;
 @Data
 public class MemberPatchDto
 {
-    private Long id;
-
     @Length(min = 3, max = 10, message = "닉네임은 3자 이상 10자 이하여야 합니다.")
     @Pattern(regexp = "[A-z가-힣0-9 ]{3,10}", message = "닉네임에는 특수문자 및 공백이 올 수 없습니다.")
     @NotSpace

@@ -29,6 +29,7 @@ public class MemberMapper
         response.setId(member.getId());
         response.setNickname(member.getNickname());
         response.setEmail(member.getEmail());
+        response.setProfileImage(member.getFile() != null ? member.getFile().getUrl() : null);
         response.setCreatedAt(member.getCreatedAt());
         response.setModifiedAt(member.getModifiedAt());
 

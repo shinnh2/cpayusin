@@ -134,7 +134,7 @@ class MemberServiceTest
         MemberPatchDto request = new MemberPatchDto();
         request.setNickname("고길동");
 
-        Member updatedMember = memberService.updateMember(member.getId(), request, member);
+        Member updatedMember = memberService.updateMember(member.getId(), request, null, member);
 
         assertThat(updatedMember.getEmail()).isEqualTo("aaaa@naver.com");
         assertThat(updatedMember.getNickname()).isEqualTo("고길동");
@@ -150,7 +150,7 @@ class MemberServiceTest
         MemberPatchDto request = new MemberPatchDto();
         request.setNickname("홍길동");
 
-        assertThrows(BusinessLogicException.class, () -> memberService.updateMember(member1.getId(), request, member2));
+        assertThrows(BusinessLogicException.class, () -> memberService.updateMember(member1.getId(), request, null, member2));
     }
 
     @DisplayName("회원 조회")

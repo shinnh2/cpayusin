@@ -47,8 +47,9 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         log.info("===memberToResponse===");
         return Projections.constructor(MemberResponseDto.class,
                 member.id,
-                member.email,
                 member.nickname,
+                member.email,
+                member.file.url,
                 member.createdAt,
                 member.modifiedAt);
     }

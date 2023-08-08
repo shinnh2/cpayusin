@@ -1,5 +1,6 @@
 package com.jbaacount.member.service;
 
+import com.jbaacount.file.service.FileService;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,7 @@ public class MemberService
     private final PasswordEncoder passwordEncoder;
     private final CustomAuthorityUtils authorityUtils;
     private final AuthorizationService authorizationService;
+    private final FileService fileService;
 
     public Member createMember(Member member)
     {
@@ -37,8 +40,9 @@ public class MemberService
         String nickname = member.getNickname();
 
         verifyExistEmail(email);
-        log.info("email = {}", email);
         verifyExistNickname(nickname);
+
+        log.info("email = {}", email);
         log.info("nickname = {}", nickname);
 
         Member savedMember = memberRepository.save(member);
@@ -49,18 +53,28 @@ public class MemberService
         return savedMember;
     }
 
-    public Member updateMember(Long memberId, MemberPatchDto request, Member currentMember)
+    public Member updateMember(Long memberId, MemberPatchDto request, MultipartFile multipartFile, Member currentMember)
     {
         Member findMember = getMemberById(memberId);
-        authorizationService.checkPermission(memberId, currentMember);
+        authorizationService.isTheSameUser(memberId, currentMember.getId());
 
         log.info("===updateMember===");
         log.info("findMember email = {}", findMember.getEmail());
 
-        Optional.ofNullable(request.getNickname())
-                .ifPresent(nickname -> findMember.updateNickname(nickname));
-        Optional.ofNullable(request.getPassword())
-                .ifPresent(password -> findMember.updatePassword(passwordEncoder.encode(password)));
+        if(multipartFile != null && !multipartFile.isEmpty())
+        {
+            fileService.deleteProfilePhoto(findMember);
+            fileService.storeProfileImage(multipartFile, findMember);
+            log.info("profile image = {}", findMember.getFile().getUrl());
+        }
+
+        if(request != null)
+        {
+            Optional.ofNullable(request.getNickname())
+                    .ifPresent(nickname -> findMember.updateNickname(nickname));
+            Optional.ofNullable(request.getPassword())
+                    .ifPresent(password -> findMember.updatePassword(passwordEncoder.encode(password)));
+        }
 
         return findMember;
     }
@@ -75,8 +89,6 @@ public class MemberService
     @Transactional(readOnly = true)
     public Slice<MemberResponseDto> getAllMembers(String keyword, Long memberId, Pageable pageable)
     {
-        log.info("===geAllMembers in service===");
-
         return memberRepository.findAllMembers(keyword, memberId, pageable);
     }
 
@@ -84,8 +96,12 @@ public class MemberService
     {
         Member member = getMemberById(memberId);
         authorizationService.checkPermission(memberId, currentMember);
-        memberRepository.deleteById(memberId);
+
         log.info("deleted Member nickname = {}", member.getNickname());
+        log.info("delete image = {}", member.getFile().getUrl());
+
+        memberRepository.deleteById(memberId);
+        fileService.deleteProfilePhoto(member);
     }
 
     private void verifyExistEmail(String email)

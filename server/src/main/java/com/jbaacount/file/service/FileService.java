@@ -6,6 +6,7 @@ import com.jbaacount.file.entity.File;
 import com.jbaacount.file.repository.FileRepository;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
+import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -33,7 +35,7 @@ public class FileService
 
         for(MultipartFile file : files)
         {
-            File storedFile = storeFile(file, post);
+            File storedFile = storeFileInPost(file, post);
             storedFiles.add(storedFile);
 
             log.info("file saved successfully = {}", storedFile.getStoreFileName());
@@ -59,22 +61,61 @@ public class FileService
         fileRepository.deleteAll(files);
     }
 
-
-    private File storeFile(MultipartFile multipartFile, Post post)
+    public void deleteProfilePhoto(Member member)
     {
+        Optional<File> file = fileRepository.findByMemberId(member.getId());
+
+        if(file.isPresent())
+        {
+            log.info("file removed successfully = {}", file.get().getStoreFileName());
+            fileRepository.deleteById(file.get().getId());
+        }
+    }
+
+    public File storeProfileImage(MultipartFile multipartFile, Member member)
+    {
+        String ext = multipartFile.getContentType();
+        if(!ext.contains("image"))
+            throw new BusinessLogicException(ExceptionMessage.EXT_NOT_ACCEPTED);
+
         String uploadFileName = multipartFile.getOriginalFilename();
         String storeFileName = createStoreFileName(uploadFileName);
+        String location = "profile/";
 
         try{
-            saveUploadFile(storeFileName, multipartFile);
+            saveUploadFile(storeFileName, multipartFile, location);
         } catch (IOException e){
-            throw new BusinessLogicException(ExceptionMessage.FILE_NOT_STORE);
+            throw new BusinessLogicException(ExceptionMessage.FILE_NOT_STORED);
         }
 
         File file = File.builder()
                 .uploadFileName(uploadFileName)
                 .storeFileName(storeFileName)
-                .url(getFileUrl(storeFileName))
+                .url(getFileUrl(storeFileName, location))
+                .contentType(extractContentType(multipartFile))
+                .build();
+
+        file.addMember(member);
+        return fileRepository.save(file);
+    }
+
+
+    private File storeFileInPost(MultipartFile multipartFile, Post post)
+    {
+        String uploadFileName = multipartFile.getOriginalFilename();
+        String storeFileName = createStoreFileName(uploadFileName);
+        String location = "post/";
+
+        try{
+            saveUploadFile(storeFileName, multipartFile, location);
+        } catch (IOException e){
+            throw new BusinessLogicException(ExceptionMessage.FILE_NOT_STORED);
+        }
+
+        File file = File.builder()
+                .uploadFileName(uploadFileName)
+                .storeFileName(storeFileName)
+                .url(getFileUrl(storeFileName, location))
                 .contentType(extractContentType(multipartFile))
                 .build();
 
@@ -82,25 +123,38 @@ public class FileService
         return fileRepository.save(file);
     }
 
-    private void saveUploadFile(String storeFileName, MultipartFile file) throws IOException
+    private void saveUploadFile(String storeFileName, MultipartFile file, String location) throws IOException
     {
         String contentType = extractContentType(file);
         ObjectMetadata metadata = new ObjectMetadata();
 
         metadata.setContentType(contentType);
         metadata.setContentLength(file.getSize());
-        amazonS3.putObject(bucket, "post/" + storeFileName, file.getInputStream(), metadata);
+        amazonS3.putObject(bucket, location + storeFileName, file.getInputStream(), metadata);
     }
 
-    private String getFileUrl(String fileName)
+    private String getFileUrl(String fileName, String location)
     {
-        return amazonS3.getUrl(bucket, "post/" + fileName).toString();
+        return amazonS3.getUrl(bucket,  location + fileName).toString();
     }
 
     private String extractContentType(MultipartFile multipartFile)
     {
         String contentType = multipartFile.getContentType();
+        String ext = extractedEXT(multipartFile.getOriginalFilename());
+        log.info("content type = {}", contentType);
 
+        if(contentType == null || "application/octet-stream".equals(contentType))
+        {
+            switch (ext.toLowerCase())
+            {
+                case "jfif":
+                    contentType = "image/jpeg";
+                    break;
+            }
+        }
+
+        log.info("content type = {}", contentType);
         return contentType;
     }
 

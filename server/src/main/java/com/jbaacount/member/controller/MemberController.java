@@ -1,12 +1,11 @@
 package com.jbaacount.member.controller;
 
 import com.jbaacount.global.dto.SingleResponseDto;
-import com.jbaacount.global.dto.SliceDto;
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.member.dto.request.MemberPatchDto;
 import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
+import com.jbaacount.member.entity.Member;
+import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.member.service.MemberService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -18,11 +17,9 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @Validated
@@ -48,11 +45,12 @@ public class MemberController
 
 
     @PatchMapping("/{member-id}")
-    public ResponseEntity updateMember(@RequestBody @Valid MemberPatchDto patchDto,
-                                       @PathVariable("member-id") @Positive long memberId,
+    public ResponseEntity updateMember(@RequestParam(value = "data", required = false) @Valid MemberPatchDto patchDto,
+                                       @RequestParam(value = "image", required = false)MultipartFile multipartFile,
+                                       @PathVariable("member-id")@Positive long memberId,
                                        @AuthenticationPrincipal Member currentUser)
     {
-        Member updatedMember = memberService.updateMember(memberId, patchDto, currentUser);
+        Member updatedMember = memberService.updateMember(memberId, patchDto, multipartFile, currentUser);
         MemberResponseDto response = memberMapper.memberToResponse(updatedMember);
 
         log.info("===updateMember===");
