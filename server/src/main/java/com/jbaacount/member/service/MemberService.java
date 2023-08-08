@@ -98,10 +98,14 @@ public class MemberService
         authorizationService.checkPermission(memberId, currentMember);
 
         log.info("deleted Member nickname = {}", member.getNickname());
-        log.info("delete image = {}", member.getFile().getUrl());
+
+        if(member.getFile() != null)
+        {
+            log.info("delete image = {}", member.getFile().getUrl());
+            fileService.deleteProfilePhoto(member);
+        }
 
         memberRepository.deleteById(memberId);
-        fileService.deleteProfilePhoto(member);
     }
 
     private void verifyExistEmail(String email)

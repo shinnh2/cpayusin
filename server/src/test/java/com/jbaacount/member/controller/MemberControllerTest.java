@@ -1,6 +1,9 @@
 package com.jbaacount.member.controller;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.google.gson.Gson;
+import com.jbaacount.file.repository.FileRepository;
+import com.jbaacount.file.service.FileService;
 import com.jbaacount.member.dto.request.MemberPatchDto;
 import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
@@ -20,11 +23,16 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.mock.web.MockPart;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -38,8 +46,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -52,6 +59,15 @@ class MemberControllerTest
 {
     @Autowired
     private MockMvc mockMvc;
+
+    @MockBean
+    private AmazonS3 amazonS3;
+
+    @MockBean
+    private FileRepository fileRepository;
+
+    @MockBean
+    private FileService fileService;
 
     @MockBean
     private MemberService memberService;
@@ -108,6 +124,7 @@ class MemberControllerTest
         response.setId(member.getId());
         response.setNickname(member.getNickname());
         response.setEmail(member.getEmail());
+        response.setProfileImage(null);
         response.setCreatedAt(member.getCreatedAt());
         response.setModifiedAt(member.getModifiedAt());
 
@@ -146,6 +163,7 @@ class MemberControllerTest
                                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
                                         fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                                         fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).optional().description("회원 프로필 사진"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
                                         fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("회원 정보 수정 일자")
                                 )
@@ -162,40 +180,46 @@ class MemberControllerTest
 
         String nickname = "홍길동";
         String password = "123456789!";
+        MockMultipartFile mockMultipartFile = new MockMultipartFile("image", "image.png", "png", new byte[]{1,2,3,4});
 
         Member memberRequest = Member.builder()
                 .nickname("nickname")
-                .email("mike@ticonsys.com")
+                .email("aaaa@naver.com")
                 .password("123456789")
                 .build();
 
         Member member = memberService.createMember(memberRequest);
 
-        MemberPatchDto patch = new MemberPatchDto();
-        patch.setNickname(nickname);
-        patch.setPassword(password);
-        String content = gson.toJson(patch);
+        MemberPatchDto patchDto = new MemberPatchDto();
+        patchDto.setNickname(nickname);
+        patchDto.setPassword(password);
+
+        String content = gson.toJson(patchDto);
+        MockPart data = new MockPart("data", content.getBytes());
+
+        data.getHeaders().setContentType(MediaType.APPLICATION_JSON);
 
         MemberResponseDto response = new MemberResponseDto();
         response.setId(memberId);
-        response.setEmail("mike@ticonsys.com");
+        response.setEmail("aaaa@naver.com");
         response.setNickname(nickname);
+        response.setProfileImage("https://abcd.s3.ap-northeast-2.amazonaws.com/profile/efd8196a-3049-43b8-8664-452bba2b8bad.png");
         response.setCreatedAt(LocalDateTime.now());
         response.setModifiedAt(LocalDateTime.now());
 
-        given(memberService.updateMember(anyLong(), any(MemberPatchDto.class), null, any(Member.class))).willReturn(member);
-
-        System.out.println("returned Member = " + member);
-
+        given(memberService.updateMember(anyLong(), any(MemberPatchDto.class), any(MockMultipartFile.class), any(Member.class))).willReturn(member);
         given(memberMapper.memberToResponse(member)).willReturn(response);
 
 
         ResultActions actions = mockMvc
-                .perform(patch("/members/{member-id}", memberId)
-                        .with(csrf())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(content));
+                .perform(
+                        multipartPatchBuilder("/members/{member-id}", memberId)
+                                .file("image", mockMultipartFile.getBytes())
+                                .part(data)
+                                .with(csrf())
+                                .accept(MediaType.APPLICATION_JSON)
+                                .contentType(MediaType.MULTIPART_FORM_DATA_VALUE)
+                );
 
         actions
                 .andExpect(status().isOk())
@@ -206,11 +230,14 @@ class MemberControllerTest
                         pathParameters(
                                 parameterWithName("member-id").description("회원 식별자")
                         ),
-                        requestFields(
-                                List.of(
-                                        fieldWithPath("nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
-                                        fieldWithPath("password").type(JsonFieldType.STRING).description("회원 비밀번호")
-                                )
+                        requestParts(
+                                partWithName("data").description("회원 정보").optional(),
+                                partWithName("image").description("프로필 이미지").optional()
+
+                        ),
+                        requestPartFields("data",
+                                fieldWithPath("nickname").type(JsonFieldType.STRING).description("회원 닉네임").optional(),
+                                fieldWithPath("password").type(JsonFieldType.STRING).description("회원 비밀번호").optional()
                         ),
                         responseFields(
                                 List.of(
@@ -218,6 +245,7 @@ class MemberControllerTest
                                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
                                         fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                                         fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).optional().description("회원 프로필 사진"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
                                         fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description(" 정보 수정일자")
                                 )
@@ -251,6 +279,7 @@ class MemberControllerTest
         response.setId(memberId);
         response.setEmail(createdMember.getEmail());
         response.setNickname(createdMember.getNickname());
+        response.setProfileImage(null);
         response.setCreatedAt(createdAt);
         response.setModifiedAt(modifiedAt);
 
@@ -264,6 +293,7 @@ class MemberControllerTest
                         .with(csrf())
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON));
+
 
         actions
                 .andExpect(status().isOk())
@@ -281,6 +311,7 @@ class MemberControllerTest
                                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
                                         fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                                         fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                                        fieldWithPath("data.profileImage").type(JsonFieldType.STRING).optional().description("회원 프로필 사진"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
                                         fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description(" 정보 수정일자")
                         ))));
@@ -334,5 +365,17 @@ class MemberControllerTest
                 .andDo(document("delete-member",
                         pathParameters(
                                 parameterWithName("member-id").description("회원 식별자"))));
+    }
+
+    private MockMultipartHttpServletRequestBuilder multipartPatchBuilder(String url, Long memberId)
+    {
+        MockMultipartHttpServletRequestBuilder builder = RestDocumentationRequestBuilders.multipart("/members/{member-id}", memberId);
+
+        builder.with(request -> {
+            request.setMethod(HttpMethod.PATCH.name());
+            return request;
+        });
+
+        return builder;
     }
 }

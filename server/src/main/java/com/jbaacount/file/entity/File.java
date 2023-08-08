@@ -20,7 +20,7 @@ public class File extends BaseEntity
     @Column(nullable = false)
     private String uploadFileName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String storeFileName;
 
     @Column(nullable = false)

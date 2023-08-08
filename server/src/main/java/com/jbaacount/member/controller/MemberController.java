@@ -45,8 +45,8 @@ public class MemberController
 
 
     @PatchMapping("/{member-id}")
-    public ResponseEntity updateMember(@RequestParam(value = "data", required = false) @Valid MemberPatchDto patchDto,
-                                       @RequestParam(value = "image", required = false)MultipartFile multipartFile,
+    public ResponseEntity updateMember(@RequestPart(value = "data", required = false) @Valid MemberPatchDto patchDto,
+                                       @RequestPart(value = "image", required = false)MultipartFile multipartFile,
                                        @PathVariable("member-id")@Positive long memberId,
                                        @AuthenticationPrincipal Member currentUser)
     {
