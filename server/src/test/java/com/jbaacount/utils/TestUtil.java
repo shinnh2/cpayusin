@@ -3,6 +3,8 @@ package com.jbaacount.utils;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.service.MemberService;
 
+import java.lang.reflect.Field;
+
 public class TestUtil
 {
     private static final String adminEmail = "mike@ticonsys.com";
@@ -27,5 +29,32 @@ public class TestUtil
 
         return memberService.createMember(user);
     }
+
+    public static void setFieldsForEntity(Object targetObject, String fieldName, Object value) {
+        try {
+            Field field = getField(targetObject.getClass(), fieldName);
+
+            if (field == null) {
+                throw new NoSuchFieldException("Field " + fieldName + " not found on " + targetObject.getClass());
+            }
+
+            field.setAccessible(true);  // make it accessible
+            field.set(targetObject, value);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException("Failed to set field using reflection", e);
+        }
+    }
+
+    private static Field getField(Class<?> clazz, String fieldName) {
+        try {
+            return clazz.getDeclaredField(fieldName);
+        } catch (NoSuchFieldException e) {
+            if (clazz.getSuperclass() != null) {
+                return getField(clazz.getSuperclass(), fieldName);
+            }
+            return null;
+        }
+    }
+
 
 }
