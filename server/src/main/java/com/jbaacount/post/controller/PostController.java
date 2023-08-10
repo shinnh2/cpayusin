@@ -6,6 +6,7 @@ import com.jbaacount.member.service.MemberService;
 import com.jbaacount.post.dto.request.PostPatchDto;
 import com.jbaacount.post.dto.request.PostPostDto;
 import com.jbaacount.post.dto.response.PostResponseDto;
+import com.jbaacount.post.dto.response.PostResponseForProfile;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.mapper.PostMapper;
 import com.jbaacount.post.service.PostService;
@@ -13,6 +14,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -69,6 +73,16 @@ public class PostController
         PostResponseDto response = postMapper.postEntityToResponse(postService.getPostById(postId), currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+    }
+
+    @GetMapping("/profile/{member-id}/posts")
+    public ResponseEntity getAllPostsByMemberId(@PathVariable("member-id") @Positive Long memberId,
+                                                @RequestParam(required = false) Long last,
+                                                @PageableDefault Pageable pageable)
+    {
+        Slice<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, last, pageable);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{post-id}")
