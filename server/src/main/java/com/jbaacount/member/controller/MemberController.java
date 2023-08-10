@@ -103,14 +103,14 @@ public class MemberController
     }
 
     @GetMapping("/exist/email")
-    public ResponseEntity checkExistEmail(@RequestParam String email)
+    public ResponseEntity checkExistEmail(@RequestBody MemberPostDto memberPostDto)
     {
-        return ResponseEntity.ok(memberService.checkExistEmail(email));
+        return ResponseEntity.ok(memberService.checkExistEmail(memberPostDto.getEmail()));
     }
 
     @GetMapping("/exist/nickname")
-    public ResponseEntity checkExistNickname(@RequestParam String nickname)
+    public ResponseEntity checkExistNickname(@RequestBody MemberPostDto memberPostDto)
     {
-        return ResponseEntity.ok(memberService.checkExistNickname(nickname));
+        return ResponseEntity.ok(memberService.checkExistNickname(memberPostDto.getNickname()));
     }
 }

@@ -138,15 +138,19 @@ public class MemberService
     }
 
     @Transactional(readOnly = true)
-    public boolean checkExistEmail(String email)
+    public String checkExistEmail(String email)
     {
-        return memberRepository.findByEmail(email).isPresent();
+        boolean response = memberRepository.findByEmail(email).isPresent();
+
+        return response ? "이미 사용중인 이메일입니다." : "사용할 수 있는 이메일입니다.";
     }
 
     @Transactional(readOnly = true)
-    public boolean checkExistNickname(String nickname)
+    public String checkExistNickname(String nickname)
     {
-        return memberRepository.findByNickname(nickname).isPresent();
+        boolean response = memberRepository.findByNickname(nickname).isPresent();
+
+        return response ? "이미 사용중인 닉네임입니다." : "사용할 수 있는 닉네임입니다.";
     }
 
 }
