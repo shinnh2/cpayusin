@@ -21,6 +21,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @Slf4j
 @Validated
 @RequiredArgsConstructor
@@ -79,6 +81,15 @@ public class MemberController
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
+    @GetMapping("/score")
+    public ResponseEntity get3MembersByScore()
+    {
+        List<MemberResponseDto> response = memberMapper.membersToResponseList(memberService.findTop3MembersByScore());
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
 
     @DeleteMapping("/{member-id}")
     public ResponseEntity deleteMember(@PathVariable("member-id") @Positive long memberId,

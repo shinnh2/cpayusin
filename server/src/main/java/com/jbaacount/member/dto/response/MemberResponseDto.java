@@ -18,6 +18,8 @@ public class MemberResponseDto
 
     private String profileImage;
 
+    private int score;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;

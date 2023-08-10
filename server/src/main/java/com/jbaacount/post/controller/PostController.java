@@ -2,6 +2,7 @@ package com.jbaacount.post.controller;
 
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
+import com.jbaacount.member.service.MemberService;
 import com.jbaacount.post.dto.request.PostPatchDto;
 import com.jbaacount.post.dto.request.PostPostDto;
 import com.jbaacount.post.dto.response.PostResponseDto;
@@ -28,6 +29,7 @@ public class PostController
 {
     private final PostService postService;
     private final PostMapper postMapper;
+    private final MemberService memberService;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity savePost(@RequestPart(value = "data") @Valid PostPostDto request,
@@ -36,13 +38,14 @@ public class PostController
     {
         Long categoryId = request.getCategoryId();
         Long boardId = request.getBoardId();
+        Member member = memberService.getMemberById(currentMember.getId());
 
         log.info("category id = {}", categoryId);
         log.info("board Id = {}", boardId);
 
         Post post = postMapper.postDtoToPostEntity(request);
-        Post savedPost = postService.createPost(post, files, categoryId, boardId, currentMember);
-        PostResponseDto response = postMapper.postEntityToResponse(savedPost, currentMember);
+        Post savedPost = postService.createPost(post, files, categoryId, boardId, member);
+        PostResponseDto response = postMapper.postEntityToResponse(savedPost, member);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }

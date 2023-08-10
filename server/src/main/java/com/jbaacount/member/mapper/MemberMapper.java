@@ -6,6 +6,9 @@ import com.jbaacount.member.dto.response.MemberResponseDto;
 import com.jbaacount.member.entity.Member;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class MemberMapper
 {
@@ -30,10 +33,18 @@ public class MemberMapper
         response.setNickname(member.getNickname());
         response.setEmail(member.getEmail());
         response.setProfileImage(member.getFile() != null ? member.getFile().getUrl() : null);
+        response.setScore(member.getScore());
         response.setCreatedAt(member.getCreatedAt());
         response.setModifiedAt(member.getModifiedAt());
 
         return response;
+    }
+
+    public List<MemberResponseDto> membersToResponseList(List<Member> members)
+    {
+        return members.stream()
+                .map(member -> memberToResponse(member))
+                .collect(Collectors.toList());
     }
 
     public MemberInfoForResponse memberToMemberInfo(Member member)

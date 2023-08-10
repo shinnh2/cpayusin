@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,6 +91,22 @@ public class MemberService
     public Slice<MemberResponseDto> getAllMembers(String keyword, Long memberId, Pageable pageable)
     {
         return memberRepository.findAllMembers(keyword, memberId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Member> findTop3MembersByScore()
+    {
+        List<Integer> scores = memberRepository.find3rdScore();
+
+        if(scores.isEmpty())
+            return Collections.emptyList();
+
+        Integer score = scores.get(scores.size() - 1);
+
+        if(scores.size() >= 3)
+            score = scores.get(2);
+
+        return memberRepository.findTop3MembersByScore(score);
     }
 
     public void deleteById(long memberId, Member currentMember)

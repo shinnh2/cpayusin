@@ -46,6 +46,12 @@ public class CommentService
 
             savedComment.addParent(parent);
         }
+
+        if(post.getMember() != currentMember)
+        {
+            currentMember.getScoreByComment();
+        }
+
         return savedComment;
     }
 

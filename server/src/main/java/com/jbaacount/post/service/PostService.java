@@ -60,6 +60,8 @@ public class PostService
 
         savedPost.addMember(currentMember);
         savedPost.addBoard(board);
+        savedPost.getMember().getScoreByPost();
+        log.info("member score = {}", savedPost.getMember().getScore());
 
         return savedPost;
     }

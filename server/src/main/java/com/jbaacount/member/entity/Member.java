@@ -36,6 +36,9 @@ public class Member extends BaseEntity
     @Column(name = "verification_code_expiry")
     private LocalDateTime verificationCodeExpiry;
 
+    @Column(nullable = false, name = "score")
+    private int score;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
@@ -59,6 +62,7 @@ public class Member extends BaseEntity
         this.email = email;
         this.password = password;
         this.platform = Platform.HOME;
+        this.score = 0;
     }
 
     public Member(String nickname, String email, List<String> roles, Platform platform)
@@ -68,6 +72,7 @@ public class Member extends BaseEntity
         this.email = email;
         this.roles = roles;
         this.platform = platform;
+        this.score = 0;
     }
 
     public void updatePassword(String password)
@@ -89,5 +94,20 @@ public class Member extends BaseEntity
     public void setFile(File file)
     {
         this.file = file;
+    }
+
+    public void getScoreByVote()
+    {
+        this.score += 2;
+    }
+
+    public void getScoreByPost()
+    {
+        this.score += 3;
+    }
+
+    public void getScoreByComment()
+    {
+        this.score += 1;
     }
 }

@@ -39,6 +39,7 @@ public class VoteService
             log.info("vote saved successfully");
             Vote savedVote = voteRepository.save(new Vote(currentMember, post));
             post.upVote();
+            post.getMember().getScoreByVote();
 
             log.info("voted post = {}", savedVote.getPost().getTitle());
             return true;
@@ -65,6 +66,7 @@ public class VoteService
         {
             voteRepository.save(new Vote(currentMember, comment));
             comment.upVote();
+            comment.getMember().getScoreByVote();
 
             log.info("===voteService===");
             log.info("vote saved successfully");

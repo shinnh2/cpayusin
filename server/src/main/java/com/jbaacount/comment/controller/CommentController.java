@@ -10,6 +10,7 @@ import com.jbaacount.comment.service.CommentService;
 import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
+import com.jbaacount.member.service.MemberService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class CommentController
 {
     private final CommentService commentService;
     private final CommentMapper commentMapper;
+    private final MemberService memberService;
 
 
     @PostMapping("/{post-id}/comment")
@@ -37,8 +39,9 @@ public class CommentController
                                       @AuthenticationPrincipal Member currentMember)
     {
         Comment comment = commentMapper.postToComment(request);
-        Comment savedComment = commentService.saveComment(comment, postId, request.getParentId(), currentMember);
-        CommentSingleResponse response = commentMapper.commentToResponse(savedComment, currentMember);
+        Member member = memberService.getMemberById(currentMember.getId());
+        Comment savedComment = commentService.saveComment(comment, postId, request.getParentId(), member);
+        CommentSingleResponse response = commentMapper.commentToResponse(savedComment, member);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
