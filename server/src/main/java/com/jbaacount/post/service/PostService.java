@@ -10,11 +10,14 @@ import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.dto.request.PostPatchDto;
+import com.jbaacount.post.dto.response.PostResponseForProfile;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
 import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -104,6 +107,14 @@ public class PostService
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND));
     }
 
+
+    @Transactional(readOnly = true)
+    public Slice<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Long last, Pageable pageable)
+    {
+        return postRepository.getAllPostsByMemberId(memberId, last, pageable);
+    }
+
+
     public void deletePostById(Long postId, Member currentMember)
     {
         Post post = getPostById(postId);
@@ -119,6 +130,7 @@ public class PostService
     {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
     }
+
 
     private Board getBoard(Long boardId)
     {
