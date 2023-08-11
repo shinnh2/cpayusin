@@ -164,6 +164,7 @@ class MemberControllerTest
                                         fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                                         fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
                                         fieldWithPath("data.profileImage").type(JsonFieldType.STRING).optional().description("회원 프로필 사진"),
+                                        fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("회원 점수"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
                                         fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("회원 정보 수정 일자")
                                 )
@@ -245,6 +246,7 @@ class MemberControllerTest
                                         fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("회원 식별자"),
                                         fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                                         fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
+                                        fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("회원 점수"),
                                         fieldWithPath("data.profileImage").type(JsonFieldType.STRING).optional().description("회원 프로필 사진"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
                                         fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description(" 정보 수정일자")
@@ -312,6 +314,7 @@ class MemberControllerTest
                                         fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("회원 닉네임"),
                                         fieldWithPath("data.email").type(JsonFieldType.STRING).description("회원 이메일"),
                                         fieldWithPath("data.profileImage").type(JsonFieldType.STRING).optional().description("회원 프로필 사진"),
+                                        fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("회원 점수"),
                                         fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("회원가입 일자"),
                                         fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description(" 정보 수정일자")
                         ))));

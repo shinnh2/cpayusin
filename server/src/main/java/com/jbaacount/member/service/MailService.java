@@ -32,7 +32,7 @@ public class MailService
     private final SpringTemplateEngine templateEngine;
     private final JavaMailSender mailSender;
     private final RedisTemplate<String, String> redisTemplate;
-    static String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private final String WORDS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     @Transactional
     public String sendMailForRestPassword(String to)
@@ -44,6 +44,17 @@ public class MailService
 
         return sendMail(to, verificationCode);
     }
+
+    @Transactional
+    public Member resetPassword(String email, String password)
+    {
+        Member member = findMemberByEmail(email);
+
+        member.updatePassword(passwordEncoder.encode(password.toString()));
+
+        return member;
+    }
+
 
     public boolean verifyCodeForResetPassword(String email, String inputCode)
     {
@@ -114,23 +125,13 @@ public class MailService
         return verificationCode;
     }
 
-    @Transactional
-    public Member resetPassword(String email, String password)
-    {
-        Member member = findMemberByEmail(email);
-
-        member.updatePassword(passwordEncoder.encode(password.toString()));
-
-        return member;
-    }
-
     private String generateVerificationCode()
     {
         Random random = new Random();
         StringBuilder sb = new StringBuilder();
         for(int i = 0; i < 8; i++)
         {
-            sb.append(ALPHABET.charAt(random.nextInt(ALPHABET.length())));
+            sb.append(WORDS.charAt(random.nextInt(WORDS.length())));
         }
         String verificationCode = sb.toString();
 
