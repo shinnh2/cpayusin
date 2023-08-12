@@ -3,12 +3,14 @@ package com.jbaacount.comment.controller;
 import com.jbaacount.comment.dto.request.CommentPatchDto;
 import com.jbaacount.comment.dto.request.CommentPostDto;
 import com.jbaacount.comment.dto.response.CommentMultiResponse;
+import com.jbaacount.comment.dto.response.CommentResponseForProfile;
 import com.jbaacount.comment.dto.response.CommentSingleResponse;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.mapper.CommentMapper;
 import com.jbaacount.comment.service.CommentService;
 import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -17,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -71,18 +74,27 @@ public class CommentController
     @GetMapping("/{post-id}/comment")
     public ResponseEntity getAllComments(@PathVariable("post-id") @Positive Long postId,
                                          @AuthenticationPrincipal Member currentMember,
-                                         Pageable pageable)
+                                         @PageableDefault(size = 8) Pageable pageable)
     {
         Page<CommentMultiResponse> response = commentService.getAllComments(postId, currentMember, pageable);
 
         return new ResponseEntity(new PageDto<>(response), HttpStatus.OK);
     }
 
+    @GetMapping("/profile/{member-id}/comments")
+    public ResponseEntity getAllCommentsForProfile(@PathVariable("member-id") @Positive Long memberId,
+                                                   @RequestParam(required = false) Long last,
+                                                   @PageableDefault(size = 8) Pageable pageable)
+    {
+        SliceDto<CommentResponseForProfile> response = commentService.getAllCommentsForProfile(memberId, last, pageable);
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 
 
     @DeleteMapping("/comment/{comment-id}")
     public ResponseEntity deleteComment(@PathVariable("comment-id") @Positive Long commentId,
-                                     @AuthenticationPrincipal Member currentMember)
+                                        @AuthenticationPrincipal Member currentMember)
     {
         commentService.deleteComment(commentId, currentMember);
 

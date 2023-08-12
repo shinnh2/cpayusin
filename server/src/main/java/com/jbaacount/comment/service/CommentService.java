@@ -2,8 +2,10 @@ package com.jbaacount.comment.service;
 
 import com.jbaacount.comment.dto.request.CommentPatchDto;
 import com.jbaacount.comment.dto.response.CommentMultiResponse;
+import com.jbaacount.comment.dto.response.CommentResponseForProfile;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.repository.CommentRepository;
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
@@ -78,6 +80,12 @@ public class CommentService
     public Page<CommentMultiResponse> getAllComments(Long postId, Member currentMember, Pageable pageable)
     {
         return commentRepository.getAllComments(postId, pageable, currentMember);
+    }
+
+    @Transactional(readOnly = true)
+    public SliceDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Long last, Pageable pageable)
+    {
+        return commentRepository.getAllCommentsForProfile(memberId, last, pageable);
     }
 
     public void deleteComment(Long commentId, Member currentMember)
