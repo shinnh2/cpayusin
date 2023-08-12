@@ -17,7 +17,7 @@ public class SliceDto<T>
     public SliceDto(List<T> data, Slice slice)
     {
         this.data = data;
-        this.sliceInfo = new SliceInfo(slice.getNumber() + 1, slice.getSize(),
+        this.sliceInfo = new SliceInfo(slice.getSize(),
                 slice.getNumberOfElements(), slice.hasNext());
     }
 }

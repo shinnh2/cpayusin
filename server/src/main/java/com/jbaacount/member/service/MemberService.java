@@ -1,6 +1,7 @@
 package com.jbaacount.member.service;
 
 import com.jbaacount.file.service.FileService;
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
@@ -88,7 +89,7 @@ public class MemberService
     }
 
     @Transactional(readOnly = true)
-    public Slice<MemberResponseDto> getAllMembers(String keyword, Long memberId, Pageable pageable)
+    public SliceDto<MemberResponseDto> getAllMembers(String keyword, Long memberId, Pageable pageable)
     {
         return memberRepository.findAllMembers(keyword, memberId, pageable);
     }
