@@ -3,7 +3,6 @@ package com.jbaacount.category.service;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.dto.request.CategoryPatchDto;
-import com.jbaacount.category.dto.response.CategoryInfoForResponse;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
 import com.jbaacount.file.service.FileService;
@@ -15,8 +14,6 @@ import com.jbaacount.post.entity.Post;
 import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,19 +66,6 @@ public class CategoryService
         return category;
     }
 
-    @Transactional(readOnly = true)
-    public CategoryInfoForResponse getCategoryResponseInfo(Long categoryId, Pageable pageable)
-    {
-        getCategory(categoryId);
-        return categoryRepository.getCategoryInfo(categoryId, pageable);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<CategoryInfoForResponse> getAllCategoryResponseInfo(Long boardId, Pageable pageable)
-    {
-        getBoard(boardId);
-        return categoryRepository.getAllCategoryInfo(boardId, pageable);
-    }
 
     @Transactional(readOnly = true)
     public Category getCategory(Long categoryId)

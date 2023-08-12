@@ -1,11 +1,13 @@
 package com.jbaacount.post.controller;
 
 import com.jbaacount.global.dto.SingleResponseDto;
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.service.MemberService;
 import com.jbaacount.post.dto.request.PostPatchDto;
 import com.jbaacount.post.dto.request.PostPostDto;
-import com.jbaacount.post.dto.response.PostResponseDto;
+import com.jbaacount.post.dto.response.PostMultiResponseDto;
+import com.jbaacount.post.dto.response.PostSingleResponseDto;
 import com.jbaacount.post.dto.response.PostResponseForProfile;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.mapper.PostMapper;
@@ -15,7 +17,6 @@ import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -49,7 +50,7 @@ public class PostController
 
         Post post = postMapper.postDtoToPostEntity(request);
         Post savedPost = postService.createPost(post, files, categoryId, boardId, member);
-        PostResponseDto response = postMapper.postEntityToResponse(savedPost, member);
+        PostSingleResponseDto response = postMapper.postEntityToResponse(savedPost, member);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
@@ -61,7 +62,7 @@ public class PostController
                                      @AuthenticationPrincipal Member currentMember)
     {
         Post post = postService.updatePost(postId, request, files, currentMember);
-        PostResponseDto response = postMapper.postEntityToResponse(post, currentMember);
+        PostSingleResponseDto response = postMapper.postEntityToResponse(post, currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
@@ -70,17 +71,40 @@ public class PostController
     public ResponseEntity getPost(@PathVariable("post-id") @Positive Long postId,
                                   @AuthenticationPrincipal Member currentMember)
     {
-        PostResponseDto response = postMapper.postEntityToResponse(postService.getPostById(postId), currentMember);
+        PostSingleResponseDto response = postMapper.postEntityToResponse(postService.getPostById(postId), currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
+
+    @GetMapping("/category/{category-id}/posts")
+    public ResponseEntity getAllPostsByCategoryId(@PathVariable("category-id") @Positive Long categoryId,
+                                                @RequestParam(required = false) Long last,
+                                                @RequestParam(required = false) String keyword,
+                                                @PageableDefault(size = 8) Pageable pageable)
+    {
+        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, last, pageable);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/board/{category-id}/posts")
+    public ResponseEntity getAllPostsByBoardId(@PathVariable("category-id") @Positive Long categoryId,
+                                                  @RequestParam(required = false) Long last,
+                                                  @RequestParam(required = false) String keyword,
+                                                  @PageableDefault(size = 8) Pageable pageable)
+    {
+        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, last, pageable);
+
+        return ResponseEntity.ok(response);
+    }
+
 
     @GetMapping("/profile/{member-id}/posts")
     public ResponseEntity getAllPostsByMemberId(@PathVariable("member-id") @Positive Long memberId,
                                                 @RequestParam(required = false) Long last,
                                                 @PageableDefault Pageable pageable)
     {
-        Slice<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, last, pageable);
+        SliceDto<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, last, pageable);
 
         return ResponseEntity.ok(response);
     }

@@ -5,11 +5,13 @@ import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
 import com.jbaacount.file.service.FileService;
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.dto.request.PostPatchDto;
+import com.jbaacount.post.dto.response.PostMultiResponseDto;
 import com.jbaacount.post.dto.response.PostResponseForProfile;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.repository.PostRepository;
@@ -17,7 +19,6 @@ import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -109,11 +110,22 @@ public class PostService
 
 
     @Transactional(readOnly = true)
-    public Slice<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Long last, Pageable pageable)
+    public SliceDto<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Long last, Pageable pageable)
     {
         return postRepository.getAllPostsByMemberId(memberId, last, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public SliceDto<PostMultiResponseDto> getAllPostsByCategoryId(Long categoryId, String keyword, Long last, Pageable pageable)
+    {
+        return postRepository.getAllPostsByCategoryId(categoryId, keyword, last, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public SliceDto<PostMultiResponseDto> getAllPostsByBoardId(Long boardId, String keyword, Long last, Pageable pageable)
+    {
+        return postRepository.getAllPostsByBoardId(boardId, keyword, last, pageable);
+    }
 
     public void deletePostById(Long postId, Member currentMember)
     {
