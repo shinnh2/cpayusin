@@ -1,22 +1,19 @@
 package com.jbaacount.post.repository;
 
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
-import com.jbaacount.member.dto.response.MemberInfoForResponse;
-import com.jbaacount.post.dto.response.PostInfoForOtherResponse;
+import com.jbaacount.post.dto.response.PostMultiResponseDto;
 import com.jbaacount.post.dto.response.PostResponseForProfile;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
-import static com.jbaacount.member.entity.QMember.member;
 import static com.jbaacount.post.entity.QPost.post;
 
 @RequiredArgsConstructor
@@ -26,24 +23,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private final PaginationUtils paginationUtils;
 
     @Override
-    public Page<PostInfoForOtherResponse> getAllPostsInfoForCategory(Long categoryId, Pageable pageable)
-    {
-        List<PostInfoForOtherResponse> postInfoResult = query
-                .select(extractPostsInfo())
-                .from(post)
-                .join(post.member, member)
-                .where(post.category.id.eq(categoryId))
-                .orderBy(post.id.desc())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .fetch();
-
-
-        return new PageImpl<>(postInfoResult, pageable, postInfoResult.size());
-    }
-
-    @Override
-    public Slice<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Long last, Pageable pageable)
+    public SliceDto<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Long last, Pageable pageable)
     {
         List<PostResponseForProfile> fetch = query
                 .select(extractPostsForProfile())
@@ -54,23 +34,80 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
 
-        return paginationUtils.toSlice(pageable, fetch);
+        Slice<PostResponseForProfile> slice = paginationUtils.toSlice(pageable, fetch);
+
+        return new SliceDto<>(fetch, slice);
     }
 
-    public Page<PostInfoForOtherResponse> getAllPostsInfoForBoard(Long boardId, Pageable pageable)
+    @Override
+    public SliceDto<PostMultiResponseDto> getAllPostsByCategoryId(Long categoryId, String keyword, Long last, Pageable pageable)
     {
-        List<PostInfoForOtherResponse> postInfoResult = query
-                .select(extractPostsInfo())
+        List<PostMultiResponseDto> posts = query
+                .select(extractPostsForCategoryAndBoard())
                 .from(post)
-                .join(post.member, member)
-                .where(post.board.id.eq(boardId))
+                .where(post.category.id.eq(categoryId))
+                .where(ltPostId(last))
+                .where(titleCondition(keyword))
+                .limit(pageable.getPageSize() + 1)
                 .orderBy(post.id.desc())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
                 .fetch();
 
-        return new PageImpl<>(postInfoResult, pageable, postInfoResult.size());
+        Slice<PostMultiResponseDto> slice = paginationUtils.toSlice(pageable, posts);
+
+        return new SliceDto<>(posts, slice);
     }
+
+    @Override
+    public SliceDto<PostMultiResponseDto> getAllPostsByBoardId(Long boardId, String keyword, Long last, Pageable pageable)
+    {
+        List<PostMultiResponseDto> posts = query
+                .select(extractPostsForCategoryAndBoard())
+                .from(post)
+                .where(post.board.id.eq(boardId))
+                .where(ltPostId(last))
+                .where(titleCondition(keyword))
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(post.id.desc())
+                .fetch();
+
+        Slice<PostMultiResponseDto> slice = paginationUtils.toSlice(pageable, posts);
+
+        return new SliceDto<>(posts, slice);
+    }
+
+    private ConstructorExpression<PostMultiResponseDto> extractPostsForCategoryAndBoard()
+    {
+        return Projections.constructor(PostMultiResponseDto.class,
+                extractBoardResponse(),
+                extractCategoryResponse(),
+                extractMemberResponse(),
+                post.id,
+                post.title,
+                post.content,
+                post.voteCount,
+                post.comments.size(),
+                post.createdAt);
+    }
+    private ConstructorExpression<PostMultiResponseDto.BoardResponse> extractBoardResponse()
+    {
+        return Projections.constructor(PostMultiResponseDto.BoardResponse.class,
+                post.board.id,
+                post.board.name);
+    }
+
+    private ConstructorExpression<PostMultiResponseDto.CategoryResponse> extractCategoryResponse()
+    {
+        return Projections.constructor(PostMultiResponseDto.CategoryResponse.class,
+                post.category.id,
+                post.category.name);
+    }
+    private ConstructorExpression<PostMultiResponseDto.MemberResponse> extractMemberResponse()
+    {
+        return Projections.constructor(PostMultiResponseDto.MemberResponse.class,
+                post.member.id,
+                post.member.nickname);
+    }
+
 
     private ConstructorExpression<PostResponseForProfile> extractPostsForProfile()
     {
@@ -80,20 +117,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 post.createdAt);
     }
 
-    private ConstructorExpression<PostInfoForOtherResponse> extractPostsInfo()
+    private BooleanExpression titleCondition(String keyword)
     {
-        return Projections.constructor(PostInfoForOtherResponse.class,
-                post.id,
-                post.title,
-                post.createdAt,
-                extractMemberInfo());
-    }
-
-    private ConstructorExpression<MemberInfoForResponse> extractMemberInfo()
-    {
-        return Projections.constructor(MemberInfoForResponse.class,
-                member.id,
-                member.nickname);
+        return keyword != null ? post.title.lower().contains(keyword.toLowerCase()) : null;
     }
 
     private BooleanExpression ltPostId(Long postId)

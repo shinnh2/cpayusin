@@ -1,6 +1,7 @@
 package com.jbaacount.member.controller;
 
 import com.jbaacount.global.dto.SingleResponseDto;
+import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.dto.request.MemberPatchDto;
 import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
@@ -77,7 +78,7 @@ public class MemberController
 
     {
         log.info("===getAllMembers===");
-        Slice<MemberResponseDto> response = memberService.getAllMembers(keyword, last, pageable);
+        SliceDto<MemberResponseDto> response = memberService.getAllMembers(keyword, last, pageable);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

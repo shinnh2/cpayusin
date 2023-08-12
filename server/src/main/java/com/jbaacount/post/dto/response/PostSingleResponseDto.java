@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PostResponseDto
+public class PostSingleResponseDto
 {
     private Long id;
     private String title;

@@ -3,20 +3,15 @@ package com.jbaacount.board.controller;
 import com.jbaacount.board.dto.request.BoardPatchDto;
 import com.jbaacount.board.dto.request.BoardPostDto;
 import com.jbaacount.board.dto.response.BoardResponseDto;
-import com.jbaacount.board.dto.response.BoardWithAllCategoriesResponse;
-import com.jbaacount.board.dto.response.BoardWithAllPostsResponse;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.mapper.BoardMapper;
 import com.jbaacount.board.service.BoardService;
-import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.member.entity.Member;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,28 +50,7 @@ public class BoardController
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
-    @GetMapping("/board/posts/{board-id}")
-    public ResponseEntity getBoardWithAllPosts(@PathVariable("board-id") @Positive Long boardId,
-                                       Pageable pageable)
-    {
-        BoardWithAllPostsResponse response = boardService.getBoardInfoWithAllPosts(boardId, pageable);
-        return new ResponseEntity(response, HttpStatus.OK);
-    }
 
-    @GetMapping("/board/categories/{board-id}")
-    public ResponseEntity getBoardWithAllCategories(@PathVariable("board-id") @Positive Long boardId)
-    {
-        BoardWithAllCategoriesResponse response = boardService.getBoardInfoWithAllCategories(boardId);
-        return new ResponseEntity(response, HttpStatus.OK);
-    }
-
-    @GetMapping("/board")
-    public ResponseEntity getAllBoards(Pageable pageable)
-    {
-        Page<BoardWithAllCategoriesResponse> response = boardService.getAllBoards(pageable);
-
-        return new ResponseEntity(new PageDto<>(response), HttpStatus.OK);
-    }
 
     @DeleteMapping("/manage/board/{board-id}")
     public ResponseEntity deleteBoard(@PathVariable("board-id") @Positive Long boardId,

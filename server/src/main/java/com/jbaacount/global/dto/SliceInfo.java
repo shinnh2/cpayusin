@@ -7,7 +7,6 @@ import lombok.Data;
 @Data
 public class SliceInfo
 {
-    private int pageNumber; //현재 페이지 번호
     private int size; //1개의 슬라이스에 포함 된 최대 개수
 
     private int numberOfElements; //현재 슬라이스에 실제로 포함 된 개수

@@ -1,8 +1,6 @@
 package com.jbaacount.board.service;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
-import com.jbaacount.board.dto.response.BoardWithAllCategoriesResponse;
-import com.jbaacount.board.dto.response.BoardWithAllPostsResponse;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.entity.Category;
@@ -13,8 +11,6 @@ import com.jbaacount.post.entity.Post;
 import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,23 +48,7 @@ public class BoardService
         return board;
     }
 
-    @Transactional(readOnly = true)
-    public BoardWithAllPostsResponse getBoardInfoWithAllPosts(Long boardId, Pageable pageable)
-    {
-        return boardRepository.getBoardWithAllPostsInfo(boardId, pageable);
-    }
 
-    @Transactional(readOnly = true)
-    public BoardWithAllCategoriesResponse getBoardInfoWithAllCategories(Long boardId)
-    {
-        return boardRepository.getBoardWithAllCatetoriesInfo(boardId);
-    }
-
-    @Transactional(readOnly = true)
-    public Page<BoardWithAllCategoriesResponse> getAllBoards(Pageable pageable)
-    {
-        return boardRepository.getAllBoardsAndCategories(pageable);
-    }
 
     @Transactional(readOnly = true)
     public Board getBoardById(Long boardId)

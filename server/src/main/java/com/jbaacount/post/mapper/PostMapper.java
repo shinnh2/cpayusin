@@ -6,7 +6,7 @@ import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
 import com.jbaacount.post.dto.request.PostPostDto;
-import com.jbaacount.post.dto.response.PostResponseDto;
+import com.jbaacount.post.dto.response.PostSingleResponseDto;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.vote.entity.Vote;
 import com.jbaacount.vote.repository.VoteRepository;
@@ -37,7 +37,7 @@ public class PostMapper
         return post;
     }
 
-    public PostResponseDto postEntityToResponse(Post entity, Member currentMember)
+    public PostSingleResponseDto postEntityToResponse(Post entity, Member currentMember)
     {
         MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(entity.getMember());
         boolean voteStatus = false;
@@ -55,7 +55,7 @@ public class PostMapper
             fileResponses.add(new FileResponseDto(file));
         }
 
-        PostResponseDto response = PostResponseDto.builder()
+        PostSingleResponseDto response = PostSingleResponseDto.builder()
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
