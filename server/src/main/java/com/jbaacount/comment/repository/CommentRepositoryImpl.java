@@ -1,6 +1,9 @@
 package com.jbaacount.comment.repository;
 
 import com.jbaacount.comment.dto.response.CommentMultiResponse;
+import com.jbaacount.comment.dto.response.CommentResponseForProfile;
+import com.jbaacount.global.dto.SliceDto;
+import com.jbaacount.global.utils.PaginationUtils;
 import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.entity.QMember;
@@ -8,11 +11,13 @@ import com.jbaacount.vote.entity.Vote;
 import com.jbaacount.vote.repository.VoteRepository;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 
 import java.util.*;
 
@@ -24,6 +29,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
 {
     private final JPAQueryFactory query;
     private final VoteRepository voteRepository;
+    private final PaginationUtils paginationUtils;
 
     @Override
     public Page<CommentMultiResponse> getAllComments(Long postId, Pageable pageable, Member member)
@@ -63,6 +69,34 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
         return new PageImpl<>(rootComments, pageable, rootComments.size());
     }
 
+    @Override
+    public SliceDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Long last, Pageable pageable)
+    {
+        List<CommentResponseForProfile> comments = query
+                .select(extractAllCommentsForProfile())
+                .from(comment)
+                .where(ltCommentId(last))
+                .where(comment.member.id.eq(memberId))
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(comment.id.desc())
+                .fetch();
+
+        Slice<CommentResponseForProfile> slice = paginationUtils.toSlice(pageable, comments);
+
+        return new SliceDto<>(comments, slice);
+    }
+
+
+    ConstructorExpression<CommentResponseForProfile> extractAllCommentsForProfile()
+    {
+        return Projections.constructor(CommentResponseForProfile.class,
+                comment.id,
+                comment.post.id,
+                comment.text,
+                comment.voteCount,
+                comment.createdAt);
+    }
+
     ConstructorExpression<CommentMultiResponse> extractCommentDto()
     {
         return Projections.constructor(CommentMultiResponse.class,
@@ -91,5 +125,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
         voteStatus = optionalVote.isPresent();
 
         return voteStatus;
+    }
+
+    private BooleanExpression ltCommentId(Long commentId)
+    {
+        return commentId != null ? comment.id.lt(commentId) : null;
     }
 }

@@ -5,15 +5,16 @@ import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.dto.request.MemberPatchDto;
 import com.jbaacount.member.dto.request.MemberPostDto;
 import com.jbaacount.member.dto.response.MemberResponseDto;
+import com.jbaacount.member.dto.response.MemberRewardResponse;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
+import com.jbaacount.member.repository.MemberRepository;
 import com.jbaacount.member.service.MemberService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -31,6 +33,7 @@ import java.util.List;
 @RestController
 public class MemberController
 {
+    private final MemberRepository memberRepository;
     private final MemberService memberService;
 
     private final MemberMapper memberMapper;
@@ -86,7 +89,9 @@ public class MemberController
     @GetMapping("/score")
     public ResponseEntity get3MembersByScore()
     {
-        List<MemberResponseDto> response = memberMapper.membersToResponseList(memberService.findTop3MembersByScore());
+        LocalDateTime now = LocalDateTime.now();
+        log.info("date = {}", now.getYear() + " " + now.getMonthValue());
+        List<MemberRewardResponse> response = memberService.findTop3MembersByScore(now);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

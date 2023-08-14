@@ -110,4 +110,9 @@ public class Member extends BaseEntity
     {
         this.score += 1;
     }
+
+    public void initializeScore()
+    {
+        this.score = 0;
+    }
 }

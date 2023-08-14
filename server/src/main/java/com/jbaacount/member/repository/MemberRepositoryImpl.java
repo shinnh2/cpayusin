@@ -2,9 +2,11 @@ package com.jbaacount.member.repository;
 
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
+import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.jbaacount.member.dto.response.MemberResponseDto;
+import com.jbaacount.member.dto.response.MemberRewardResponse;
+import com.jbaacount.member.entity.Member;
 import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -13,9 +15,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.member.entity.QMember.member;
+import static com.jbaacount.post.entity.QPost.post;
+import static com.jbaacount.vote.entity.QVote.vote;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -23,6 +29,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
 {
     private final JPAQueryFactory query;
     private final PaginationUtils paginationUtils;
+    private final NumberTemplate<Integer> monthExpression = Expressions.numberTemplate(Integer.class, "month({0})", post.createdAt);
+    private final NumberTemplate<Integer> yearExpression = Expressions.numberTemplate(Integer.class, "year({0})", post.createdAt);
 
     @Override
     public SliceDto<MemberResponseDto> findAllMembers(String keyword, Long memberId, Pageable pageable)
@@ -46,9 +54,44 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         return new SliceDto<>(memberDto, slice);
     }
 
+    @Override
+    public List<MemberRewardResponse> memberResponseForReward(LocalDateTime now)
+    {
+        LocalDateTime startMonth = LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0);
+        LocalDateTime endMonth = startMonth.plusMonths(1);
 
+        List<Member> memberList = query
+                .select(member)
+                .from(member)
+                .leftJoin(member.posts, post)
+                .leftJoin(post.votes, vote)
+                .where(post.createdAt.between(startMonth, endMonth))
+                .groupBy(member.id)
+                .orderBy(
+                        member.score.desc(), //점수 기준
+                        post.count().desc(), //해당 월에 작성한 게시글 기준
+                        post.voteCount.sum().desc(), //해당 월에 받은 투표 개수 기준
+                        member.posts.size().desc(), //그 동안의 총 개시물 갯수
+                        member.createdAt.asc() //가입날짜 오래 된 순
+                )
+                .limit(3)
+                .fetch();
 
-    public ConstructorExpression<MemberResponseDto> memberToResponse()
+        List<MemberRewardResponse> responses = new ArrayList<>();
+        for (Member member : memberList)
+        {
+            MemberRewardResponse response = new MemberRewardResponse();
+            response.setId(member.getId());
+            response.setNickname(member.getNickname());
+            response.setScore(member.getScore());
+
+            responses.add(response);
+        }
+
+        return responses;
+    }
+
+    private ConstructorExpression<MemberResponseDto> memberToResponse()
     {
         StringExpression url = new CaseBuilder()
                 .when(member.file.isNotNull())
@@ -63,6 +106,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 url,
                 member.createdAt,
                 member.modifiedAt);
+    }
+
+    private ConstructorExpression extractMemberForReward()
+    {
+        return Projections.constructor(MemberInfoForResponse.class,
+                member.id,
+                member.nickname);
     }
 
 

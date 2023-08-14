@@ -102,7 +102,7 @@ public class PostController
     @GetMapping("/profile/{member-id}/posts")
     public ResponseEntity getAllPostsByMemberId(@PathVariable("member-id") @Positive Long memberId,
                                                 @RequestParam(required = false) Long last,
-                                                @PageableDefault Pageable pageable)
+                                                @PageableDefault(size = 8) Pageable pageable)
     {
         SliceDto<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, last, pageable);
 
