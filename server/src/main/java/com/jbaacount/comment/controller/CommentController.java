@@ -8,7 +8,6 @@ import com.jbaacount.comment.dto.response.CommentSingleResponse;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.mapper.CommentMapper;
 import com.jbaacount.comment.service.CommentService;
-import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.entity.Member;
@@ -17,13 +16,14 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -76,9 +76,9 @@ public class CommentController
                                          @AuthenticationPrincipal Member currentMember,
                                          @PageableDefault(size = 8) Pageable pageable)
     {
-        Page<CommentMultiResponse> response = commentService.getAllComments(postId, currentMember, pageable);
+        List<CommentMultiResponse> response = commentService.getAllComments(postId, currentMember, pageable);
 
-        return new ResponseEntity(new PageDto<>(response), HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @GetMapping("/profile/{member-id}/comments")

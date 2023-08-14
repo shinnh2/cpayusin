@@ -4,12 +4,13 @@ import com.jbaacount.comment.dto.response.CommentMultiResponse;
 import com.jbaacount.comment.dto.response.CommentResponseForProfile;
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.entity.Member;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface CommentRepositoryCustom
 {
-    Page<CommentMultiResponse> getAllComments(Long postId, Pageable pageable, Member currentMember);
+    List<CommentMultiResponse> getAllComments(Long postId, Pageable pageable, Member currentMember);
 
-    public SliceDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Long last, Pageable pageable);
+    SliceDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Long last, Pageable pageable);
 }

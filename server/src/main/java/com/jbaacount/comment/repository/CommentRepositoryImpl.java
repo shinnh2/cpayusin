@@ -32,7 +32,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
     private final PaginationUtils paginationUtils;
 
     @Override
-    public Page<CommentMultiResponse> getAllComments(Long postId, Pageable pageable, Member member)
+    public List<CommentMultiResponse> getAllComments(Long postId, Pageable pageable, Member member)
     {
         List<CommentMultiResponse> fetch = query
                 .select(extractCommentDto())
@@ -66,7 +66,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
 
         }
 
-        return new PageImpl<>(rootComments, pageable, rootComments.size());
+        return rootComments;
     }
 
     @Override
