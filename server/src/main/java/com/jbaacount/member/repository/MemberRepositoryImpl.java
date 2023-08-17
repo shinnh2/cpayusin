@@ -66,6 +66,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 .leftJoin(member.posts, post)
                 .leftJoin(post.votes, vote)
                 .where(post.createdAt.between(startMonth, endMonth))
+                .where(post.member.email.ne("mike@ticonsys.com"))
                 .groupBy(member.id)
                 .orderBy(
                         member.score.desc(), //점수 기준

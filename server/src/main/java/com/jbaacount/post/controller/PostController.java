@@ -87,8 +87,8 @@ public class PostController
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/board/{category-id}/posts")
-    public ResponseEntity getAllPostsByBoardId(@PathVariable("category-id") @Positive Long categoryId,
+    @GetMapping("/board/{board-id}/posts")
+    public ResponseEntity getAllPostsByBoardId(@PathVariable("board-id") @Positive Long categoryId,
                                                   @RequestParam(required = false) Long last,
                                                   @RequestParam(required = false) String keyword,
                                                   @PageableDefault(size = 8) Pageable pageable)
