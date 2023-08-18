@@ -13,4 +13,5 @@ public class BoardResponseDto
 {
     private Long id;
     private String name;
+    private Long orderIndex;
 }

@@ -26,6 +26,8 @@ public class Board extends BaseEntity
     @Column(nullable = false)
     private Boolean isAdminOnly;
 
+    private Long orderIndex;
+
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Category> categories = new ArrayList<>();
 
@@ -47,5 +49,10 @@ public class Board extends BaseEntity
     public void changeBoardAuthority(Boolean isAdminOnly)
     {
         this.isAdminOnly = isAdminOnly;
+    }
+
+    public void updateOrderIndex(Long orderIndex)
+    {
+        this.orderIndex = orderIndex;
     }
 }

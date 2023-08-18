@@ -33,6 +33,7 @@ public class CategoryMapper
         response.setId(entity.getId());
         response.setCategoryName(entity.getName());
         response.setAdminOnly(entity.getIsAdminOnly());
+        response.setOrderIndex(entity.getOrderIndex());
 
         return response;
     }

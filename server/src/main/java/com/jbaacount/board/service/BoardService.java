@@ -32,7 +32,10 @@ public class BoardService
     {
         authorizationService.isAdmin(currentMember);
 
-        return boardRepository.save(board);
+        Board savedBoard = boardRepository.save(board);
+        savedBoard.updateOrderIndex(savedBoard.getId());
+
+        return savedBoard;
     }
 
     public Board updateBoard(Long boardId, BoardPatchDto request, Member currentMember)
@@ -45,6 +48,33 @@ public class BoardService
                 .ifPresent(name -> board.updateName(name));
         Optional.ofNullable(request.getIsAdminOnly())
                 .ifPresent(authority -> board.changeBoardAuthority(authority));
+
+        if(request.getOrderIndex() != null)
+        {
+            Long currentOrderIndex = board.getOrderIndex();
+            Long afterOrderIndex = request.getOrderIndex();
+
+            if(currentOrderIndex > afterOrderIndex)
+            {
+                List<Board> allBoards = boardRepository.findAllBetween(afterOrderIndex, currentOrderIndex);
+                for (Board boardList : allBoards)
+                {
+                    boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
+                }
+            }
+
+            else
+            {
+                List<Board> allBoards = boardRepository.findAllBetween(currentOrderIndex, afterOrderIndex);
+                for (Board boardList : allBoards)
+                {
+                    boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
+                }
+            }
+
+            board.updateOrderIndex(request.getOrderIndex());
+        }
+
         return board;
     }
 

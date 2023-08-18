@@ -14,4 +14,5 @@ public class CategoryResponseDto
     private Long id;
     private String categoryName;
     private boolean isAdminOnly;
+    private Long orderIndex;
 }

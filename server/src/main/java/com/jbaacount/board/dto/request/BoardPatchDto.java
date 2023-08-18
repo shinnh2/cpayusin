@@ -13,4 +13,5 @@ public class BoardPatchDto
     @Size(max = 15, message = "게시판 제목은 최대 15자까지 입력 가능합니다.")
     private String name;
     private Boolean isAdminOnly;
+    private Long orderIndex;
 }

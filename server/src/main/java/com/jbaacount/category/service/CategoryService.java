@@ -37,9 +37,12 @@ public class CategoryService
         authorizationService.isAdmin(currentMember);
         Board board = getBoard(boardId);
 
-        category.addBoard(board);
+        Category savedCategory = categoryRepository.save(category);
 
-        return categoryRepository.save(category);
+        savedCategory.addBoard(board);
+        savedCategory.updateOrderIndex(category.getId());
+
+        return savedCategory;
     }
 
     public Category updateCategory(Long categoryId, CategoryPatchDto request, Member currentMember)
@@ -61,6 +64,32 @@ public class CategoryService
         Optional.ofNullable(request.isAdminOnly())
                 .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
 
+        if(request.getOrderIndex() != null)
+        {
+            Long currentIndex = category.getOrderIndex();
+            Long afterIndex = request.getOrderIndex();
+
+            if(currentIndex > afterIndex)
+            {
+                List<Category> allCategories = categoryRepository.findAllBetween(afterIndex, currentIndex);
+                for (Category categoryList : allCategories)
+                {
+                    categoryList.updateOrderIndex(categoryList.getOrderIndex() + 1);
+                }
+            }
+
+            else
+            {
+                List<Category> allCategories = categoryRepository.findAllBetween(currentIndex, afterIndex);
+
+                for (Category categoryList : allCategories)
+                {
+                    categoryList.updateOrderIndex(categoryList.getOrderIndex() - 1);
+                }
+            }
+
+            category.updateOrderIndex(request.getOrderIndex());
+        }
 
 
         return category;

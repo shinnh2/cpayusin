@@ -1,6 +1,5 @@
 package com.jbaacount.board.mapper;
 
-import com.jbaacount.board.dto.request.BoardPatchDto;
 import com.jbaacount.board.dto.request.BoardPostDto;
 import com.jbaacount.board.dto.response.BoardResponseDto;
 import com.jbaacount.board.entity.Board;
@@ -28,6 +27,7 @@ public class BoardMapper
         BoardResponseDto response = BoardResponseDto.builder()
                 .id(entity.getId())
                 .name(entity.getName())
+                .orderIndex(entity.getOrderIndex())
                 .build();
 
         return response;

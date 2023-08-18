@@ -26,6 +26,8 @@ public class Category extends BaseEntity
     @JsonProperty("isAdminOnly")
     private Boolean isAdminOnly;
 
+    private Long orderIndex;
+
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
@@ -61,5 +63,10 @@ public class Category extends BaseEntity
 
         else
             this.isAdminOnly = isAdminOnly;
+    }
+
+    public void updateOrderIndex(Long orderIndex)
+    {
+        this.orderIndex = orderIndex;
     }
 }
