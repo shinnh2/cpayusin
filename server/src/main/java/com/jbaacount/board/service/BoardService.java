@@ -46,34 +46,32 @@ public class BoardService
 
         Optional.ofNullable(request.getName())
                 .ifPresent(name -> board.updateName(name));
+
         Optional.ofNullable(request.getIsAdminOnly())
                 .ifPresent(authority -> board.changeBoardAuthority(authority));
 
-        if(request.getOrderIndex() != null)
-        {
-            Long currentOrderIndex = board.getOrderIndex();
-            Long afterOrderIndex = request.getOrderIndex();
+        Optional.ofNullable(request.getOrderIndex())
+                .ifPresent(orderIndex ->{
+                    Long currentIndex = board.getOrderIndex();
+                    if(currentIndex > orderIndex)
+                    {
+                        List<Board> allBoards = boardRepository.findAllBetween(orderIndex, currentIndex);
+                        for (Board boardList : allBoards)
+                        {
+                            boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
+                        }
+                    }
 
-            if(currentOrderIndex > afterOrderIndex)
-            {
-                List<Board> allBoards = boardRepository.findAllBetween(afterOrderIndex, currentOrderIndex);
-                for (Board boardList : allBoards)
-                {
-                    boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
-                }
-            }
-
-            else
-            {
-                List<Board> allBoards = boardRepository.findAllBetween(currentOrderIndex, afterOrderIndex);
-                for (Board boardList : allBoards)
-                {
-                    boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
-                }
-            }
-
-            board.updateOrderIndex(request.getOrderIndex());
-        }
+                    else
+                    {
+                        List<Board> allBoards = boardRepository.findAllBetween(currentIndex, orderIndex);
+                        for (Board boardList : allBoards)
+                        {
+                            boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
+                        }
+                    }
+                    board.updateOrderIndex(orderIndex);
+                });
 
         return board;
     }
