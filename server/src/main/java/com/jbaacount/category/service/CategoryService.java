@@ -64,32 +64,31 @@ public class CategoryService
         Optional.ofNullable(request.isAdminOnly())
                 .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
 
-        if(request.getOrderIndex() != null)
-        {
-            Long currentIndex = category.getOrderIndex();
-            Long afterIndex = request.getOrderIndex();
+        Optional.ofNullable(request.getOrderIndex())
+                .ifPresent(orderIndex ->{
+                    Long currentIndex = category.getOrderIndex();
 
-            if(currentIndex > afterIndex)
-            {
-                List<Category> allCategories = categoryRepository.findAllBetween(afterIndex, currentIndex);
-                for (Category categoryList : allCategories)
-                {
-                    categoryList.updateOrderIndex(categoryList.getOrderIndex() + 1);
-                }
-            }
+                    if(currentIndex > orderIndex)
+                    {
+                        List<Category> allCategories = categoryRepository.findAllBetween(orderIndex, currentIndex);
+                        for (Category categoryList : allCategories)
+                        {
+                            categoryList.updateOrderIndex(categoryList.getOrderIndex() + 1);
+                        }
+                    }
 
-            else
-            {
-                List<Category> allCategories = categoryRepository.findAllBetween(currentIndex, afterIndex);
+                    else
+                    {
+                        List<Category> allCategories = categoryRepository.findAllBetween(currentIndex, orderIndex);
+                        for (Category categoryList : allCategories)
+                        {
+                            categoryList.updateOrderIndex(categoryList.getOrderIndex() - 1);
+                        }
+                    }
 
-                for (Category categoryList : allCategories)
-                {
-                    categoryList.updateOrderIndex(categoryList.getOrderIndex() - 1);
-                }
-            }
+                    category.updateOrderIndex(orderIndex);
 
-            category.updateOrderIndex(request.getOrderIndex());
-        }
+                });
 
 
         return category;
