@@ -49,9 +49,13 @@ public class TestService implements CommandLineRunner
 
         Board board1 = Board.builder().name("첫번째 게시판").isAdminOnly(false).build();
         Board board2 = Board.builder().name("두번째 게시판").isAdminOnly(false).build();
+
         boardService.createBoard(board1, admin);
         boardService.createBoard(board2, admin);
-
+        for(int i = 3; i < 11; i++)
+        {
+            boardService.createBoard(Board.builder().name(i + "번째 게시판").isAdminOnly(false).build(), admin);
+        }
 
         Category category1 = Category.builder().name("카테고리1").isAdminOnly(false).build();
         Category category2 = Category.builder().name("카테고리2").isAdminOnly(false).build();

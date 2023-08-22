@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Slf4j
 @RequestMapping
 @RequiredArgsConstructor
@@ -39,17 +41,36 @@ public class BoardController
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/manage/board/{board-id}")
-    public ResponseEntity updateBoard(@PathVariable("board-id") @Positive Long boardId,
-                                      @RequestBody @Valid BoardPatchDto request,
+    @PatchMapping("/manage/board")
+    public ResponseEntity updateBoard(@RequestBody @Valid List<BoardPatchDto> requests,
                                       @AuthenticationPrincipal Member currentMember)
     {
-        Board updatedBoard = boardService.updateBoard(boardId, request, currentMember);
-        BoardResponseDto response = boardMapper.boardToResponse(updatedBoard);
+        for (BoardPatchDto request : requests)
+        {
+            boardService.updateBoard(request.getBoardId(), request, currentMember);
+        }
+
+        List<BoardResponseDto> response = boardService.getAllBoards();
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @GetMapping("/board/{board-id}")
+    public ResponseEntity getBoard(@PathVariable("board-id") @Positive Long boardId)
+    {
+        Board board = boardService.getBoardById(boardId);
+        BoardResponseDto response = boardMapper.boardToResponse(board);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
+    @GetMapping("/board")
+    public ResponseEntity getAllBoards()
+    {
+        List<BoardResponseDto> response = boardService.getAllBoards();
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 
 
     @DeleteMapping("/manage/board/{board-id}")
