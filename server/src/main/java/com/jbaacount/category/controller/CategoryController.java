@@ -17,6 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -40,17 +42,27 @@ public class CategoryController
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/manage/category/{category-id}")
-    public ResponseEntity updateCategory(@PathVariable("category-id") @Positive Long categoryId,
-                                         @RequestBody @Valid CategoryPatchDto request,
+    @PatchMapping("/manage/category")
+    public ResponseEntity updateCategory(@RequestBody @Valid List<CategoryPatchDto> requests,
                                          @AuthenticationPrincipal Member currentMember)
     {
-        Category category = categoryService.updateCategory(categoryId, request, currentMember);
-        CategoryResponseDto response = categoryMapper.categoryToResponse(category);
+        for (CategoryPatchDto request : requests)
+        {
+            categoryService.updateCategory(request.getCategoryId(), request, currentMember);
+        }
 
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+
+        return null;
+        //return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
+    @GetMapping("/board/{board-id}/category}")
+    public ResponseEntity getAllCategories(@PathVariable("board-id") @Positive Long boardId)
+    {
+        List<CategoryResponseDto> response = categoryService.getAllCategories(boardId);
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 
 
     @DeleteMapping("/manage/category/{category-id}")

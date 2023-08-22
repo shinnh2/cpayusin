@@ -1,13 +1,12 @@
 package com.jbaacount.category.dto.response;
 
-import lombok.AllArgsConstructor;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class CategoryResponseDto
 {
@@ -15,4 +14,13 @@ public class CategoryResponseDto
     private String categoryName;
     private boolean isAdminOnly;
     private Long orderIndex;
+
+    @QueryProjection
+    public CategoryResponseDto(Long id, String categoryName, boolean isAdminOnly, Long orderIndex)
+    {
+        this.id = id;
+        this.categoryName = categoryName;
+        this.isAdminOnly = isAdminOnly;
+        this.orderIndex = orderIndex;
+    }
 }

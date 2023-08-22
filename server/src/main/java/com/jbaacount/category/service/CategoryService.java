@@ -3,6 +3,7 @@ package com.jbaacount.category.service;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.dto.request.CategoryPatchDto;
+import com.jbaacount.category.dto.response.CategoryResponseDto;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
 import com.jbaacount.file.service.FileService;
@@ -99,6 +100,12 @@ public class CategoryService
     public Category getCategory(Long categoryId)
     {
         return categoryRepository.findById(categoryId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public List<CategoryResponseDto> getAllCategories(Long boardId)
+    {
+        return categoryRepository.findAllCategories(boardId);
     }
 
     public void deleteCategory(Long categoryId, Member currentMember)
