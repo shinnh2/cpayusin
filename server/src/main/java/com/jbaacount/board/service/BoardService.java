@@ -16,7 +16,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -77,6 +82,53 @@ public class BoardService
         return board;
     }
 
+    public void bulkUpdateBoards(List<BoardPatchDto> requests, Member currentMember)
+    {
+        authorizationService.isAdmin(currentMember);
+
+        List<Long> boardIds = requests.stream()
+                .map(BoardPatchDto::getBoardId)
+                .collect(toList());
+
+        List<Board> BoardList = boardRepository.findAllById(boardIds);
+
+        Map<Long, BoardPatchDto> boardMap = requests.stream()
+                .collect(toMap(BoardPatchDto::getBoardId, Function.identity()));
+
+        for(Board board : BoardList)
+        {
+            BoardPatchDto request = boardMap.get(board.getId());
+
+            Optional.ofNullable(request.getName())
+                    .ifPresent(name -> board.updateName(name));
+
+            Optional.ofNullable(request.getIsAdminOnly())
+                    .ifPresent(authority -> board.changeBoardAuthority(authority));
+
+            Optional.ofNullable(request.getOrderIndex())
+                    .ifPresent(orderIndex ->{
+                        Long currentIndex = board.getOrderIndex();
+                        if(currentIndex > orderIndex)
+                        {
+                            List<Board> allBoards = boardRepository.findAllBetween(orderIndex, currentIndex);
+                            for (Board boardList : allBoards)
+                            {
+                                boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
+                            }
+                        }
+
+                        else
+                        {
+                            List<Board> allBoards = boardRepository.findAllBetween(currentIndex, orderIndex);
+                            for (Board boardList : allBoards)
+                            {
+                                boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
+                            }
+                        }
+                        board.updateOrderIndex(orderIndex);
+                    });
+        }
+    }
 
 
     @Transactional(readOnly = true)
