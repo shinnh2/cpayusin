@@ -5,7 +5,7 @@ import com.jbaacount.global.utils.PaginationUtils;
 import com.jbaacount.member.dto.response.MemberInfoForResponse;
 import com.jbaacount.member.dto.response.MemberResponseDto;
 import com.jbaacount.member.dto.response.MemberRewardResponse;
-import com.jbaacount.member.entity.Member;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.*;
@@ -16,8 +16,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.jbaacount.member.entity.QMember.member;
 import static com.jbaacount.post.entity.QPost.post;
@@ -60,8 +60,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         LocalDateTime startMonth = LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0);
         LocalDateTime endMonth = startMonth.plusMonths(1);
 
-        List<Member> memberList = query
-                .select(member)
+        List<Tuple> memberListTuple = query
+                .select(member.id, member.nickname, member.score)
                 .from(member)
                 .leftJoin(member.posts, post)
                 .leftJoin(post.votes, vote)
@@ -73,21 +73,14 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                         post.count().desc(), //해당 월에 작성한 게시글 기준
                         post.voteCount.sum().desc(), //해당 월에 받은 투표 개수 기준
                         member.posts.size().desc(), //그 동안의 총 개시물 갯수
-                        member.createdAt.asc() //가입날짜 오래 된 순
+                        member.createdAt.asc() //가입 날짜 오래 된 순
                 )
                 .limit(3)
                 .fetch();
 
-        List<MemberRewardResponse> responses = new ArrayList<>();
-        for (Member member : memberList)
-        {
-            MemberRewardResponse response = new MemberRewardResponse();
-            response.setId(member.getId());
-            response.setNickname(member.getNickname());
-            response.setScore(member.getScore());
-
-            responses.add(response);
-        }
+        List<MemberRewardResponse> responses = memberListTuple.stream()
+                .map(tuple -> new MemberRewardResponse(tuple.get(member.id), tuple.get(member.nickname), tuple.get(member.score)))
+                .collect(Collectors.toList());
 
         return responses;
     }
@@ -113,7 +106,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
     {
         return Projections.constructor(MemberInfoForResponse.class,
                 member.id,
-                member.nickname);
+                member.nickname,
+                member.score);
     }
 
 
