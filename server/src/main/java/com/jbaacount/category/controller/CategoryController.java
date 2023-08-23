@@ -56,7 +56,7 @@ public class CategoryController
         //return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
     }
 
-    @GetMapping("/board/{board-id}/category}")
+    @GetMapping("/board/{board-id}/category")
     public ResponseEntity getAllCategories(@PathVariable("board-id") @Positive Long boardId)
     {
         List<CategoryResponseDto> response = categoryService.getAllCategories(boardId);
