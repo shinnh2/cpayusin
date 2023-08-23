@@ -29,8 +29,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
 {
     private final JPAQueryFactory query;
     private final PaginationUtils paginationUtils;
-    private final NumberTemplate<Integer> monthExpression = Expressions.numberTemplate(Integer.class, "month({0})", post.createdAt);
-    private final NumberTemplate<Integer> yearExpression = Expressions.numberTemplate(Integer.class, "year({0})", post.createdAt);
 
     @Override
     public SliceDto<MemberResponseDto> findAllMembers(String keyword, Long memberId, Pageable pageable)
