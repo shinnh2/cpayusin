@@ -86,47 +86,29 @@ public class BoardService
     {
         authorizationService.isAdmin(currentMember);
 
+        for(BoardPatchDto request : requests)
+        {
+            if(Boolean.TRUE.equals(request.getIsDeleted()))
+            {
+                Board board = getBoardById(request.getBoardId());
+                processDelete(request, board, currentMember);
+            }
+        }
+
         List<Long> boardIds = requests.stream()
+                .filter(request -> request.getIsDeleted() == null || !request.getIsDeleted())
                 .map(BoardPatchDto::getBoardId)
                 .collect(toList());
 
-        List<Board> BoardList = boardRepository.findAllById(boardIds);
+        List<Board> boardList = boardRepository.findAllById(boardIds);
 
         Map<Long, BoardPatchDto> boardMap = requests.stream()
                 .collect(toMap(BoardPatchDto::getBoardId, Function.identity()));
 
-        for(Board board : BoardList)
+        for(Board board : boardList)
         {
             BoardPatchDto request = boardMap.get(board.getId());
-
-            Optional.ofNullable(request.getName())
-                    .ifPresent(name -> board.updateName(name));
-
-            Optional.ofNullable(request.getIsAdminOnly())
-                    .ifPresent(authority -> board.changeBoardAuthority(authority));
-
-            Optional.ofNullable(request.getOrderIndex())
-                    .ifPresent(orderIndex ->{
-                        Long currentIndex = board.getOrderIndex();
-                        if(currentIndex > orderIndex)
-                        {
-                            List<Board> allBoards = boardRepository.findAllBetween(orderIndex, currentIndex);
-                            for (Board boardList : allBoards)
-                            {
-                                boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
-                            }
-                        }
-
-                        else
-                        {
-                            List<Board> allBoards = boardRepository.findAllBetween(currentIndex, orderIndex);
-                            for (Board boardList : allBoards)
-                            {
-                                boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
-                            }
-                        }
-                        board.updateOrderIndex(orderIndex);
-                    });
+            processUpdateBoard(request, board);
         }
     }
 
@@ -164,6 +146,47 @@ public class BoardService
         }
 
         boardRepository.deleteById(boardId);
+    }
+
+    private boolean processDelete(BoardPatchDto request, Board board, Member currentMember)
+    {
+        return Optional.ofNullable(request.getIsDeleted())
+                .filter(isDeleted -> isDeleted)
+                .map(isDeleted -> {
+                    Long lastOrderIndex = boardRepository.findTheBiggestOrderIndex();
+                    Long startOrderIndex = board.getOrderIndex();
+
+                    if(startOrderIndex < lastOrderIndex)
+                        boardRepository.bulkUpdateOrderIndex(startOrderIndex + 1, lastOrderIndex, -1);
+
+                    deleteBoard(board.getId(), currentMember);
+                    return true;
+                }).orElse(false);
+    }
+
+    private void processUpdateBoard(BoardPatchDto request, Board board)
+    {
+        Optional.ofNullable(request.getName())
+                .ifPresent(name -> board.updateName(name));
+        Optional.ofNullable(request.getIsAdminOnly())
+                .ifPresent(authority -> board.changeBoardAuthority(authority));
+        updateBoardOrderIndex(request, board);
+    }
+
+    private void updateBoardOrderIndex(BoardPatchDto request, Board board)
+    {
+        Optional.ofNullable(request.getOrderIndex())
+                .ifPresent(orderIndex ->{
+                    Long currentIndex = board.getOrderIndex();
+
+                    if(currentIndex > orderIndex)
+                        boardRepository.bulkUpdateOrderIndex(orderIndex, currentIndex, 1);
+
+                    else
+                        boardRepository.bulkUpdateOrderIndex(currentIndex, orderIndex, -1);
+
+                    board.updateOrderIndex(orderIndex);
+                });
     }
 
 }

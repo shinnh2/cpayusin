@@ -17,4 +17,5 @@ public class BoardPatchDto
     private String name;
     private Boolean isAdminOnly;
     private Long orderIndex;
+    private Boolean isDeleted;
 }
