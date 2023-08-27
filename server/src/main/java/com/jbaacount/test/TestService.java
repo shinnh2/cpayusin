@@ -63,18 +63,19 @@ public class TestService implements CommandLineRunner
         Category category4 = Category.builder().name("카테고리4").isAdminOnly(false).build();
 
 
-        categoryService.createCategory(category1, board1.getId(), admin);
-        categoryService.createCategory(category2, board1.getId(), admin);
-        categoryService.createCategory(category3, board2.getId(), admin);
-        categoryService.createCategory(category4, board2.getId(), admin);
-
         for(int i = 0; i < 10; i++)
         {
             postService.createPost(Post.builder().title("게시글"+i).content("1234").build(), null, category1.getId(), board1.getId(), admin);
             postService.createPost(Post.builder().title("문제풀이"+i).content("abcde").build(), null, category2.getId(), board1.getId(), admin);
             postService.createPost(Post.builder().title("질문글"+i).content("가나다라").build(), null, category3.getId(), board2.getId(), admin);
             postService.createPost(Post.builder().title("핵심요약"+i).content("aeiou").build(), null, category4.getId(), board2.getId(), admin);
+
+            categoryService.createCategory(Category.builder().name("카테고리"+i).isAdminOnly(false).build(), board1.getId(), admin);
         }
+
+        categoryService.createCategory(category3, board2.getId(), admin);
+        categoryService.createCategory(category4, board2.getId(), admin);
+
 
         Post adminPost = Post.builder().title("핵심요약").content("aeiou").build();
         postService.createPost(adminPost, null, category4.getId(), board2.getId(), admin);

@@ -26,6 +26,7 @@ public class Category extends BaseEntity
     @JsonProperty("isAdminOnly")
     private Boolean isAdminOnly;
 
+    @Column(nullable = false)
     private Long orderIndex;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.REMOVE)

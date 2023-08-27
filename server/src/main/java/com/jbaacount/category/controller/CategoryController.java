@@ -42,18 +42,16 @@ public class CategoryController
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/manage/category")
+    @PatchMapping("/manage/{board-id}/category")
     public ResponseEntity updateCategory(@RequestBody @Valid List<CategoryPatchDto> requests,
+                                         @PathVariable("board-id") @Positive long boardId,
                                          @AuthenticationPrincipal Member currentMember)
     {
-        for (CategoryPatchDto request : requests)
-        {
-            categoryService.updateCategory(request.getCategoryId(), request, currentMember);
-        }
+        categoryService.categoryBulkUpdate(requests, boardId, currentMember);
 
+        List<CategoryResponseDto> response = categoryService.getAllCategories(boardId);
 
-        return null;
-        //return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @GetMapping("/board/{board-id}/category")

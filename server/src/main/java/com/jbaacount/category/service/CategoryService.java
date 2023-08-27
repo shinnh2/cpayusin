@@ -19,7 +19,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toMap;
 
 @Transactional
 @Slf4j
@@ -38,10 +43,11 @@ public class CategoryService
         authorizationService.isAdmin(currentMember);
         Board board = getBoard(boardId);
 
-        Category savedCategory = categoryRepository.save(category);
+        long orderIndex = categoryRepository.countCategory(boardId);
+        category.updateOrderIndex(orderIndex + 1);
 
+        Category savedCategory = categoryRepository.save(category);
         savedCategory.addBoard(board);
-        savedCategory.updateOrderIndex(category.getId());
 
         return savedCategory;
     }
@@ -56,13 +62,13 @@ public class CategoryService
                 {
                     Board board = getBoard(boardId);
                     category.addBoard(board);
-                    category.changeCategoryAuthority(request.isAdminOnly());
+                    category.changeCategoryAuthority(request.getIsAdminOnly());
                 });
 
         Optional.ofNullable(request.getName())
                 .ifPresent(name -> category.updateName(name));
 
-        Optional.ofNullable(request.isAdminOnly())
+        Optional.ofNullable(request.getIsAdminOnly())
                 .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
 
         Optional.ofNullable(request.getOrderIndex())
@@ -95,6 +101,40 @@ public class CategoryService
         return category;
     }
 
+    public void categoryBulkUpdate(List<CategoryPatchDto> requests, long boardId, Member currentMember)
+    {
+        log.info("bulk update");
+        authorizationService.isAdmin(currentMember);
+
+        for(CategoryPatchDto request : requests)
+        {
+            if(Boolean.TRUE.equals(request.getIsDeleted()))
+            {
+                Category category = getCategory(request.getCategoryId());
+                processDelete(request, category, boardId, currentMember);
+            }
+        }
+
+        List<Long> categoryIds = requests.stream()
+                .filter(request -> request.getIsDeleted() == null || !request.getIsDeleted())
+                .map(CategoryPatchDto::getCategoryId)
+                .collect(Collectors.toList());
+
+        List<Category> categoryList = categoryRepository.findAllById(categoryIds);
+        Map<Long, CategoryPatchDto> categoryMap = requests.stream()
+                .collect(toMap(CategoryPatchDto::getCategoryId, Function.identity()));
+
+
+        for(Category category : categoryList)
+        {
+            CategoryPatchDto request = categoryMap.get(category.getId());
+            processUpdateCategory(request, category);
+            processOrderIndexChange(request, category, boardId);
+        }
+        
+    }
+
+
 
     @Transactional(readOnly = true)
     public Category getCategory(Long categoryId)
@@ -123,6 +163,53 @@ public class CategoryService
         }
 
         categoryRepository.deleteById(categoryId);
+    }
+
+    private void processUpdateCategory(CategoryPatchDto request, Category category)
+    {
+        Optional.ofNullable(request.getName())
+                .ifPresent(name -> category.updateName(name));
+
+        Optional.ofNullable(request.getIsAdminOnly())
+                .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
+
+        Optional.ofNullable(request.getBoardId())
+                .ifPresent(boardId ->
+                {
+                    Board board = getBoard(boardId);
+                    category.addBoard(board);
+                    category.changeCategoryAuthority(request.getIsAdminOnly());
+                });
+    }
+
+    private void processOrderIndexChange(CategoryPatchDto request, Category category, long boardId)
+    {
+        Optional.ofNullable(request.getOrderIndex())
+                .ifPresent(orderIndex -> {
+                    Long currentIndex = category.getOrderIndex();
+
+                    if(currentIndex > orderIndex)
+                        categoryRepository.bulkUpdateOrderIndex(orderIndex, currentIndex, +1, boardId);
+
+                    else
+                        categoryRepository.bulkUpdateOrderIndex(currentIndex, orderIndex, -1, boardId);
+
+                    category.updateOrderIndex(orderIndex);
+                });
+    }
+
+    private void processDelete(CategoryPatchDto request, Category category, long boardId, Member currentMember)
+    {
+        Optional.ofNullable(request.getIsDeleted())
+                .ifPresent(isDeleted -> {
+                    Long lastOrderIndex = categoryRepository.findTheBiggestOrderIndex(boardId);
+                    Long startOrderIndex = category.getOrderIndex();
+
+                    if(startOrderIndex < lastOrderIndex)
+                        categoryRepository.bulkUpdateOrderIndex(startOrderIndex, lastOrderIndex, -1, boardId);
+
+                    deleteCategory(category.getId(), currentMember);
+                });
     }
 
     private Board getBoard(Long boardId)
