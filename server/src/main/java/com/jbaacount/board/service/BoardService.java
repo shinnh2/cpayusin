@@ -1,6 +1,7 @@
 package com.jbaacount.board.service;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
+import com.jbaacount.board.dto.response.BoardAndCategoryResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
@@ -124,6 +125,12 @@ public class BoardService
     public List<BoardResponseDto> getAllBoards()
     {
         return boardRepository.findAllBoards();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BoardAndCategoryResponse> getAllBoardAndCategory()
+    {
+        return boardRepository.findAllBoardAndCategory();
     }
 
     public void deleteBoard(Long boardId, Member currentMember)

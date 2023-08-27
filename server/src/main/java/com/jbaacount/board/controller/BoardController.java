@@ -2,6 +2,7 @@ package com.jbaacount.board.controller;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
 import com.jbaacount.board.dto.request.BoardPostDto;
+import com.jbaacount.board.dto.response.BoardAndCategoryResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.mapper.BoardMapper;
@@ -68,6 +69,15 @@ public class BoardController
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
+
+    @GetMapping("/board/all")
+    public ResponseEntity getAllBoardAndCategory()
+    {
+        List<BoardAndCategoryResponse> response = boardService.getAllBoardAndCategory();
+
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
 
 
     @DeleteMapping("/manage/board/{board-id}")

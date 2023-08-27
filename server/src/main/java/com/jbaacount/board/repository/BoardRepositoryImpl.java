@@ -1,6 +1,8 @@
 package com.jbaacount.board.repository;
 
+import com.jbaacount.board.dto.response.BoardAndCategoryResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
+import com.jbaacount.category.repository.CategoryRepository;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +18,8 @@ import static com.jbaacount.board.entity.QBoard.board;
 public class BoardRepositoryImpl implements BoardRepositoryCustom
 {
     private final JPAQueryFactory query;
+    private final CategoryRepository categoryRepository;
+
     @Override
     public List<BoardResponseDto> findAllBoards()
     {
@@ -45,6 +49,31 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
                 .select(board.orderIndex.max())
                 .from(board)
                 .fetchOne();
+    }
+
+    @Override
+    public List<BoardAndCategoryResponse> findAllBoardAndCategory()
+    {
+        List<BoardAndCategoryResponse> boardList = query
+                .select(extractBoardAndCategories())
+                .from(board)
+                .orderBy(board.orderIndex.asc())
+                .fetch();
+
+        for (BoardAndCategoryResponse board : boardList)
+        {
+            board.setCategories(categoryRepository.findAllCategories(board.getId()));
+        }
+
+        return boardList;
+    }
+
+    private ConstructorExpression<BoardAndCategoryResponse> extractBoardAndCategories()
+    {
+        return Projections.constructor(BoardAndCategoryResponse.class,
+                board.id,
+                board.name,
+                board.orderIndex);
     }
 
     private ConstructorExpression<BoardResponseDto> extractBoardsInfo()
