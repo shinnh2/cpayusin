@@ -52,55 +52,6 @@ public class CategoryService
         return savedCategory;
     }
 
-    public Category updateCategory(Long categoryId, CategoryPatchDto request, Member currentMember)
-    {
-        authorizationService.isAdmin(currentMember);
-
-        Category category = getCategory(categoryId);
-        Optional.ofNullable(request.getBoardId())
-                .ifPresent(boardId ->
-                {
-                    Board board = getBoard(boardId);
-                    category.addBoard(board);
-                    category.changeCategoryAuthority(request.getIsAdminOnly());
-                });
-
-        Optional.ofNullable(request.getName())
-                .ifPresent(name -> category.updateName(name));
-
-        Optional.ofNullable(request.getIsAdminOnly())
-                .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
-
-        Optional.ofNullable(request.getOrderIndex())
-                .ifPresent(orderIndex ->{
-                    Long currentIndex = category.getOrderIndex();
-
-                    if(currentIndex > orderIndex)
-                    {
-                        List<Category> allCategories = categoryRepository.findAllBetween(orderIndex, currentIndex);
-                        for (Category categoryList : allCategories)
-                        {
-                            categoryList.updateOrderIndex(categoryList.getOrderIndex() + 1);
-                        }
-                    }
-
-                    else
-                    {
-                        List<Category> allCategories = categoryRepository.findAllBetween(currentIndex, orderIndex);
-                        for (Category categoryList : allCategories)
-                        {
-                            categoryList.updateOrderIndex(categoryList.getOrderIndex() - 1);
-                        }
-                    }
-
-                    category.updateOrderIndex(orderIndex);
-
-                });
-
-
-        return category;
-    }
-
     public void categoryBulkUpdate(List<CategoryPatchDto> requests, long boardId, Member currentMember)
     {
         log.info("bulk update");
@@ -135,7 +86,6 @@ public class CategoryService
     }
 
 
-
     @Transactional(readOnly = true)
     public Category getCategory(Long categoryId)
     {
@@ -167,19 +117,26 @@ public class CategoryService
 
     private void processUpdateCategory(CategoryPatchDto request, Category category)
     {
+        //board 를 변경 한다면
+        //변경 전 board 안에 있는 category 의 orderIndex 를 변경 해준다(삭제 프로세스와 같음)
         Optional.ofNullable(request.getName())
                 .ifPresent(name -> category.updateName(name));
-
-        Optional.ofNullable(request.getIsAdminOnly())
-                .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
 
         Optional.ofNullable(request.getBoardId())
                 .ifPresent(boardId ->
                 {
                     Board board = getBoard(boardId);
+                    long previousBoardId = category.getBoard().getId();
+                    changeOrderIndexForDeletionOrBoardChange(category.getOrderIndex(), previousBoardId);
+
                     category.addBoard(board);
-                    category.changeCategoryAuthority(request.getIsAdminOnly());
+
+                    long orderIndex = categoryRepository.countCategory(boardId);
+                    category.updateOrderIndex(orderIndex + 1);
                 });
+
+        Optional.ofNullable(request.getIsAdminOnly())
+                .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
     }
 
     private void processOrderIndexChange(CategoryPatchDto request, Category category, long boardId)
@@ -202,14 +159,18 @@ public class CategoryService
     {
         Optional.ofNullable(request.getIsDeleted())
                 .ifPresent(isDeleted -> {
-                    Long lastOrderIndex = categoryRepository.findTheBiggestOrderIndex(boardId);
-                    Long startOrderIndex = category.getOrderIndex();
-
-                    if(startOrderIndex < lastOrderIndex)
-                        categoryRepository.bulkUpdateOrderIndex(startOrderIndex, lastOrderIndex, -1, boardId);
+                    changeOrderIndexForDeletionOrBoardChange(category.getOrderIndex(), boardId);
 
                     deleteCategory(category.getId(), currentMember);
                 });
+    }
+
+    private void changeOrderIndexForDeletionOrBoardChange(long startOrderIndex, long boardId)
+    {
+        Long lastOrderIndex = categoryRepository.findTheBiggestOrderIndex(boardId);
+
+        if(startOrderIndex < lastOrderIndex)
+            categoryRepository.bulkUpdateOrderIndex(startOrderIndex, lastOrderIndex, -1, boardId);
     }
 
     private Board getBoard(Long boardId)
