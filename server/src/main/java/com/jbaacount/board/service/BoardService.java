@@ -39,48 +39,10 @@ public class BoardService
     {
         authorizationService.isAdmin(currentMember);
 
-        Board savedBoard = boardRepository.save(board);
-        savedBoard.updateOrderIndex(savedBoard.getId());
+        long orderIndex = boardRepository.countBoard();
+        board.updateOrderIndex(orderIndex + 1);
 
-        return savedBoard;
-    }
-
-    public Board updateBoard(Long boardId, BoardPatchDto request, Member currentMember)
-    {
-        authorizationService.isAdmin(currentMember);
-
-        Board board = getBoardById(boardId);
-
-        Optional.ofNullable(request.getName())
-                .ifPresent(name -> board.updateName(name));
-
-        Optional.ofNullable(request.getIsAdminOnly())
-                .ifPresent(authority -> board.changeBoardAuthority(authority));
-
-        Optional.ofNullable(request.getOrderIndex())
-                .ifPresent(orderIndex ->{
-                    Long currentIndex = board.getOrderIndex();
-                    if(currentIndex > orderIndex)
-                    {
-                        List<Board> allBoards = boardRepository.findAllBetween(orderIndex, currentIndex);
-                        for (Board boardList : allBoards)
-                        {
-                            boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
-                        }
-                    }
-
-                    else
-                    {
-                        List<Board> allBoards = boardRepository.findAllBetween(currentIndex, orderIndex);
-                        for (Board boardList : allBoards)
-                        {
-                            boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
-                        }
-                    }
-                    board.updateOrderIndex(orderIndex);
-                });
-
-        return board;
+        return boardRepository.save(board);
     }
 
     public void bulkUpdateBoards(List<BoardPatchDto> requests, Member currentMember)
@@ -92,6 +54,7 @@ public class BoardService
             if(Boolean.TRUE.equals(request.getIsDeleted()))
             {
                 Board board = getBoardById(request.getBoardId());
+                log.info("delete process = {}", board.getOrderIndex());
                 processDelete(request, board, currentMember);
             }
         }
@@ -155,20 +118,23 @@ public class BoardService
         boardRepository.deleteById(boardId);
     }
 
-    private boolean processDelete(BoardPatchDto request, Board board, Member currentMember)
+    private void processDelete(BoardPatchDto request, Board board, Member currentMember)
     {
-        return Optional.ofNullable(request.getIsDeleted())
-                .filter(isDeleted -> isDeleted)
-                .map(isDeleted -> {
+        Optional.ofNullable(request.getIsDeleted())
+                .ifPresent(isDeleted -> {
                     Long lastOrderIndex = boardRepository.findTheBiggestOrderIndex();
                     Long startOrderIndex = board.getOrderIndex();
 
+
+
                     if(startOrderIndex < lastOrderIndex)
+                    {
+                        log.info("update orderIndex between = {} and {}", startOrderIndex, lastOrderIndex);
                         boardRepository.bulkUpdateOrderIndex(startOrderIndex + 1, lastOrderIndex, -1);
+                    }
 
                     deleteBoard(board.getId(), currentMember);
-                    return true;
-                }).orElse(false);
+                });
     }
 
     private void processUpdateBoard(BoardPatchDto request, Board board)

@@ -8,12 +8,17 @@ import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
 import com.jbaacount.member.service.MemberService;
 import com.jbaacount.utils.TestUtil;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -34,20 +39,24 @@ class BoardServiceTest
     @Autowired
     private MemberService memberService;
 
+    @PersistenceContext
+    private EntityManager em;
+
     private static final String adminEmail = "mike@ticonsys.com";
     private static final String userEmail = "aaa@naver.com";
     @BeforeEach
     void beforeEach()
     {
         Member admin = TestUtil.createAdminMember(memberService);
-        Member user = TestUtil.createUserMember(memberService);
+        TestUtil.createUserMember(memberService);
 
-        Board board = Board.builder()
-                .name("첫번째 게시판")
-                .isAdminOnly(true)
-                .build();
-
-        boardService.createBoard(board, admin);
+        for(int i = 1; i < 10; i++)
+        {
+            boardService.createBoard(Board.builder()
+                    .name(i + "번째 게시판")
+                    .isAdminOnly(false)
+                    .build(), admin);
+        }
     }
 
     @DisplayName("게시판 생성 - 관리자")
@@ -81,18 +90,68 @@ class BoardServiceTest
         assertThrows(BusinessLogicException.class, () -> boardService.createBoard(board, user));
     }
 
-    @DisplayName("게시판 수정 - 관리자")
+    @DisplayName("게시판 수정 - orderIndex 확인")
     @Test
-    void updateBoard_WithAdmin()
+    void updateBoard_orderIndexCheck()
     {
+        //given
         Member admin = memberRepository.findByEmail(adminEmail).get();
-        Board board = boardRepository.findBoardByName("첫번째 게시판").get();
-        BoardPatchDto request = new BoardPatchDto("업데이트 게시판", false);
+        Board board1 = boardRepository.findBoardByName("1번째 게시판").get();
+        Board board2 = boardRepository.findBoardByName("2번째 게시판").get();
+        List<BoardPatchDto> requests = new ArrayList<>();
+        BoardPatchDto request1 = new BoardPatchDto(board1.getId(), "첫번째 게시판", null, 3L, null);
+        BoardPatchDto request2 = new BoardPatchDto(board2.getId(), "두번째 게시판", null, 1L, null);
+        requests.add(request1);
+        requests.add(request2);
 
-        Board updatedBoard = boardService.updateBoard(board.getId(), request, admin);
+        //when
+        boardService.bulkUpdateBoards(requests, admin);
 
-        assertThat(updatedBoard.getName()).isEqualTo("업데이트 게시판");
-        assertThat(updatedBoard.getIsAdminOnly()).isEqualTo(false);
+        //then
+        board1 = boardService.getBoardById(board1.getId());
+        board2 = boardService.getBoardById(board2.getId());
+
+        assertThat(board1.getOrderIndex()).isEqualTo(3L);
+        assertThat(board1.getName()).isEqualTo("첫번째 게시판");
+
+        assertThat(board2.getOrderIndex()).isEqualTo(1L);
+        assertThat(board2.getName()).isEqualTo("두번째 게시판");
+    }
+
+
+    @DisplayName("게시판 삭제 후 orderIndex 정렬 확인")
+    @Test
+    void deleteBoard_orderIndexCheck()
+    {
+        //given
+        Member admin = memberRepository.findByEmail(adminEmail).get();
+        Board board1 = boardRepository.findBoardByName("1번째 게시판").get();
+
+
+        List<BoardPatchDto> requests = new ArrayList<>();
+        BoardPatchDto request1 = new BoardPatchDto(board1.getId(), null, null, null, true);
+        requests.add(request1);
+
+        //when
+        boardService.bulkUpdateBoards(requests, admin);
+
+        //then
+        Board board2 = boardService.getBoardById(boardRepository.findBoardByName("2번째 게시판").get().getId());
+        Board board3 = boardService.getBoardById(boardRepository.findBoardByName("3번째 게시판").get().getId());
+        Board board4 = boardService.getBoardById(boardRepository.findBoardByName("4번째 게시판").get().getId());
+
+        em.refresh(board2);
+        em.refresh(board3);
+        em.refresh(board4);
+
+        System.out.println("board 2 orderIndex = " + board2.getOrderIndex());
+        System.out.println("board 3 orderIndex = " + board3.getOrderIndex());
+        System.out.println("board 4 orderIndex = " + board4.getOrderIndex());
+
+        assertThat(board2.getOrderIndex()).isEqualTo(1L);
+        assertThat(board3.getOrderIndex()).isEqualTo(2L);
+        assertThat(board4.getOrderIndex()).isEqualTo(3L);
+
     }
 
     @DisplayName("게시판 수정 - 유저")
@@ -100,31 +159,16 @@ class BoardServiceTest
     void updateBoard_WithUser()
     {
         Member user = memberRepository.findByEmail(userEmail).get();
-        Board board = boardRepository.findBoardByName("첫번째 게시판").get();
-        BoardPatchDto request = new BoardPatchDto("업데이트 게시판", false);
+        Board board1 = boardRepository.findBoardByName("1번째 게시판").get();
+        Board board2 = boardRepository.findBoardByName("2번째 게시판").get();
 
-        assertThrows(BusinessLogicException.class, () -> boardService.updateBoard(board.getId(), request, user));
-    }
+        //when
+        List<BoardPatchDto> requests = new ArrayList<>();
+        BoardPatchDto request1 = new BoardPatchDto(board1.getId(), "첫번째 게시판", null, 3L, null);
+        BoardPatchDto request2 = new BoardPatchDto(board2.getId(), "두번째 게시판", null, 1L, null);
+        requests.add(request1);
+        requests.add(request2);
 
-    @DisplayName("게시판 삭제 - 관리자")
-    @Test
-    void deleteBoard_WithAdmin()
-    {
-        Member admin = memberRepository.findByEmail(adminEmail).get();
-        Board board = boardRepository.findBoardByName("첫번째 게시판").get();
-
-        boardService.deleteBoard(board.getId(), admin);
-
-        assertThat(boardRepository.findBoardByName("첫번째 게시판")).isEmpty();
-    }
-
-    @DisplayName("게시판 삭제 - 유저")
-    @Test
-    void deleteBoard_WithUser()
-    {
-        Member user = memberRepository.findByEmail(userEmail).get();
-        Board board = boardRepository.findBoardByName("첫번째 게시판").get();
-
-        assertThrows(BusinessLogicException.class, () -> boardService.deleteBoard(board.getId(), user));
+        assertThrows(BusinessLogicException.class, () -> boardService.bulkUpdateBoards(requests, user));
     }
 }

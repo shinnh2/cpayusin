@@ -48,8 +48,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
                 .select(category.count())
                 .from(category)
                 .where(category.board.id.eq(boardId))
-                .fetch()
-                .size();
+                .fetchOne();
     }
 
 

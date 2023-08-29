@@ -80,12 +80,4 @@ public class BoardController
 
 
 
-    @DeleteMapping("/manage/board/{board-id}")
-    public ResponseEntity deleteBoard(@PathVariable("board-id") @Positive Long boardId,
-                                      @AuthenticationPrincipal Member currentMember)
-    {
-        boardService.deleteBoard(boardId, currentMember);
-
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
-    }
 }

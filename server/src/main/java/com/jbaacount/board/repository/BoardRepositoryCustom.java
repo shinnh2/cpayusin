@@ -14,4 +14,6 @@ public interface BoardRepositoryCustom
     void bulkUpdateOrderIndex(Long start, Long end, int num);
 
     Long findTheBiggestOrderIndex();
+
+    long countBoard();
 }
