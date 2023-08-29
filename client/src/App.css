@@ -59,7 +59,7 @@ body {
 	color: var(--on-background-color);
 }
 
-/* Button */
+/* button */
 button {
 	padding: 0;
 	border: 0 none;
@@ -102,10 +102,41 @@ button.no_em {
 button.big {
 	padding: 18px 24px;
 	border-radius: var(--br-md);
-	font-size: var(--fs-caption);
+	font-size: var(--fs-normal);
 }
 button.small {
 	padding: 6px 8px;
 	border-radius: var(--br-md);
 	font-size: var(--fs-caption);
+}
+
+/* input */
+label {
+	display: block;
+	font-size: var(--fs-normal);
+	margin-bottom: 6px;
+}
+input {
+	border: 1px solid var(--border-color);
+	border-radius: var(--br-md);
+	background: var(--white);
+	font-size: var(--fs-normal);
+	color: var(--on-background-color);
+	padding: 0 16px;
+	height: 48px;
+	box-sizing: border-box;
+}
+input::placeholder {
+	font-size: var(--fs-normal);
+	color: var(--on-background-secondary-color);
+}
+input.error {
+	border: 1px solid var(--error-color);
+	color: var(--error-color);
+}
+.error_msg {
+	padding: 4px 0;
+	margin: 0; /*스토리북 속성으로 임시*/
+	font-size: var(--fs-caption-sm);
+	color: var(--error-color);
 }
