@@ -68,6 +68,15 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
         return boardList;
     }
 
+    @Override
+    public long countBoard()
+    {
+        return query
+                .select(board.count())
+                .from(board)
+                .fetchOne();
+    }
+
     private ConstructorExpression<BoardAndCategoryResponse> extractBoardAndCategories()
     {
         return Projections.constructor(BoardAndCategoryResponse.class,
