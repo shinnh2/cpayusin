@@ -1,8 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap");
+
 :root {
 	/* color */
 	--purple-50: #7037f0;
 	--pirple-80: #d6c6fb;
-	--red-50: #c73a2d;
+	--red-50: #e41111;
 	--black-00: #080217;
 	--black-30: #454151;
 	--black-40: #817f8b;
@@ -18,7 +20,7 @@
 	--on-background-color: var(--black-30);
 	--on-background-secondary-color: var(--black-40);
 	--error-color: var(--red-50);
-	/* size */
+	/* font size */
 	--fs-normal: 16px;
 	--fs-h1: 40px;
 	--fs-h2: 32px;
@@ -28,6 +30,9 @@
 	--fs-h6: 16px;
 	--fs-caption: 14px;
 	--fs-caption-sm: 12px;
+	/* font weight */
+	--fw-bold: 500;
+	--fw-normal: 400;
 	/* line-height */
 	--lh-normal: calc(var(--fs-normal)+8);
 	--lh-h1: calc(var(--fs-h1)+8);
@@ -44,4 +49,94 @@
 	--br-sm: 4px;
 	/* box-shadow */
 	--bs-layer1: 8px 11px 29px 0px rgba(129, 127, 139, 0.15);
+}
+
+body {
+	margin: 0;
+	font-family: "Noto Sans KR", sans-serif;
+	font-weight: var(--fw-normal);
+	font-size: var(--fs-normal);
+	color: var(--on-background-color);
+}
+
+/* button */
+button {
+	padding: 0;
+	border: 0 none;
+	background: none;
+	box-sizing: border-box;
+	font-family: "Noto Sans KR", sans-serif;
+	line-height: var(--lh-caption);
+	font-weight: var(--fw-bold);
+}
+button.primary {
+	border: 1px solid var(--primary-color);
+	background-color: var(--primary-color);
+	color: var(--white);
+}
+button.em {
+	border: 1px solid var(--black);
+	background-color: var(--black);
+	color: var(--white);
+}
+button.cancel {
+	border: 1px solid var(--on-background-secondary-color);
+	background-color: var(--on-background-secondary-color);
+	color: var(--white);
+}
+button.another {
+	border: 1px solid var(--primary-color);
+	background-color: var(--white);
+	color: var(--primary-color);
+}
+button.error {
+	border: 1px solid var(--error-color);
+	background-color: var(--error-color);
+	color: var(--white);
+}
+button.no_em {
+	border: 1px solid var(--on-background-secondary-color);
+	background-color: var(--white);
+	color: var(--on-background-secondary-color);
+}
+button.big {
+	padding: 18px 24px;
+	border-radius: var(--br-md);
+	font-size: var(--fs-normal);
+}
+button.small {
+	padding: 6px 8px;
+	border-radius: var(--br-md);
+	font-size: var(--fs-caption);
+}
+
+/* input */
+label {
+	display: block;
+	font-size: var(--fs-normal);
+	margin-bottom: 6px;
+}
+input {
+	border: 1px solid var(--border-color);
+	border-radius: var(--br-md);
+	background: var(--white);
+	font-size: var(--fs-normal);
+	color: var(--on-background-color);
+	padding: 0 16px;
+	height: 48px;
+	box-sizing: border-box;
+}
+input::placeholder {
+	font-size: var(--fs-normal);
+	color: var(--on-background-secondary-color);
+}
+input.error {
+	border: 1px solid var(--error-color);
+	color: var(--error-color);
+}
+.error_msg {
+	padding: 4px 0;
+	margin: 0; /*스토리북 속성으로 임시*/
+	font-size: var(--fs-caption-sm);
+	color: var(--error-color);
 }
