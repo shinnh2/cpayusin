@@ -106,7 +106,6 @@ class CategoryServiceTest
         assertThrows(BusinessLogicException.class, () -> categoryService.createCategory(category, board.getId(), user));
     }
 
-
     private Board getBoard()
     {
         Board board = boardRepository.findBoardByName(boardName).get();

@@ -10,7 +10,4 @@ public interface CategoryRepositoryCustom
 
     long countCategory(Long boardId);
 
-    void bulkUpdateOrderIndex(long start, long end, int num, long boardId);
-
-    Long findTheBiggestOrderIndex(long boardId);
 }

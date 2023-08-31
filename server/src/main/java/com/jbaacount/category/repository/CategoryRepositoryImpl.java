@@ -29,19 +29,6 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
     }
 
     @Override
-    public void bulkUpdateOrderIndex(long start, long end, int num, long boardId)
-    {
-        query
-                .update(category)
-                .where(category.board.id.eq(boardId))
-                .where(category.orderIndex.goe(start).and(category.orderIndex.loe(end)))
-                .set(category.orderIndex, category.orderIndex.add(num))
-                .execute();
-
-        log.info("updated records");
-    }
-
-    @Override
     public long countCategory(Long boardId)
     {
         return query
@@ -49,17 +36,6 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
                 .from(category)
                 .where(category.board.id.eq(boardId))
                 .fetchOne();
-    }
-
-
-    @Override
-    public Long findTheBiggestOrderIndex(long boardId)
-    {
-        return query
-                .select(category.orderIndex.max())
-                .from(category)
-                .where(category.board.id.eq(boardId))
-                .fetchFirst();
     }
 
     private ConstructorExpression<CategoryResponseDto> extractCategories()

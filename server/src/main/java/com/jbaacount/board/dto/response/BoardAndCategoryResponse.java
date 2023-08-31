@@ -1,7 +1,6 @@
 package com.jbaacount.board.dto.response;
 
 import com.jbaacount.category.dto.response.CategoryResponseDto;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -18,11 +17,11 @@ public class BoardAndCategoryResponse
 
     private List<CategoryResponseDto> categories = new ArrayList<>();
 
-    @QueryProjection
+    /*@QueryProjection
     public BoardAndCategoryResponse(Long id, String name, Long orderIndex)
     {
         this.id = id;
         this.name = name;
         this.orderIndex = orderIndex;
-    }
+    }*/
 }

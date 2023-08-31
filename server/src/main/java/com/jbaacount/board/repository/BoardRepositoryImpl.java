@@ -1,6 +1,5 @@
 package com.jbaacount.board.repository;
 
-import com.jbaacount.board.dto.response.BoardAndCategoryResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
 import com.jbaacount.category.repository.CategoryRepository;
 import com.querydsl.core.types.ConstructorExpression;
@@ -51,7 +50,7 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
                 .fetchOne();
     }
 
-    @Override
+    /*@Override
     public List<BoardAndCategoryResponse> findAllBoardAndCategory()
     {
         List<BoardAndCategoryResponse> boardList = query
@@ -66,7 +65,7 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
         }
 
         return boardList;
-    }
+    }*/
 
     @Override
     public long countBoard()
@@ -77,13 +76,13 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
                 .fetchOne();
     }
 
-    private ConstructorExpression<BoardAndCategoryResponse> extractBoardAndCategories()
+    /*private ConstructorExpression<BoardAndCategoryResponse> extractBoardAndCategories()
     {
         return Projections.constructor(BoardAndCategoryResponse.class,
                 board.id,
                 board.name,
                 board.orderIndex);
-    }
+    }*/
 
     private ConstructorExpression<BoardResponseDto> extractBoardsInfo()
     {
