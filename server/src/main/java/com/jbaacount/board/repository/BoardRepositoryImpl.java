@@ -1,5 +1,6 @@
 package com.jbaacount.board.repository;
 
+import com.jbaacount.board.dto.response.BoardAndCategoryResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
 import com.jbaacount.category.repository.CategoryRepository;
 import com.querydsl.core.types.ConstructorExpression;
@@ -30,27 +31,6 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
     }
 
     @Override
-    public void bulkUpdateOrderIndex(Long start, Long end, int num)
-    {
-        query
-                .update(board)
-                .where(board.orderIndex.goe(start).and(board.orderIndex.loe(end)))
-                .set(board.orderIndex, board.orderIndex.add(num))
-                .execute();
-
-        log.info("updated records");
-    }
-
-    @Override
-    public Long findTheBiggestOrderIndex()
-    {
-        return query
-                .select(board.orderIndex.max())
-                .from(board)
-                .fetchOne();
-    }
-
-    /*@Override
     public List<BoardAndCategoryResponse> findAllBoardAndCategory()
     {
         List<BoardAndCategoryResponse> boardList = query
@@ -65,7 +45,7 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
         }
 
         return boardList;
-    }*/
+    }
 
     @Override
     public long countBoard()
@@ -76,13 +56,13 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
                 .fetchOne();
     }
 
-    /*private ConstructorExpression<BoardAndCategoryResponse> extractBoardAndCategories()
+    private ConstructorExpression<BoardAndCategoryResponse> extractBoardAndCategories()
     {
         return Projections.constructor(BoardAndCategoryResponse.class,
                 board.id,
                 board.name,
                 board.orderIndex);
-    }*/
+    }
 
     private ConstructorExpression<BoardResponseDto> extractBoardsInfo()
     {
