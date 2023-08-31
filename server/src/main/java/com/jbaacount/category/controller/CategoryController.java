@@ -1,6 +1,5 @@
 package com.jbaacount.category.controller;
 
-import com.jbaacount.category.dto.request.CategoryPatchDto;
 import com.jbaacount.category.dto.request.CategoryPostDto;
 import com.jbaacount.category.dto.response.CategoryResponseDto;
 import com.jbaacount.category.entity.Category;
@@ -42,17 +41,6 @@ public class CategoryController
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/manage/{board-id}/category")
-    public ResponseEntity updateCategory(@RequestBody @Valid List<CategoryPatchDto> requests,
-                                         @PathVariable("board-id") @Positive long boardId,
-                                         @AuthenticationPrincipal Member currentMember)
-    {
-        categoryService.categoryBulkUpdate(requests, boardId, currentMember);
-
-        List<CategoryResponseDto> response = categoryService.getAllCategories(boardId);
-
-        return new ResponseEntity(response, HttpStatus.OK);
-    }
 
     @GetMapping("/board/{board-id}/category")
     public ResponseEntity getAllCategories(@PathVariable("board-id") @Positive Long boardId)
@@ -60,15 +48,5 @@ public class CategoryController
         List<CategoryResponseDto> response = categoryService.getAllCategories(boardId);
 
         return new ResponseEntity(response, HttpStatus.OK);
-    }
-
-
-    @DeleteMapping("/manage/category/{category-id}")
-    public ResponseEntity deleteCategory(@PathVariable("category-id") @Positive Long categoryId,
-                                         @AuthenticationPrincipal Member currentMember)
-    {
-        categoryService.deleteCategory(categoryId, currentMember);
-
-        return ResponseEntity.noContent().build();
     }
 }

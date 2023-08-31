@@ -46,7 +46,9 @@ public class BoardController
     public ResponseEntity updateBoard(@RequestBody @Valid List<BoardPatchDto> requests,
                                       @AuthenticationPrincipal Member currentMember)
     {
+        log.info("bulk update 시작");
         boardService.bulkUpdateBoards(requests, currentMember);
+        log.info("bulk update 종료");
 
         List<BoardResponseDto> response = boardService.getAllBoards();
 

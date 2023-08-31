@@ -1,10 +1,14 @@
 package com.jbaacount.board.dto.request;
 
+import com.jbaacount.category.dto.request.CategoryPatchDto;
 import com.jbaacount.global.validation.notspace.NotSpace;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -18,4 +22,5 @@ public class BoardPatchDto
     private Boolean isAdminOnly;
     private Long orderIndex;
     private Boolean isDeleted;
+    private List<CategoryPatchDto> category = new ArrayList<>();
 }

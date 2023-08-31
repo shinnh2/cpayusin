@@ -23,6 +23,4 @@ public class CategoryPatchDto
 
     private Long orderIndex;
     private Boolean isDeleted;
-
-    private Long boardId;
 }

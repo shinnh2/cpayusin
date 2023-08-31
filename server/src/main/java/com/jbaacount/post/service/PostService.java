@@ -42,8 +42,8 @@ public class PostService
     public Post createPost(Post request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
     {
         Board board = getBoard(boardId);
-        Post savedPost = postRepository.save(request);
         authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
+        Post savedPost = postRepository.save(request);
 
         if(files != null && !files.isEmpty())
         {
