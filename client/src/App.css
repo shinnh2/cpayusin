@@ -58,6 +58,58 @@ body {
 	font-size: var(--fs-normal);
 	color: var(--on-background-color);
 }
+/* header */
+.header {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	min-height: 72px;
+	padding: 16px;
+	box-sizing: border-box;
+	background: var(--primary-color);
+}
+.header .button_navi {
+	width: 24px;
+	height: 24px;
+	margin-right: 16px;
+}
+.header .logo {
+	font-size: var(--fs-h4);
+	font-weight: var(--fw-bold);
+	color: var(--white);
+}
+.header .header_button_wrap {
+	display: flex;
+	margin-left: auto;
+}
+.header .header_button_wrap .header_links {
+	display: block;
+	padding: 18px 24px;
+	font-size: var(--fs-normal);
+	font-weight: var(--fw-normal);
+	color: var(--white);
+}
+.header .header_button_wrap .header_btns {
+	display: block;
+	width: 36px;
+	height: 36px;
+	padding: 6px 0;
+	margin-left: 16px;
+	overflow: hidden;
+	box-sizing: border-box;
+	border-radius: 100%;
+	text-align: center;
+	font-size: 0;
+}
+.link_profile {
+	background-color: var(--border-color);
+}
+.link_write {
+	background-color: var(--primary-container-color);
+}
+.button_logout {
+	background-color: var(--primary-container-color);
+}
 
 /* button */
 button {
@@ -136,7 +188,6 @@ input.error {
 }
 .error_msg {
 	padding: 4px 0;
-	margin: 0; /*스토리북 속성으로 임시*/
 	font-size: var(--fs-caption-sm);
 	color: var(--error-color);
 }
