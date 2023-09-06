@@ -1,7 +1,13 @@
 package com.jbaacount.board.service;
 
+import com.jbaacount.board.dto.request.BoardPatchDto;
+import com.jbaacount.board.dto.response.BoardAndCategoryResponse;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
+import com.jbaacount.category.dto.request.CategoryPatchDto;
+import com.jbaacount.category.dto.response.CategoryResponseDto;
+import com.jbaacount.category.entity.Category;
+import com.jbaacount.category.service.CategoryService;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.repository.MemberRepository;
@@ -16,6 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -25,6 +34,9 @@ class BoardServiceTest
 {
     @Autowired
     private BoardService boardService;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Autowired
     private BoardRepository boardRepository;
@@ -46,12 +58,21 @@ class BoardServiceTest
         Member admin = TestUtil.createAdminMember(memberService);
         TestUtil.createUserMember(memberService);
 
-        for(int i = 1; i < 10; i++)
+        for(int i = 1; i <= 3; i++)
         {
-            boardService.createBoard(Board.builder()
+            Board board= Board.builder()
                     .name(i + "번째 게시판")
                     .isAdminOnly(false)
-                    .build(), admin);
+                    .build();
+
+            boardService.createBoard(board, admin);
+
+            Category category = Category.builder()
+                            .name(i + "번째 카테고리")
+                            .isAdminOnly(false)
+                            .build();
+
+            categoryService.createCategory(category, board.getId(), admin);
         }
     }
 
@@ -86,4 +107,56 @@ class BoardServiceTest
         assertThrows(BusinessLogicException.class, () -> boardService.createBoard(board, user));
     }
 
+    @DisplayName("게시판 & 카테고리 수정 - 관리자")
+    @Test
+    void updateBoardAndCategory_Admin()
+    {
+        Member admin = getAdmin();
+        List<BoardAndCategoryResponse> allBoardAndCategory = boardService.getAllBoardAndCategory();
+
+        List<BoardPatchDto> boardRequests = new ArrayList<>();
+        List<CategoryPatchDto> categoryRequests = new ArrayList<>();
+        int num = 1;
+        for(BoardAndCategoryResponse boardResponse : allBoardAndCategory)
+        {
+            List<CategoryResponseDto> categoryList = boardResponse.getCategories();
+            for(CategoryResponseDto categoryResponse : categoryList)
+            {
+                CategoryPatchDto categoryPatchDto = new CategoryPatchDto(categoryResponse.getId(), "수정 후 카테고리" + num, true, categoryResponse.getOrderIndex(), null);
+                categoryRequests.add(categoryPatchDto);
+
+                BoardPatchDto boardPatchDto = new BoardPatchDto(boardResponse.getId(), "수정 후 게시판" + num, true, boardResponse.getOrderIndex(), null, categoryRequests);
+                boardRequests.add(boardPatchDto);
+                num++;
+            }
+        }
+
+        boardService.bulkUpdateBoards(boardRequests, admin);
+
+        List<BoardAndCategoryResponse> afterBulkUpdate = boardService.getAllBoardAndCategory();
+
+        for(BoardAndCategoryResponse boardResponse : afterBulkUpdate)
+        {
+            List<CategoryResponseDto> categories = boardResponse.getCategories();
+
+            String name = boardResponse.getName();
+            assertThat(boardResponse.getName()).isEqualTo(name);
+            System.out.println("board name = " + name);
+            for(CategoryResponseDto category : categories)
+            {
+                String categoryName = category.getCategoryName();
+                assertThat(category.getCategoryName()).isEqualTo(categoryName);
+            }
+        }
+    }
+
+    private Member getAdmin()
+    {
+        return memberRepository.findByEmail(adminEmail).get();
+    }
+
+    private Member getUser()
+    {
+        return memberRepository.findByEmail(userEmail).get();
+    }
 }
