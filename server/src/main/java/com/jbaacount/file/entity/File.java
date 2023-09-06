@@ -21,7 +21,7 @@ public class File extends BaseEntity
     private String uploadFileName;
 
     @Column(nullable = false, unique = true)
-    private String storeFileName;
+    private String storedFileName;
 
     @Column(nullable = false)
     private String url;
@@ -41,7 +41,7 @@ public class File extends BaseEntity
     public File(String uploadFileName, String storeFileName, String url, String contentType)
     {
         this.uploadFileName = uploadFileName;
-        this.storeFileName = storeFileName;
+        this.storedFileName = storeFileName;
         this.url = url;
         this.contentType = contentType;
     }

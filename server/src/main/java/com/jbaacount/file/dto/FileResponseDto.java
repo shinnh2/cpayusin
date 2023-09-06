@@ -15,7 +15,7 @@ public class FileResponseDto
     public FileResponseDto(File file)
     {
         this.originalFileName = file.getUploadFileName();
-        this.storedFileName = file.getStoreFileName();
+        this.storedFileName = file.getStoredFileName();
         this.url = file.getUrl();
     }
 }

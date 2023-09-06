@@ -57,10 +57,10 @@ public class TestService implements CommandLineRunner
             boardService.createBoard(Board.builder().name(i + "번째 게시판").isAdminOnly(false).build(), admin);
         }
 
-        Category category1 = Category.builder().name("카테고리1").isAdminOnly(false).build();
-        Category category2 = Category.builder().name("카테고리2").isAdminOnly(false).build();
-        Category category3 = Category.builder().name("카테고리3").isAdminOnly(false).build();
-        Category category4 = Category.builder().name("카테고리4").isAdminOnly(false).build();
+        Category category1 = categoryService.createCategory(Category.builder().name("카테고리a").isAdminOnly(false).build(), board1.getId(), admin);
+        Category category2 = categoryService.createCategory(Category.builder().name("카테고리b").isAdminOnly(false).build(), board1.getId(), admin);
+        Category category3 = categoryService.createCategory(Category.builder().name("카테고리c").isAdminOnly(false).build(), board2.getId(), admin);
+        Category category4 = categoryService.createCategory(Category.builder().name("카테고리d").isAdminOnly(false).build(), board2.getId(), admin);
 
 
         for(int i = 0; i < 10; i++)

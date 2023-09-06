@@ -30,14 +30,14 @@ public class Comment extends BaseEntity
     private boolean isRemoved = false;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment parent;
 
     @ManyToOne
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @OneToMany(mappedBy = "parent")

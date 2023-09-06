@@ -34,7 +34,7 @@ public class Post extends BaseEntity
     private int voteCount;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,7 +42,7 @@ public class Post extends BaseEntity
     private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)

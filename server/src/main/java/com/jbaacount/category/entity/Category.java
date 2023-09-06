@@ -33,7 +33,7 @@ public class Category extends BaseEntity
     private List<Post> posts = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "board_id")
+    @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
     public void addBoard(Board board)

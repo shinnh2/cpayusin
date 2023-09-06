@@ -38,7 +38,7 @@ public class FileService
             File storedFile = storeFileInPost(file, post);
             storedFiles.add(storedFile);
 
-            log.info("file saved successfully = {}", storedFile.getStoreFileName());
+            log.info("file saved successfully = {}", storedFile.getStoredFileName());
         }
 
         return storedFiles;
@@ -52,8 +52,8 @@ public class FileService
         {
             for (File file : files)
             {
-                amazonS3.deleteObject(bucket, "post/" + file.getStoreFileName());
-                log.info("file removed successfully = {}", file.getStoreFileName());
+                amazonS3.deleteObject(bucket, "post/" + file.getStoredFileName());
+                log.info("file removed successfully = {}", file.getStoredFileName());
                 post.removeFile(file);
             }
         }
@@ -67,7 +67,7 @@ public class FileService
 
         if(file.isPresent())
         {
-            log.info("file removed successfully = {}", file.get().getStoreFileName());
+            log.info("file removed successfully = {}", file.get().getStoredFileName());
             fileRepository.deleteById(file.get().getId());
         }
     }

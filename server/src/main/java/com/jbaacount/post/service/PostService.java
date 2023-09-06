@@ -43,11 +43,10 @@ public class PostService
     {
         Board board = getBoard(boardId);
         authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
-        Post savedPost = postRepository.save(request);
 
         if(files != null && !files.isEmpty())
         {
-            fileService.storeFiles(files, savedPost);
+            fileService.storeFiles(files, request);
         }
 
         if(categoryId != null)
@@ -56,16 +55,17 @@ public class PostService
             checkBoardHasCategory(board, category);
 
             authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
-            savedPost.addCategory(category);
+            request.addCategory(category);
         }
 
         log.info("===postService - createPost===");
-        log.info("post saved successfully = {}", savedPost.getTitle());
+        log.info("post saved successfully = {}", request.getTitle());
 
-        savedPost.addMember(currentMember);
-        savedPost.addBoard(board);
-        savedPost.getMember().getScoreByPost();
-        log.info("member score = {}", savedPost.getMember().getScore());
+        request.addMember(currentMember);
+        request.addBoard(board);
+
+        log.info("member score = {}", request.getMember().getScore());
+        Post savedPost = postRepository.save(request);
 
         return savedPost;
     }

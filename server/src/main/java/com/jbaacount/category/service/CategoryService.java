@@ -5,12 +5,10 @@ import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.dto.response.CategoryResponseDto;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
-import com.jbaacount.file.service.FileService;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
-import com.jbaacount.vote.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,8 +25,6 @@ public class CategoryService
     private final CategoryRepository categoryRepository;
     private final BoardRepository boardRepository;
     private final AuthorizationService authorizationService;
-    private final VoteRepository voteRepository;
-    private final FileService fileService;
 
     public Category createCategory(Category category, Long boardId, Member currentMember)
     {
@@ -38,9 +34,8 @@ public class CategoryService
         long orderIndex = categoryRepository.countCategory(boardId);
         category.updateOrderIndex(orderIndex + 1);
 
+        category.addBoard(board);
         Category savedCategory = categoryRepository.save(category);
-        savedCategory.addBoard(board);
-
         return savedCategory;
     }
 
