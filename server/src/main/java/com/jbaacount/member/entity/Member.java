@@ -88,7 +88,7 @@ public class Member extends BaseEntity
     public void setVerificationCode(String verificationCode)
     {
         this.verificationCode = verificationCode;
-        this.verificationCodeExpiry = LocalDateTime.now().plusMinutes(3);
+        this.verificationCodeExpiry = LocalDateTime.now().plusMinutes(5);
     }
 
     public void setFile(File file)

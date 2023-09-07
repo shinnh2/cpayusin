@@ -63,7 +63,7 @@ public class PostService
 
         request.addMember(currentMember);
         request.addBoard(board);
-
+        currentMember.getScoreByPost();
         log.info("member score = {}", request.getMember().getScore());
         Post savedPost = postRepository.save(request);
 

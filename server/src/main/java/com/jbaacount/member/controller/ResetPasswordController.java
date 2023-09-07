@@ -25,7 +25,7 @@ public class ResetPasswordController
     {
         String verificationCode = mailService.sendMailForRestPassword(mailDto.getEmail());
 
-        return new ResponseEntity(verificationCode, HttpStatus.OK);
+        return ResponseEntity.ok("인증코드가 발송되었습니다. 5분 내로 인증을 완료해주세요.");
     }
 
     @GetMapping("/verification-code")
