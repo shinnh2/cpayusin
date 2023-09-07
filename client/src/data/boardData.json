@@ -1,0 +1,148 @@
+[
+	{
+		"id": 1,
+		"name": "첫번째 게시판",
+		"orderIndex": 1,
+		"categories": [
+			{
+				"id": 1,
+				"categoryName": "카테고리a",
+				"orderIndex": 1,
+				"adminOnly": false
+			},
+			{
+				"id": 2,
+				"categoryName": "카테고리b",
+				"orderIndex": 2,
+				"adminOnly": false
+			},
+			{
+				"id": 5,
+				"categoryName": "카테고리0",
+				"orderIndex": 3,
+				"adminOnly": false
+			},
+			{
+				"id": 6,
+				"categoryName": "카테고리1",
+				"orderIndex": 4,
+				"adminOnly": false
+			},
+			{
+				"id": 7,
+				"categoryName": "카테고리2",
+				"orderIndex": 5,
+				"adminOnly": false
+			},
+			{
+				"id": 8,
+				"categoryName": "카테고리3",
+				"orderIndex": 6,
+				"adminOnly": false
+			},
+			{
+				"id": 9,
+				"categoryName": "카테고리4",
+				"orderIndex": 7,
+				"adminOnly": false
+			},
+			{
+				"id": 10,
+				"categoryName": "카테고리5",
+				"orderIndex": 8,
+				"adminOnly": false
+			},
+			{
+				"id": 11,
+				"categoryName": "카테고리6",
+				"orderIndex": 9,
+				"adminOnly": false
+			},
+			{
+				"id": 12,
+				"categoryName": "카테고리7",
+				"orderIndex": 10,
+				"adminOnly": false
+			},
+			{
+				"id": 13,
+				"categoryName": "카테고리8",
+				"orderIndex": 11,
+				"adminOnly": false
+			},
+			{
+				"id": 14,
+				"categoryName": "카테고리9",
+				"orderIndex": 12,
+				"adminOnly": false
+			}
+		]
+	},
+	{
+		"id": 2,
+		"name": "두번째 게시판",
+		"orderIndex": 2,
+		"categories": [
+			{
+				"id": 3,
+				"categoryName": "카테고리c",
+				"orderIndex": 3,
+				"adminOnly": false
+			},
+			{
+				"id": 4,
+				"categoryName": "카테고리d",
+				"orderIndex": 3,
+				"adminOnly": false
+			}
+		]
+	},
+	{
+		"id": 3,
+		"name": "3번째 게시판",
+		"orderIndex": 3,
+		"categories": []
+	},
+	{
+		"id": 4,
+		"name": "4번째 게시판",
+		"orderIndex": 4,
+		"categories": []
+	},
+	{
+		"id": 5,
+		"name": "5번째 게시판",
+		"orderIndex": 5,
+		"categories": []
+	},
+	{
+		"id": 6,
+		"name": "6번째 게시판",
+		"orderIndex": 6,
+		"categories": []
+	},
+	{
+		"id": 7,
+		"name": "7번째 게시판",
+		"orderIndex": 7,
+		"categories": []
+	},
+	{
+		"id": 8,
+		"name": "8번째 게시판",
+		"orderIndex": 8,
+		"categories": []
+	},
+	{
+		"id": 9,
+		"name": "9번째 게시판",
+		"orderIndex": 9,
+		"categories": []
+	},
+	{
+		"id": 10,
+		"name": "10번째 게시판",
+		"orderIndex": 10,
+		"categories": []
+	}
+]
