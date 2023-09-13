@@ -50,14 +50,37 @@
 	/* box-shadow */
 	--bs-layer1: 8px 11px 29px 0px rgba(129, 127, 139, 0.15);
 }
-
+html {
+	height: 100%;
+}
 body {
+	height: 100%;
 	margin: 0;
-	background: var(--background-color);
 	font-family: "Noto Sans KR", sans-serif;
 	font-weight: var(--fw-normal);
 	font-size: var(--fs-normal);
 	color: var(--on-background-color);
+}
+/* layout */
+#root {
+	height: 100%;
+}
+.App {
+	display: flex;
+	flex-direction: column;
+	min-height: 100%;
+	background: var(--background-color);
+}
+.page_wrap {
+	display: flex;
+	flex: 1;
+	position: relative;
+}
+.page_wrap .container {
+	width: 100%;
+	max-width: 1100px;
+	padding: 40px;
+	margin: 0 auto;
 }
 /* header */
 .header {
@@ -114,6 +137,7 @@ body {
 
 /* nav */
 .nav {
+	flex: 0 0 auto;
 	width: 300px;
 	padding: 16px 0;
 	background: var(--white);
@@ -153,8 +177,14 @@ body {
 	height: 24px;
 	margin-left: auto;
 }
+.nav a.unfold .toggle_updown {
+	transform: rotate(180deg);
+}
 .depth2 {
-	padding: 12px 0;
+	padding: 0;
+	transition: all 0.3s;
+	max-height: 0;
+	overflow: hidden;
 }
 .depth2 .nav_menu_item a {
 	position: relative;
@@ -175,6 +205,10 @@ body {
 	height: 8px;
 	border-radius: 100%;
 	background: var(--primary-color);
+}
+.nav a.unfold + .nav_menu.depth2 {
+	max-height: fit-content;
+	padding: 12px 0;
 }
 
 /* button */
