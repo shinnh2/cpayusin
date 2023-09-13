@@ -53,6 +53,7 @@
 
 body {
 	margin: 0;
+	background: var(--background-color);
 	font-family: "Noto Sans KR", sans-serif;
 	font-weight: var(--fw-normal);
 	font-size: var(--fs-normal);
@@ -64,7 +65,7 @@ body {
 	align-items: center;
 	width: 100%;
 	min-height: 72px;
-	padding: 16px;
+	padding: 0 16px;
 	box-sizing: border-box;
 	background: var(--primary-color);
 }
@@ -109,6 +110,71 @@ body {
 }
 .button_logout {
 	background-color: var(--primary-container-color);
+}
+
+/* nav */
+.nav {
+	width: 300px;
+	padding: 16px 0;
+	background: var(--white);
+	box-shadow: var(--bs-layer1);
+}
+.nav_menu {
+	padding: 0 16px;
+}
+.nav a {
+	display: flex;
+	align-items: center;
+	height: 56px;
+	padding: 0 16px;
+	border-radius: var(--br-md);
+	color: var(--on-background-color);
+}
+.nav a:hover {
+	background: var(--primary-container-color);
+	color: var(--primary-color);
+}
+.nav a:focus {
+	background: var(--primary-container-color);
+	color: var(--primary-color);
+}
+.nav .home_link {
+	padding: 0 16px;
+}
+.nav .home_link svg {
+	margin-right: 12px;
+}
+.nav .home_link a:hover svg path,
+.nav .home_link a:focus svg path {
+	fill: var(--primary-color);
+}
+.nav a .toggle_updown {
+	width: 24px;
+	height: 24px;
+	margin-left: auto;
+}
+.depth2 {
+	padding: 12px 0;
+}
+.depth2 .nav_menu_item a {
+	position: relative;
+	height: 36px;
+	padding: 0 16px 0 36px;
+	font-size: var(--fs-caption);
+}
+.depth2 .nav_menu_item a:hover {
+	background: none;
+	color: var(--primary-color);
+}
+.depth2 .nav_menu_item a:hover::before {
+	content: "";
+	position: absolute;
+	left: 16px;
+	display: block;
+	width: 8px;
+	height: 8px;
+	border-radius: 100%;
+	background: var(--primary-color);
 }
 
 /* button */

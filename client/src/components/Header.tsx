@@ -1,6 +1,6 @@
 // import { ReactComponent as iconMenu } from "./../assets/icon _menu_.svg";
 import { useState } from "react";
-import iconMenu from "./../assets/icon _menu_.svg";
+import iconMenu from "./../assets/icon_menu.svg";
 import iconWrite from "./../assets/edit_document.svg";
 import iconLogout from "./../assets/logout.svg";
 
