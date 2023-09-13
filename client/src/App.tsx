@@ -9,16 +9,20 @@ function App() {
 	return (
 		<div className="App">
 			<Header isLogin={false} />
-			<Nav />
-			<section>
-				<Button buttonType="no_em" buttonSize="big" buttonLabel="테스트" />
-				<Input
-					InputLabel="테스트"
-					isLabel={true}
-					errorMsg="이것은 오류일 때 나타납니다"
-					inputAttr={{ type: "text", placeholder: "입력하세요" }}
-				/>
-			</section>
+			<div className="page_wrap">
+				<Nav />
+				<main className="container">
+					<section>
+						<Button buttonType="no_em" buttonSize="big" buttonLabel="테스트" />
+						<Input
+							InputLabel="테스트"
+							isLabel={true}
+							errorMsg="이것은 오류일 때 나타납니다"
+							inputAttr={{ type: "text", placeholder: "입력하세요" }}
+						/>
+					</section>
+				</main>
+			</div>
 		</div>
 	);
 }
