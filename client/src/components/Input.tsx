@@ -10,20 +10,31 @@ export interface InputProps {
 		id?: string;
 	};
 	errorMsg?: string;
+	children?: React.ReactNode;
 }
 
 let count = 0;
 
-const Input = ({ InputLabel, isLabel, errorMsg, inputAttr }: InputProps) => {
+const Input = ({
+	InputLabel,
+	isLabel,
+	errorMsg,
+	inputAttr,
+	children,
+}: InputProps) => {
 	const id = `jb-input-${count + 1}` ?? inputAttr.id;
 	return (
 		<div className="input_wrap">
 			{isLabel ? <label htmlFor={id}>{InputLabel}</label> : null}
-			<input
-				id={id}
-				type={inputAttr.type}
-				placeholder={inputAttr.placeholder}
-			/>
+			<div className="input_area">
+				<input
+					id={id}
+					type={inputAttr.type}
+					placeholder={inputAttr.placeholder}
+				/>
+				{children && children}
+			</div>
+
 			{errorMsg ? <p className="error_msg">{errorMsg}</p> : null}
 		</div>
 	);
