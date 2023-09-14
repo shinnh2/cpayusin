@@ -4,6 +4,8 @@ import Button from "./components/Button";
 import Input from "./components/Input";
 import Header from "./components/Header";
 import Nav from "./components/Nav";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Login from "./pages/Login";
 
 function App() {
 	return (
@@ -12,7 +14,12 @@ function App() {
 			<div className="page_wrap">
 				<Nav />
 				<main className="container">
-					<section>
+					<Router>
+						<Routes>
+							<Route path="/login" Component={Login} />
+						</Routes>
+					</Router>
+					{/* <section>
 						<Button buttonType="no_em" buttonSize="big" buttonLabel="테스트" />
 						<Input
 							InputLabel="테스트"
@@ -20,7 +27,7 @@ function App() {
 							errorMsg="이것은 오류일 때 나타납니다"
 							inputAttr={{ type: "text", placeholder: "입력하세요" }}
 						/>
-					</section>
+					</section> */}
 				</main>
 			</div>
 		</div>
