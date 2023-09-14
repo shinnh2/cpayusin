@@ -3,7 +3,7 @@ import Button from "./../components/Button";
 
 const Login = () => {
 	return (
-		<div className="login_box col_4">
+		<div className="input_box login_box col_4">
 			<h3 className="title_h3">로그인</h3>
 			<div className="content">
 				<Input
