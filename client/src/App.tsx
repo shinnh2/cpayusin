@@ -9,18 +9,18 @@ import Signup from "./pages/Signup";
 function App() {
 	return (
 		<div className="App">
-			<Header isLogin={false} />
-			<div className="page_wrap">
-				<Nav />
-				<main className="container">
-					<Router>
+			<Router>
+				<Header isLogin={false} />
+				<div className="page_wrap">
+					<Nav />
+					<main className="container">
 						<Routes>
 							<Route path="/login" element={<Login />} />
 							<Route path="/signup" element={<Signup />} />
 						</Routes>
-					</Router>
-				</main>
-			</div>
+					</main>
+				</div>
+			</Router>
 		</div>
 	);
 }
