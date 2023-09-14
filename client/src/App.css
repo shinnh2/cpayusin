@@ -3,7 +3,7 @@
 :root {
 	/* color */
 	--purple-50: #7037f0;
-	--pirple-80: #d6c6fb;
+	--purple-80: #d6c6fb;
 	--red-50: #e41111;
 	--black-00: #080217;
 	--black-30: #454151;
@@ -14,7 +14,7 @@
 	--black: var(--black-00);
 	/* ui color */
 	--primary-color: var(--purple-50);
-	--primary-container-color: var(--pirple-80);
+	--primary-container-color: var(--purple-80);
 	--background-color: var(--black-90);
 	--border-color: var(--black-70);
 	--on-background-color: var(--black-30);
@@ -126,10 +126,16 @@ body {
 }
 .header .header_button_wrap .header_links {
 	display: block;
-	padding: 18px 24px;
+	padding: 10px 24px;
+	border-radius: var(--br-md);
 	font-size: var(--fs-normal);
 	font-weight: var(--fw-normal);
 	color: var(--white);
+}
+header .header_button_wrap .header_links.active {
+	background: var(--white);
+	font-weight: var(--fw-bold);
+	color: var(--primary-color);
 }
 .header .header_button_wrap .header_btns {
 	display: block;
@@ -304,16 +310,45 @@ input.error {
 	border: 1px solid var(--error-color);
 	color: var(--error-color);
 }
-.input_wrap input {
-	width: 100%;
-}
 .error_msg {
 	padding: 4px 0;
 	font-size: var(--fs-caption-sm);
 	color: var(--error-color);
 }
+.input_wrap .input_area {
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+.input_wrap .input_area input {
+	flex: 1;
+}
+.input_wrap .input_area button {
+	width: auto;
+	margin: 0 0 0 8px;
+	padding: 16px 24px;
+}
 
 /* pages */
+/* input_box */
+.input_box {
+	margin: 0 auto;
+}
+.input_box .title_h3 {
+	margin-bottom: 32px;
+	text-align: center;
+}
+.input_box .content {
+	width: 100%;
+}
+.input_box .content .input_wrap {
+	width: 100%;
+	margin-bottom: 8px;
+}
+.input_box button {
+	width: 100%;
+	margin-top: 32px;
+}
 /* login */
 .login_box {
 	position: absolute;
@@ -321,18 +356,19 @@ input.error {
 	top: 50%;
 	transform: translate3d(-50%, -50%, 0);
 }
-.login_box .title_h3 {
-	margin-bottom: 32px;
+/* signup */
+.sign_box .validate_email_wrap {
+	margin-bottom: 16px;
+}
+.sign_box .validate_email_wrap button {
+	margin-top: 8px;
+}
+.validate_email_msg {
+	padding: 8px 0;
+	margin-top: 8px;
 	text-align: center;
+	font-size: var(--fs-caption-sm);
 }
-.login_box .content {
-	width: 100%;
-}
-.login_box .content .input_wrap {
-	width: 100%;
-	margin-bottom: 8px;
-}
-.login_box .content button {
-	width: 100%;
-	margin-top: 32px;
+.validate_email_msg.error {
+	color: var(--error-color);
 }

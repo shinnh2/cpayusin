@@ -1,5 +1,6 @@
 // import { ReactComponent as iconMenu } from "./../assets/icon _menu_.svg";
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 import iconMenu from "./../assets/icon_menu.svg";
 import iconWrite from "./../assets/edit_document.svg";
 import iconLogout from "./../assets/logout.svg";
@@ -37,12 +38,12 @@ const Header = ({ isLogin }: HeaderProps) => {
 					</>
 				) : (
 					<>
-						<a href="" className="header_links login">
+						<NavLink to="/login" className="header_links login">
 							로그인
-						</a>
-						<a href="" className="header_links signup">
+						</NavLink>
+						<NavLink to="/signup" className="header_links signup">
 							회원가입
-						</a>
+						</NavLink>
 					</>
 				)}
 			</div>
