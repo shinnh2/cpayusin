@@ -17,7 +17,7 @@ let count = 0;
 const Input = ({ InputLabel, isLabel, errorMsg, inputAttr }: InputProps) => {
 	const id = `jb-input-${count + 1}` ?? inputAttr.id;
 	return (
-		<div>
+		<div className="input_wrap">
 			{isLabel ? <label htmlFor={id}>{InputLabel}</label> : null}
 			<input
 				id={id}
