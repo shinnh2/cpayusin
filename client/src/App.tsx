@@ -2,8 +2,9 @@ import React from "react";
 import "./App.css";
 import Header from "./components/Header";
 import Nav from "./components/Nav";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 
 function App() {
 	return (
@@ -14,7 +15,8 @@ function App() {
 				<main className="container">
 					<Router>
 						<Routes>
-							<Route path="/login" Component={Login} />
+							<Route path="/login" element={<Login />} />
+							<Route path="/signup" element={<Signup />} />
 						</Routes>
 					</Router>
 				</main>
