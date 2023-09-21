@@ -7,6 +7,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import ValidateEmail from "./pages/ValidateEmail";
 import NewPassword from "./pages/NewPassword";
+import BoardList from "./pages/BoardList";
 
 function App() {
 	return (
@@ -21,6 +22,7 @@ function App() {
 							<Route path="/signup" element={<Signup />} />
 							<Route path="/validateEmail" element={<ValidateEmail />} />
 							<Route path="/newPassword" element={<NewPassword />} />
+							<Route path="/board" element={<BoardList />} />
 						</Routes>
 					</main>
 				</div>
