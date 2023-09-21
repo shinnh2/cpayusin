@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&family=Roboto&display=swap");
 
 :root {
 	/* color */
@@ -83,10 +83,25 @@ body {
 	position: relative;
 	width: 100%;
 	max-width: 1100px;
-	padding: 40px;
+	padding: 72px 40px;
 	margin: 0 auto;
 }
 /* common */
+h2 {
+	line-height: var(--lh-h2);
+	font-size: var(--fs-h2);
+	font-weight: var(--fw-bold);
+}
+h3 {
+	line-height: var(--lh-h3);
+	font-size: var(--fs-h3);
+	font-weight: var(--fw-bold);
+}
+h4 {
+	line-height: var(--lh-h4);
+	font-size: var(--fs-h4);
+	font-weight: var(--fw-bold);
+}
 .content_box {
 	border-radius: var(--br-md);
 	background: var(--white);
@@ -371,4 +386,81 @@ input.error {
 }
 .validate_email_msg.error {
 	color: var(--error-color);
+}
+
+/* board_list_box */
+.board_list_box {
+	padding: 0 16px;
+	margin-top: 16px;
+	background: var(--white);
+	border-radius: var(--br-md);
+	box-shadow: var(--bs-layer1);
+}
+.board_list_box li {
+	border-top: 1px solid var(--border-color);
+}
+.board_list_box li:first-child {
+	border-top: 0 none;
+}
+/* board_item */
+.board_item {
+	padding: 24px;
+}
+.board_item .board_item_element_wrap {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.board_item .category_tag {
+	width: fit-content;
+	padding: 4px 8px;
+	border-radius: var(--br-sm);
+	background: var(--primary-container-color);
+	font-size: var(--fs-caption-sm);
+	color: var(--primary-color);
+}
+.board_item .board_info {
+	display: flex;
+	align-items: center;
+}
+.board_item .board_info .info_item {
+	display: flex;
+	align-items: center;
+	margin-left: 8px;
+}
+.board_item .board_info .icon {
+	font-size: 0;
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	margin-right: 2px;
+	background-repeat: no-repeat;
+	background-position: center;
+	overflow: hidden;
+}
+.board_item .board_info .info {
+	font-family: "Roboto";
+	font-size: var(--fs-caption);
+	color: var(--on-background-secondary-color);
+}
+.board_item .board_info .comments_info .icon {
+	background-image: url("./assets/icon_sms.svg");
+}
+.board_item .board_info .votes_info .icon {
+	background-image: url("./assets/icon_thumb_up.svg");
+}
+.board_item .title {
+	margin: 14px 0;
+	line-height: 100%;
+	font-size: var(--fs-h5);
+	font-weight: var(--fw-bold);
+}
+.board_item .board_date {
+	font-family: "Roboto";
+	font-size: var(--fs-caption);
+	color: var(--on-background-secondary-color);
+}
+.board_item .board_writer {
+	font-size: var(--fs-caption);
+	color: var(--on-background-secondary-color);
 }
