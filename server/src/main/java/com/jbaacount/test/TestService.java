@@ -17,7 +17,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
-
 @Component
 public class TestService implements CommandLineRunner
 {
@@ -72,9 +71,6 @@ public class TestService implements CommandLineRunner
 
             categoryService.createCategory(Category.builder().name("카테고리"+i).isAdminOnly(false).build(), board1.getId(), admin);
         }
-
-        categoryService.createCategory(category3, board2.getId(), admin);
-        categoryService.createCategory(category4, board2.getId(), admin);
 
 
         Post adminPost = Post.builder().title("핵심요약").content("aeiou").build();
