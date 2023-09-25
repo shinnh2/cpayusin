@@ -8,6 +8,7 @@ import Signup from "./pages/Signup";
 import ValidateEmail from "./pages/ValidateEmail";
 import NewPassword from "./pages/NewPassword";
 import BoardList from "./pages/BoardList";
+import Home from "./pages/Home";
 
 function App() {
 	return (
@@ -18,6 +19,7 @@ function App() {
 					<Nav />
 					<main className="container">
 						<Routes>
+							<Route path="/" element={<Home/>}/>
 							<Route path="/login" element={<Login />} />
 							<Route path="/signup" element={<Signup />} />
 							<Route path="/validateEmail" element={<ValidateEmail />} />
