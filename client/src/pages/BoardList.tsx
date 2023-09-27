@@ -25,7 +25,7 @@ const BoardList = () => {
 	return (
 		<div>
 			<h3>게시판 이름</h3>
-			<ul className="board_list_box">
+			<ul className="board_box board_list_box">
 				<li>
 					<BoardItem data={dummyData} />
 				</li>
