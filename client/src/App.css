@@ -223,6 +223,7 @@ input.error {
 /* select (custom) */
 .custom_select {
 	min-width: 250px;
+	position: relative;
 }
 .custom_select .label {
 	margin-bottom: 6px;
@@ -252,6 +253,9 @@ input.error {
 }
 .custom_select .option_list {
 	display: none;
+	position: absolute;
+	z-index: 100;
+	width: 100%;
 	border: 1px solid var(--border-color);
 	border-top: 0 none;
 	border-radius: 0 0 8px 8px;
@@ -515,6 +519,18 @@ header .header_button_wrap .header_links.active {
 .info_item.votes_info .icon {
 	background-image: url("./assets/icon_thumb_up.svg");
 }
+/* board editor */
+.board_editor_button_wrap {
+	display: flex;
+	align-items: center;
+	padding: 32px 0;
+}
+.board_editor_button_wrap > button {
+	flex: 1;
+}
+.board_editor_button_wrap > button:first-child {
+	margin-right: 16px;
+}
 /* board list */
 .board_list_box {
 	padding: 0 16px;
@@ -639,6 +655,32 @@ header .header_button_wrap .header_links.active {
 	display: block;
 	width: 160px;
 	margin-left: auto;
+}
+/* board write */
+.board_write_box {
+	padding: 48px;
+}
+.board_select_wrap {
+	display: flex;
+	align-items: center;
+}
+.board_select_wrap .select_wrap {
+	margin-right: 12px;
+}
+.board_input_title {
+	padding: 28px 0 16px 0;
+	margin-bottom: 48px;
+	border-bottom: 1px solid var(--border-color);
+}
+.board_input_title > input {
+	width: 100%;
+	font-size: var(--fs-h1);
+	border: 0 none;
+}
+.board_input_title > input::placeholder {
+	font-family: "Noto Sans KR", sans-serif;
+	font-size: var(--fs-h1);
+	color: var(--border-color);
 }
 /* user page */
 .user_profile {
