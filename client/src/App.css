@@ -631,3 +631,7 @@ header .header_button_wrap .header_links.active {
 	width: 160px;
 	margin-left: auto;
 }
+/* board write */
+.board_write_box {
+	padding: 48px;
+}
