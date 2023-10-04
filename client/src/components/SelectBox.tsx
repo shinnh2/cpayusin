@@ -4,10 +4,11 @@ import "../App.css";
 
 export interface SelectProps {
 	id?: string;
-	selectLabel: string;
+	selectLabel?: string;
 	isLabel: boolean; //label의 유무를 나타냅니다.
 	selectItem: string[];
 	placeHolder: string;
+	setHandleStatus?: (status: string) => void;
 }
 
 const SelectBox = ({
@@ -16,6 +17,7 @@ const SelectBox = ({
 	isLabel,
 	selectItem,
 	placeHolder,
+	setHandleStatus,
 }: SelectProps) => {
 	const [nowValue, setNowValue] = useState(placeHolder);
 	const [isOpen, setIsOpen] = useState(false);
@@ -40,7 +42,9 @@ const SelectBox = ({
 		setIsOpen(!isOpen);
 	};
 	const handleClickListItem = (event: React.MouseEvent<HTMLLIElement>) => {
-		setNowValue((event.target as HTMLLIElement).innerText);
+		const value = (event.target as HTMLLIElement).innerText;
+		setNowValue(value);
+		if (setHandleStatus !== undefined) setHandleStatus(value);
 		setIsOpen(false);
 	};
 
