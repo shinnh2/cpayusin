@@ -11,6 +11,7 @@ import NewPassword from "./pages/NewPassword";
 import BoardList from "./pages/BoardList";
 import BoardDetail from "./pages/BoardDetail";
 import BoardWrite from "./pages/BoardWrite";
+import UserPage from "./pages/UserPage";
 
 function App() {
 	return (
@@ -29,6 +30,7 @@ function App() {
 							<Route path="/board" element={<BoardList />} />
 							<Route path="/board/detail" element={<BoardDetail />} />
 							<Route path="/board/write" element={<BoardWrite />} />
+							<Route path="/user" element={<UserPage />} />
 						</Routes>
 					</main>
 				</div>
