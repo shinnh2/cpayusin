@@ -8,7 +8,6 @@ import com.jbaacount.member.dto.response.MemberResponseDto;
 import com.jbaacount.member.dto.response.MemberRewardResponse;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.mapper.MemberMapper;
-import com.jbaacount.member.repository.MemberRepository;
 import com.jbaacount.member.service.MemberService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -33,7 +32,6 @@ import java.util.List;
 @RestController
 public class MemberController
 {
-    private final MemberRepository memberRepository;
     private final MemberService memberService;
 
     private final MemberMapper memberMapper;
@@ -76,12 +74,12 @@ public class MemberController
 
     @GetMapping
     public ResponseEntity getAllMembers(@RequestParam(value = "keyword", required = false) String keyword,
-                                        @RequestParam(required = false) Long last,
+                                        @RequestParam(required = false) Long member,
                                         @PageableDefault(size = 8)Pageable pageable)
 
     {
         log.info("===getAllMembers===");
-        SliceDto<MemberResponseDto> response = memberService.getAllMembers(keyword, last, pageable);
+        SliceDto<MemberResponseDto> response = memberService.getAllMembers(keyword, member, pageable);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

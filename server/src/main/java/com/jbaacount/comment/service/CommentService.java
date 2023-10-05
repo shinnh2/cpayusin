@@ -34,10 +34,9 @@ public class CommentService
     public Comment saveComment(Comment comment, Long postId, Long parentId, Member currentMember)
     {
         Post post = verifyPost(postId);
-        Comment savedComment = commentRepository.save(comment);
 
-        savedComment.addPost(post);
-        savedComment.addMember(currentMember);
+        comment.addPost(post);
+        comment.addMember(currentMember);
         if(parentId != null)
         {
             Comment parent = getComment(parentId);
@@ -46,13 +45,15 @@ public class CommentService
                 throw new RuntimeException();
             }
 
-            savedComment.addParent(parent);
+            comment.addParent(parent);
         }
 
         if(post.getMember() != currentMember)
         {
             currentMember.getScoreByComment();
         }
+
+        Comment savedComment = commentRepository.save(comment);
 
         return savedComment;
     }

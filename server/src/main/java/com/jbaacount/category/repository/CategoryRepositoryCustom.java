@@ -7,4 +7,7 @@ import java.util.List;
 public interface CategoryRepositoryCustom
 {
     List<CategoryResponseDto> findAllCategories(Long boardId);
+
+    long countCategory(Long boardId);
+
 }

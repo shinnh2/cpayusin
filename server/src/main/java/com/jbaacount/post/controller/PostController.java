@@ -78,22 +78,22 @@ public class PostController
 
     @GetMapping("/category/{category-id}/posts")
     public ResponseEntity getAllPostsByCategoryId(@PathVariable("category-id") @Positive Long categoryId,
-                                                @RequestParam(required = false) Long last,
+                                                @RequestParam(required = false) Long post,
                                                 @RequestParam(required = false) String keyword,
                                                 @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, last, pageable);
+        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, post, pageable);
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/board/{board-id}/posts")
-    public ResponseEntity getAllPostsByBoardId(@PathVariable("board-id") @Positive Long categoryId,
+    public ResponseEntity getAllPostsByBoardId(@PathVariable("board-id") @Positive Long boardId,
                                                   @RequestParam(required = false) Long last,
                                                   @RequestParam(required = false) String keyword,
                                                   @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, last, pageable);
+        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByBoardId(boardId, keyword, last, pageable);
 
         return ResponseEntity.ok(response);
     }
@@ -101,10 +101,10 @@ public class PostController
 
     @GetMapping("/profile/{member-id}/posts")
     public ResponseEntity getAllPostsByMemberId(@PathVariable("member-id") @Positive Long memberId,
-                                                @RequestParam(required = false) Long last,
+                                                @RequestParam(required = false) Long post,
                                                 @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, last, pageable);
+        SliceDto<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, post, pageable);
 
         return ResponseEntity.ok(response);
     }

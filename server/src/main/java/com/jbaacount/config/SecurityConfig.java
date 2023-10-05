@@ -54,7 +54,7 @@ public class SecurityConfig
                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/members/help/reset").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/members/help/reset-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/members/login", "/members/sign-up").permitAll()
                         .requestMatchers(HttpMethod.POST).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH).hasAnyRole("USER", "ADMIN")

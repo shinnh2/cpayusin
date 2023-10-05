@@ -19,9 +19,8 @@ public class CategoryPatchDto
     @Size(max = 15, message = "카테고리 제목은 최대 15자까지 입력 가능합니다.")
     private String name;
 
-    private boolean isAdminOnly;
+    private Boolean isAdminOnly;
 
     private Long orderIndex;
-
-    private Long boardId;
+    private Boolean isDeleted;
 }

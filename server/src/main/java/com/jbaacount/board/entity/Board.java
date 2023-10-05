@@ -26,6 +26,7 @@ public class Board extends BaseEntity
     @Column(nullable = false)
     private Boolean isAdminOnly;
 
+    @Column(nullable = false)
     private Long orderIndex;
 
     @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)

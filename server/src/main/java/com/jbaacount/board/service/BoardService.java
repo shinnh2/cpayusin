@@ -1,11 +1,16 @@
 package com.jbaacount.board.service;
 
 import com.jbaacount.board.dto.request.BoardPatchDto;
+import com.jbaacount.board.dto.response.BoardAndCategoryResponse;
 import com.jbaacount.board.dto.response.BoardResponseDto;
 import com.jbaacount.board.entity.Board;
 import com.jbaacount.board.repository.BoardRepository;
+import com.jbaacount.category.dto.request.CategoryPatchDto;
 import com.jbaacount.category.entity.Category;
+import com.jbaacount.category.repository.CategoryRepository;
 import com.jbaacount.file.service.FileService;
+import com.jbaacount.global.exception.BusinessLogicException;
+import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.post.entity.Post;
@@ -16,12 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -30,6 +30,7 @@ import static java.util.stream.Collectors.toMap;
 public class BoardService
 {
     private final BoardRepository boardRepository;
+    private final CategoryRepository categoryRepository;
     private final AuthorizationService authorizationService;
     private final FileService fileService;
     private final VoteRepository voteRepository;
@@ -38,96 +39,65 @@ public class BoardService
     {
         authorizationService.isAdmin(currentMember);
 
-        Board savedBoard = boardRepository.save(board);
-        savedBoard.updateOrderIndex(savedBoard.getId());
+        long orderIndex = boardRepository.countBoard();
+        board.updateOrderIndex(orderIndex + 1);
 
-        return savedBoard;
-    }
-
-    public Board updateBoard(Long boardId, BoardPatchDto request, Member currentMember)
-    {
-        authorizationService.isAdmin(currentMember);
-
-        Board board = getBoardById(boardId);
-
-        Optional.ofNullable(request.getName())
-                .ifPresent(name -> board.updateName(name));
-
-        Optional.ofNullable(request.getIsAdminOnly())
-                .ifPresent(authority -> board.changeBoardAuthority(authority));
-
-        Optional.ofNullable(request.getOrderIndex())
-                .ifPresent(orderIndex ->{
-                    Long currentIndex = board.getOrderIndex();
-                    if(currentIndex > orderIndex)
-                    {
-                        List<Board> allBoards = boardRepository.findAllBetween(orderIndex, currentIndex);
-                        for (Board boardList : allBoards)
-                        {
-                            boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
-                        }
-                    }
-
-                    else
-                    {
-                        List<Board> allBoards = boardRepository.findAllBetween(currentIndex, orderIndex);
-                        for (Board boardList : allBoards)
-                        {
-                            boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
-                        }
-                    }
-                    board.updateOrderIndex(orderIndex);
-                });
-
-        return board;
+        return boardRepository.save(board);
     }
 
     public void bulkUpdateBoards(List<BoardPatchDto> requests, Member currentMember)
     {
         authorizationService.isAdmin(currentMember);
 
-        List<Long> boardIds = requests.stream()
-                .map(BoardPatchDto::getBoardId)
-                .collect(toList());
-
-        List<Board> BoardList = boardRepository.findAllById(boardIds);
-
-        Map<Long, BoardPatchDto> boardMap = requests.stream()
-                .collect(toMap(BoardPatchDto::getBoardId, Function.identity()));
-
-        for(Board board : BoardList)
+        for(BoardPatchDto request : requests)
         {
-            BoardPatchDto request = boardMap.get(board.getId());
+            //boardId, orderIndex = 필수
+            //name, isAdminOnly, category = 있으면 변경
+            Board board = getBoardById(request.getBoardId());
 
+            log.info("board = {}", board.getName());
+
+            if(request.getIsDeleted() != null)
+            {
+                deleteBoard(board.getId());
+                continue;
+            }
+
+            board.updateOrderIndex(request.getOrderIndex());
             Optional.ofNullable(request.getName())
-                    .ifPresent(name -> board.updateName(name));
-
+                            .ifPresent(boardName -> board.updateName(boardName));
             Optional.ofNullable(request.getIsAdminOnly())
-                    .ifPresent(authority -> board.changeBoardAuthority(authority));
+                            .ifPresent(isAdminOnly -> board.changeBoardAuthority(isAdminOnly));
 
-            Optional.ofNullable(request.getOrderIndex())
-                    .ifPresent(orderIndex ->{
-                        Long currentIndex = board.getOrderIndex();
-                        if(currentIndex > orderIndex)
-                        {
-                            List<Board> allBoards = boardRepository.findAllBetween(orderIndex, currentIndex);
-                            for (Board boardList : allBoards)
-                            {
-                                boardList.updateOrderIndex(boardList.getOrderIndex() + 1);
-                            }
-                        }
+            if(request.getCategory() != null && !request.getCategory().isEmpty())
+            {
+                //orderIndex, categoryId = 필수
+                //name, isAdminOnly = 있으면 변경
+                List<CategoryPatchDto> categoryPatchList = request.getCategory();
+                for(CategoryPatchDto categoryRequest : categoryPatchList)
+                {
+                    Long categoryId = categoryRequest.getCategoryId();
+                    Category category = findByCategoryId(categoryId);
 
-                        else
-                        {
-                            List<Board> allBoards = boardRepository.findAllBetween(currentIndex, orderIndex);
-                            for (Board boardList : allBoards)
-                            {
-                                boardList.updateOrderIndex(boardList.getOrderIndex() - 1);
-                            }
-                        }
-                        board.updateOrderIndex(orderIndex);
-                    });
+                    category.addBoard(board);
+                    category.updateOrderIndex(categoryRequest.getOrderIndex());
+
+                    if(categoryRequest.getIsDeleted() != null)
+                    {
+                        deleteCategory(categoryId);
+                        continue;
+                    }
+
+                    Optional.ofNullable(categoryRequest.getName())
+                            .ifPresent(categoryName -> category.updateName(categoryName));
+
+                    Optional.ofNullable(categoryRequest.getIsAdminOnly())
+                            .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
+                }
+            }
         }
+
+        log.info("업데이트 종료");
     }
 
 
@@ -144,10 +114,14 @@ public class BoardService
         return boardRepository.findAllBoards();
     }
 
-    public void deleteBoard(Long boardId, Member currentMember)
+    @Transactional(readOnly = true)
+    public List<BoardAndCategoryResponse> getAllBoardAndCategory()
     {
-        authorizationService.isAdmin(currentMember);
+        return boardRepository.findAllBoardAndCategory();
+    }
 
+    public void deleteBoard(Long boardId)
+    {
         Board board = getBoardById(boardId);
         List<Category> categories = board.getCategories();
         for (Category category : categories)
@@ -166,4 +140,25 @@ public class BoardService
         boardRepository.deleteById(boardId);
     }
 
+    private Category findByCategoryId(long categoryId)
+    {
+        return categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND));
+    }
+
+    public void deleteCategory(Long categoryId)
+    {
+        Category category = findByCategoryId(categoryId);
+        List<Post> posts = category.getPosts();
+        for (Post post : posts)
+        {
+            log.info("post removed = {}", post.getTitle());
+            log.info("file removed in category service");
+
+            voteRepository.deleteByPostId(post.getId());
+            fileService.deleteUploadedFile(post);
+        }
+
+        categoryRepository.deleteById(categoryId);
+    }
 }
