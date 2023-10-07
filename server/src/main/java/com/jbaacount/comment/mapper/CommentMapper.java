@@ -37,7 +37,7 @@ public class CommentMapper
             parentId = entity.getParent().getId();
         }
 
-        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(currentMember);
+        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(entity.getMember());
 
         boolean voteStatus = false;
 
