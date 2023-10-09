@@ -49,13 +49,12 @@ public class CommentController
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
     }
 
-    @PatchMapping("/{post-id}/comment/{comment-id}")
-    public ResponseEntity updateComment(@PathVariable("post-id") @Positive Long postId,
-                                        @RequestBody @Valid CommentPatchDto request,
+    @PatchMapping("/comment/{comment-id}")
+    public ResponseEntity updateComment(@RequestBody @Valid CommentPatchDto request,
                                         @PathVariable("comment-id") @Positive Long commentId,
                                         @AuthenticationPrincipal Member currentMember)
     {
-        Comment updatedComment = commentService.updateComment(request, postId, commentId, currentMember);
+        Comment updatedComment = commentService.updateComment(request, commentId, currentMember);
         CommentSingleResponse response = commentMapper.commentToResponse(updatedComment, currentMember);
 
         return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
@@ -83,10 +82,10 @@ public class CommentController
 
     @GetMapping("/profile/{member-id}/comments")
     public ResponseEntity getAllCommentsForProfile(@PathVariable("member-id") @Positive Long memberId,
-                                                   @RequestParam(required = false) Long last,
+                                                   @RequestParam(required = false) Long comment,
                                                    @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<CommentResponseForProfile> response = commentService.getAllCommentsForProfile(memberId, last, pageable);
+        SliceDto<CommentResponseForProfile> response = commentService.getAllCommentsForProfile(memberId, comment, pageable);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

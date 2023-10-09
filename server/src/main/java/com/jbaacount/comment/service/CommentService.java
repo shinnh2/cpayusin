@@ -58,9 +58,8 @@ public class CommentService
         return savedComment;
     }
 
-    public Comment updateComment(CommentPatchDto request, Long postId, Long commentId, Member currentMember)
+    public Comment updateComment(CommentPatchDto request, Long commentId, Member currentMember)
     {
-        verifyPost(postId);
         Comment comment = getComment(commentId);
         authService.isTheSameUser(comment.getMember().getId(), currentMember.getId());
 

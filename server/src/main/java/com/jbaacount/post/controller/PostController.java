@@ -89,11 +89,11 @@ public class PostController
 
     @GetMapping("/board/{board-id}/posts")
     public ResponseEntity getAllPostsByBoardId(@PathVariable("board-id") @Positive Long boardId,
-                                                  @RequestParam(required = false) Long last,
+                                                  @RequestParam(required = false) Long post,
                                                   @RequestParam(required = false) String keyword,
                                                   @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByBoardId(boardId, keyword, last, pageable);
+        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByBoardId(boardId, keyword, post, pageable);
 
         return ResponseEntity.ok(response);
     }

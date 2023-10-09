@@ -12,6 +12,7 @@ import BoardList from "./pages/BoardList";
 import BoardDetail from "./pages/BoardDetail";
 import BoardWrite from "./pages/BoardWrite";
 import UserPage from "./pages/UserPage";
+import UserEdit from "./pages/UserEdit";
 
 function App() {
 	return (
@@ -31,6 +32,7 @@ function App() {
 							<Route path="/board/detail" element={<BoardDetail />} />
 							<Route path="/board/write" element={<BoardWrite />} />
 							<Route path="/user" element={<UserPage />} />
+							<Route path="/user/edit" element={<UserEdit />} />
 						</Routes>
 					</main>
 				</div>

@@ -123,6 +123,11 @@ h4 {
 	font-size: var(--fs-h4);
 	font-weight: var(--fw-bold);
 }
+.title_h5 {
+	line-height: var(--lh-h5);
+	font-size: var(--fs-h5);
+	font-weight: var(--fw-bold);
+}
 .col_4 {
 	width: var(--col-4);
 }
@@ -741,4 +746,37 @@ header .header_button_wrap .header_links.active {
 }
 .tab_content ul li {
 	border-bottom: 1px solid var(--border-color);
+}
+/* user edit */
+.user_edit_wrap {
+	padding: 48px;
+	background: var(--white);
+	border-radius: var(--br-md);
+	box-shadow: var(--bs-layer1);
+}
+.user_edit_wrap .user_profile {
+	padding: 0;
+	margin-bottom: 24px;
+	background: none;
+	box-shadow: none;
+}
+.user_edit_wrap .user_profile .profile_img_wrap {
+	width: 56px;
+	height: 56px;
+}
+.user_input_content_wrap .input_wrap {
+	margin-bottom: 16px;
+}
+.user_input_content_wrap .link {
+	margin-bottom: 60px;
+}
+.user_edit_button_wrap {
+	display: flex;
+	align-items: center;
+}
+.user_edit_button_wrap button {
+	flex: 1;
+}
+.user_edit_button_wrap button:first-child {
+	margin-right: 16px;
 }
