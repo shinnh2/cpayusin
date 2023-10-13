@@ -2,9 +2,10 @@ import { useState } from "react";
 import Input from "./../components/Input";
 import Button from "./../components/Button";
 import { validator, ValidatorStatus } from "../assets/validater";
+import axios from "axios";
 
 const Signup = () => {
-	const [value, setValue] = useState({
+	const [form, setForm] = useState({
 		email: "",
 		password: "",
 		nickname: "",
@@ -15,46 +16,61 @@ const Signup = () => {
 		nickname: false,
 	});
 	const setEmailValue = (value: string) => {
-		setValue((prevState) => ({
+		setForm((prevState) => ({
 			...prevState,
 			email: value,
 		}));
 	};
 	const setPasswordValue = (value: string) => {
-		setValue((prevState) => ({
+		setForm((prevState) => ({
 			...prevState,
 			password: value,
 		}));
 	};
 	const setNicknameValue = (value: string) => {
-		setValue((prevState) => ({
+		setForm((prevState) => ({
 			...prevState,
 			nickname: value,
 		}));
 	};
 	//유효성 검사
 	const validatorStatusEmail: ValidatorStatus = {
-		value: value.email,
+		value: form.email,
 		isRequired: true,
 		valueType: "email",
 	};
 	const validatorStatusPassword: ValidatorStatus = {
-		value: value.password,
+		value: form.password,
 		isRequired: true,
 		valueType: "password",
 	};
 	const validatorStatusNickname: ValidatorStatus = {
-		value: value.nickname,
+		value: form.nickname,
 		isRequired: true,
 		valueType: "nickname",
 	};
-	const handleOnclick = () => {
+	const handleSubmit = () => {
 		setIsError((prevState) => ({
 			...prevState,
 			email: !validator(validatorStatusEmail),
 			password: !validator(validatorStatusPassword),
 			nickname: !validator(validatorStatusNickname),
 		}));
+		if (isError.email || isError.password || isError.nickname) {
+			return;
+		}
+		console.log(form);
+
+		axios
+			.post("https://20f5-118-219-108-178.ngrok.io/members/sign-up", form, {
+				withCredentials: true,
+			})
+			.then((response) => {
+				console.log("회원가입 성공 !!!!", response.data);
+			})
+			.catch((error) => {
+				console.error("회원가입 실패 ㅠㅠㅠㅠ", error);
+			});
 	};
 	return (
 		<div className="input_box sign_box col_4">
@@ -66,7 +82,7 @@ const Signup = () => {
 					errorMsg="올바른 이메일을 입력해 주세요."
 					inputAttr={{ type: "text", placeholder: "이메일을 입력하세요" }}
 					setInputValue={setEmailValue}
-					inputValue={value.email}
+					inputValue={form.email}
 					isError={isError.email}
 				/>
 				<Button
@@ -84,7 +100,7 @@ const Signup = () => {
 					errorMsg="비밀번호는 8~20자의 영문, 숫자가 포함되어야 합니다. "
 					inputAttr={{ type: "password", placeholder: "비밀번호를 입력하세요" }}
 					setInputValue={setPasswordValue}
-					inputValue={value.password}
+					inputValue={form.password}
 					isError={isError.password}
 				/>
 				<Input
@@ -105,7 +121,7 @@ const Signup = () => {
 						placeholder: "닉네임을 입력하세요",
 					}}
 					setInputValue={setNicknameValue}
-					inputValue={value.nickname}
+					inputValue={form.nickname}
 					isError={isError.nickname}
 				>
 					<Button
@@ -118,7 +134,7 @@ const Signup = () => {
 					buttonType="primary"
 					buttonSize="big"
 					buttonLabel="회원가입"
-					onClick={handleOnclick}
+					onClick={handleSubmit}
 				/>
 			</div>
 		</div>
