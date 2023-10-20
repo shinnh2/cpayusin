@@ -62,7 +62,7 @@ const Signup = () => {
 		console.log(form);
 
 		axios
-			.post("https://20f5-118-219-108-178.ngrok.io/members/sign-up", form, {
+			.post("http://localhost:8080/members/sign-up", form, {
 				withCredentials: true,
 			})
 			.then((response) => {

@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -23,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
@@ -43,7 +45,7 @@ public class SecurityConfig
                 .headers((headers) ->
                         headers.frameOptions((frameOptions) -> frameOptions.disable()))
                 .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .cors(Customizer.withDefaults())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .formLogin(formLogin -> formLogin.disable())
                 .sessionManagement(management -> management
@@ -53,6 +55,8 @@ public class SecurityConfig
                                 .accessDeniedHandler(new CustomAccessDeniedHandler())
                                 .authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/members/help/reset-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/members/login", "/members/sign-up").permitAll()
@@ -73,12 +77,13 @@ public class SecurityConfig
     }
 
 
-    public CorsConfigurationSource corsConfigurationSource()
+    @Bean
+    CorsConfigurationSource corsConfigurationSource()
     {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
         configuration.setExposedHeaders(List.of("Authorization", "Refresh"));
         configuration.setAllowCredentials(true);
 

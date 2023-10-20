@@ -1,26 +1,28 @@
-/*
 package com.jbaacount.visitor.service;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.HandlerInterceptor;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 @Slf4j
 @RequiredArgsConstructor
-@Component
-public class VisitorInterceptor implements HandlerInterceptor
+@Configuration
+public class VisitorFilter extends OncePerRequestFilter
 {
     private final RedisTemplate<String, String> redisTemplate;
 
     @Override
-    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException
     {
         String ipAddress = getIp(request);
         String userAgent = request.getHeader("User-Agent");
@@ -35,7 +37,8 @@ public class VisitorInterceptor implements HandlerInterceptor
 
         log.info("ip address = {}", ipAddress);
         log.info("key = {}", key);
-        return true;
+
+        doFilterInternal(request, response, filterChain);
     }
 
     private String getIp(HttpServletRequest request)
@@ -59,4 +62,4 @@ public class VisitorInterceptor implements HandlerInterceptor
 
         return ip;
     }
-}*/
+}

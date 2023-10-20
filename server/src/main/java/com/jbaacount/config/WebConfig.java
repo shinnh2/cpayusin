@@ -1,3 +1,4 @@
+/*
 package com.jbaacount.config;
 
 import com.jbaacount.visitor.service.VisitorInterceptor;
@@ -18,3 +19,4 @@ public class WebConfig implements WebMvcConfigurer
         registry.addInterceptor(visitorInterceptor);
     }
 }
+*/
