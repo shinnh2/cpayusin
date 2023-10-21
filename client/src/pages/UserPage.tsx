@@ -1,6 +1,7 @@
 import Button from "../components/Button";
 import BoardItem from "../components/Boarditem";
 import CommentItem from "../components/CommentItem";
+import { useState } from "react";
 
 const dummyData = {
 	id: 53,
@@ -24,6 +25,12 @@ const dummyData = {
 };
 
 const UserPage = () => {
+	const [tabIndex, setTabIndex] = useState(0);
+	const tabMenu = ["작성글", "댓글"];
+	const handleclickTabMenuButton = (tabIndex: number) => {
+		setTabIndex(tabIndex);
+	};
+
 	return (
 		<div className="user_page_wrap">
 			<div className="user_profile">
@@ -46,27 +53,44 @@ const UserPage = () => {
 				</div>
 			</div>
 			<div className="user_written_wrap">
-				<div className="tab_menu">
-					<div className="tab_button">작성글</div>
-					<div className="tab_button active">댓글</div>
-				</div>
+				<ul className="tab_menu">
+					{tabMenu.map((el, idx) => {
+						return (
+							<li
+								key={idx}
+								className={
+									tabIndex === idx ? "tab_button active" : "tab_button"
+								}
+								onClick={() => handleclickTabMenuButton(idx)}
+							>
+								{el}
+							</li>
+						);
+					})}
+				</ul>
 				<div className="tab_content">
-					<ul className="board">
-						<li>
-							<BoardItem data={dummyData} />
-						</li>
-						<li>
-							<BoardItem data={dummyData} />
-						</li>
-					</ul>
-					<ul className="comment">
-						<li>
-							<CommentItem />
-						</li>
-						<li>
-							<CommentItem />
-						</li>
-					</ul>
+					{/* 작성글인 경우 */}
+					{tabIndex === 0 ? (
+						<ul className="board">
+							<li>
+								<BoardItem data={dummyData} />
+							</li>
+							<li>
+								<BoardItem data={dummyData} />
+							</li>
+						</ul>
+					) : null}
+					{/* 댓글인 경우 */}
+					{tabIndex === 1 ? (
+						<ul className="comment">
+							<li>
+								<CommentItem />
+							</li>
+							<li>
+								<CommentItem />
+							</li>
+						</ul>
+					) : null}
 				</div>
 			</div>
 		</div>
