@@ -10,10 +10,8 @@ import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.global.security.userdetails.MemberDetailsService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.redis.RedisRepository;
-import com.jbaacount.visitor.service.VisitorFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -40,7 +38,6 @@ public class SecurityConfig
     private final RedisRepository redisRepository;
     private final CustomAuthorityUtils authorityUtils;
     private final MemberDetailsService memberDetailsService;
-    private final RedisTemplate<String, String> redisTemplate;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
@@ -110,12 +107,10 @@ public class SecurityConfig
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 
             JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService, authorityUtils, memberDetailsService);
-            VisitorFilter visitorFilter = new VisitorFilter(redisTemplate);
 
             builder
                     .addFilter(jwtAuthenticationFilter)
-                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class)
-                    .addFilterAfter(visitorFilter, JwtVerificationFilter.class);
+                    .addFilterAfter(jwtVerificationFilter, JwtAuthenticationFilter.class);
         }
     }
 }
