@@ -731,6 +731,7 @@ header .header_button_wrap .header_links.active {
 .tab_menu .tab_button {
 	position: relative;
 	padding: 12px 24px 14px 24px;
+	cursor: pointer;
 }
 .tab_menu .tab_button.active {
 	color: var(--primary-color);
