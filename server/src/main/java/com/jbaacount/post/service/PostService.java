@@ -5,7 +5,7 @@ import com.jbaacount.board.repository.BoardRepository;
 import com.jbaacount.category.entity.Category;
 import com.jbaacount.category.repository.CategoryRepository;
 import com.jbaacount.file.service.FileService;
-import com.jbaacount.global.dto.SliceDto;
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
@@ -110,21 +110,21 @@ public class PostService
 
 
     @Transactional(readOnly = true)
-    public SliceDto<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Long last, Pageable pageable)
+    public PageDto<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Pageable pageable)
     {
-        return postRepository.getAllPostsByMemberId(memberId, last, pageable);
+        return postRepository.getAllPostsByMemberId(memberId, pageable);
     }
 
     @Transactional(readOnly = true)
-    public SliceDto<PostMultiResponseDto> getAllPostsByCategoryId(Long categoryId, String keyword, Long last, Pageable pageable)
+    public PageDto<PostMultiResponseDto> getAllPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
     {
-        return postRepository.getAllPostsByCategoryId(categoryId, keyword, last, pageable);
+        return postRepository.getAllPostsByCategoryId(categoryId, keyword, pageable);
     }
 
     @Transactional(readOnly = true)
-    public SliceDto<PostMultiResponseDto> getAllPostsByBoardId(Long boardId, String keyword, Long last, Pageable pageable)
+    public PageDto<PostMultiResponseDto> getAllPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
-        return postRepository.getAllPostsByBoardId(boardId, keyword, last, pageable);
+        return postRepository.getAllPostsByBoardId(boardId, keyword, pageable);
     }
 
     public void deletePostById(Long postId, Member currentMember)
