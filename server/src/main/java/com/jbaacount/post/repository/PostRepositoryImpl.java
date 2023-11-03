@@ -1,7 +1,6 @@
 package com.jbaacount.post.repository;
 
-import com.jbaacount.global.dto.SliceDto;
-import com.jbaacount.global.utils.PaginationUtils;
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.post.dto.response.PostMultiResponseDto;
 import com.jbaacount.post.dto.response.PostResponseForProfile;
 import com.querydsl.core.types.ConstructorExpression;
@@ -9,8 +8,8 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 
 import java.util.List;
 
@@ -20,9 +19,9 @@ import static com.jbaacount.post.entity.QPost.post;
 public class PostRepositoryImpl implements PostRepositoryCustom
 {
     private final JPAQueryFactory query;
-    private final PaginationUtils paginationUtils;
+    //private final PaginationUtils paginationUtils;
 
-    @Override
+    /*@Override
     public SliceDto<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Long last, Pageable pageable)
     {
         List<PostResponseForProfile> fetch = query
@@ -37,9 +36,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom
         Slice<PostResponseForProfile> slice = paginationUtils.toSlice(pageable, fetch);
 
         return new SliceDto<>(fetch, slice);
-    }
+    }*/
 
-    @Override
+    /*@Override
     public SliceDto<PostMultiResponseDto> getAllPostsByCategoryId(Long categoryId, String keyword, Long last, Pageable pageable)
     {
         List<PostMultiResponseDto> posts = query
@@ -55,9 +54,82 @@ public class PostRepositoryImpl implements PostRepositoryCustom
         Slice<PostMultiResponseDto> slice = paginationUtils.toSlice(pageable, posts);
 
         return new SliceDto<>(posts, slice);
+    }*/
+
+    @Override
+    public PageDto<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Pageable pageable)
+    {
+        List<PostResponseForProfile> content = query
+                .select(extractPostsForProfile())
+                .from(post)
+                .where(post.member.id.eq(memberId))
+                .orderBy(post.createdAt.desc())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+
+        Long total = query
+                .select(post.count())
+                .from(post)
+                .where(post.member.id.eq(memberId))
+                .fetchOne();
+
+        PageImpl<PostResponseForProfile> pageDto = new PageImpl<>(content, pageable, total);
+
+        return new PageDto<>(pageDto);
     }
 
     @Override
+    public PageDto<PostMultiResponseDto> getAllPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
+    {
+        List<PostMultiResponseDto> content = query
+                .select(extractPostsForCategoryAndBoard())
+                .from(post)
+                .where(post.category.id.eq(categoryId))
+                .where(titleCondition(keyword))
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .orderBy(post.id.desc())
+                .fetch();
+
+        Long total = query
+                .select(post.count())
+                .from(post)
+                .where(post.category.id.eq(categoryId))
+                .where(titleCondition(keyword))
+                .fetchOne();
+
+        PageImpl<PostMultiResponseDto> pageDto = new PageImpl<>(content, pageable, total);
+
+        return new PageDto<>(pageDto);
+
+    }
+
+    @Override
+    public PageDto<PostMultiResponseDto> getAllPostsByBoardId(Long boardId, String keyword, Pageable pageable)
+    {
+        List<PostMultiResponseDto> content = query
+                .select(extractPostsForCategoryAndBoard())
+                .from(post)
+                .where(post.board.id.eq(boardId))
+                .where(titleCondition(keyword))
+                .limit(pageable.getPageSize())
+                .offset(pageable.getPageNumber())
+                .orderBy(post.id.desc())
+                .fetch();
+
+        Long total = query
+                .select(post.count())
+                .from(post)
+                .where(post.board.id.eq(boardId))
+                .where(titleCondition(keyword))
+                .fetchOne();
+
+        PageImpl<PostMultiResponseDto> pageDto = new PageImpl<>(content, pageable, total);
+
+        return new PageDto<>(pageDto);
+    }
+
+    /*@Override
     public SliceDto<PostMultiResponseDto> getAllPostsByBoardId(Long boardId, String keyword, Long last, Pageable pageable)
     {
         List<PostMultiResponseDto> posts = query
@@ -73,7 +145,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom
         Slice<PostMultiResponseDto> slice = paginationUtils.toSlice(pageable, posts);
 
         return new SliceDto<>(posts, slice);
-    }
+    }*/
 
     private ConstructorExpression<PostMultiResponseDto> extractPostsForCategoryAndBoard()
     {

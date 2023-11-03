@@ -8,8 +8,8 @@ import com.jbaacount.comment.dto.response.CommentSingleResponse;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.mapper.CommentMapper;
 import com.jbaacount.comment.service.CommentService;
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
-import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.service.MemberService;
 import jakarta.validation.Valid;
@@ -81,11 +81,10 @@ public class CommentController
     }
 
     @GetMapping("/profile/{member-id}/comments")
-    public ResponseEntity getAllCommentsForProfile(@PathVariable("member-id") @Positive Long memberId,
-                                                   @RequestParam(required = false) Long comment,
+    public ResponseEntity<PageDto<CommentResponseForProfile>> getAllCommentsForProfile(@PathVariable("member-id") @Positive Long memberId,
                                                    @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<CommentResponseForProfile> response = commentService.getAllCommentsForProfile(memberId, comment, pageable);
+        PageDto<CommentResponseForProfile> response = commentService.getAllCommentsForProfile(memberId, pageable);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

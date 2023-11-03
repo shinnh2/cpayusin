@@ -5,7 +5,7 @@ import com.jbaacount.comment.dto.response.CommentMultiResponse;
 import com.jbaacount.comment.dto.response.CommentResponseForProfile;
 import com.jbaacount.comment.entity.Comment;
 import com.jbaacount.comment.repository.CommentRepository;
-import com.jbaacount.global.dto.SliceDto;
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.service.AuthorizationService;
@@ -83,9 +83,9 @@ public class CommentService
     }
 
     @Transactional(readOnly = true)
-    public SliceDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Long last, Pageable pageable)
+    public PageDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
     {
-        return commentRepository.getAllCommentsForProfile(memberId, last, pageable);
+        return commentRepository.getAllCommentsForProfile(memberId, pageable);
     }
 
     public void deleteComment(Long commentId, Member currentMember)
