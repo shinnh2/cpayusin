@@ -63,7 +63,7 @@ const Signup = () => {
 		console.log(form);
 
 		axios
-			.post(`http://${api}/members/sign-up`, form)
+			.post(`${api}/members/sign-up`, form, { withCredentials: true })
 			.then((response) => {
 				console.log("회원가입 성공 !!!!", response.data);
 			})
@@ -96,13 +96,13 @@ const Signup = () => {
 					inputValue={form.email}
 					isError={isError.email}
 				/>
-				<Button
+				{/* <Button
 					buttonType="primary"
 					buttonSize="big"
 					buttonLabel="이메일 인증"
 				/>
 				<p className="validate_email_msg">이메일 인증이 완료되었습니다.</p>
-				<p className="validate_email_msg error">이미 가입한 이메일입니다.</p>
+				<p className="validate_email_msg error">이미 가입한 이메일입니다.</p> */}
 			</div>
 			<div className="content">
 				<Input
