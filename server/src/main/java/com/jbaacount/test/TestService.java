@@ -1,3 +1,4 @@
+/*
 package com.jbaacount.test;
 
 import com.jbaacount.board.entity.Board;
@@ -102,3 +103,4 @@ public class TestService implements CommandLineRunner
 
     }
 }
+*/
