@@ -1,14 +1,14 @@
 package com.jbaacount.post.controller;
 
+import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.dto.SingleResponseDto;
-import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.member.entity.Member;
 import com.jbaacount.member.service.MemberService;
 import com.jbaacount.post.dto.request.PostPatchDto;
 import com.jbaacount.post.dto.request.PostPostDto;
 import com.jbaacount.post.dto.response.PostMultiResponseDto;
-import com.jbaacount.post.dto.response.PostSingleResponseDto;
 import com.jbaacount.post.dto.response.PostResponseForProfile;
+import com.jbaacount.post.dto.response.PostSingleResponseDto;
 import com.jbaacount.post.entity.Post;
 import com.jbaacount.post.mapper.PostMapper;
 import com.jbaacount.post.service.PostService;
@@ -77,34 +77,31 @@ public class PostController
     }
 
     @GetMapping("/category/{category-id}/posts")
-    public ResponseEntity getAllPostsByCategoryId(@PathVariable("category-id") @Positive Long categoryId,
-                                                @RequestParam(required = false) Long post,
+    public ResponseEntity<PageDto<PostMultiResponseDto>> getAllPostsByCategoryId(@PathVariable("category-id") @Positive Long categoryId,
                                                 @RequestParam(required = false) String keyword,
                                                 @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, post, pageable);
+        PageDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, pageable.previousOrFirst());
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/board/{board-id}/posts")
-    public ResponseEntity getAllPostsByBoardId(@PathVariable("board-id") @Positive Long boardId,
-                                                  @RequestParam(required = false) Long post,
+    public ResponseEntity<PageDto<PostMultiResponseDto>> getAllPostsByBoardId(@PathVariable("board-id") @Positive Long boardId,
                                                   @RequestParam(required = false) String keyword,
                                                   @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<PostMultiResponseDto> response = postService.getAllPostsByBoardId(boardId, keyword, post, pageable);
+        PageDto<PostMultiResponseDto> response = postService.getAllPostsByBoardId(boardId, keyword, pageable.previousOrFirst());
 
         return ResponseEntity.ok(response);
     }
 
 
     @GetMapping("/profile/{member-id}/posts")
-    public ResponseEntity getAllPostsByMemberId(@PathVariable("member-id") @Positive Long memberId,
-                                                @RequestParam(required = false) Long post,
+    public ResponseEntity<PageDto<PostResponseForProfile>> getAllPostsByMemberId(@PathVariable("member-id") @Positive Long memberId,
                                                 @PageableDefault(size = 8) Pageable pageable)
     {
-        SliceDto<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, post, pageable);
+        PageDto<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, pageable.previousOrFirst());
 
         return ResponseEntity.ok(response);
     }
