@@ -39,7 +39,7 @@ const Header = (props: HeaderProps) => {
 							프로필
 						</a>
 						<a
-							href=""
+							href="/board/write"
 							className="header_btns link_write"
 							title="클릭시 글쓰기 페이지로 이동합니다."
 						>
