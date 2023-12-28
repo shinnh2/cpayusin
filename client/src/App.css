@@ -720,12 +720,12 @@ header .header_button_wrap .header_links.active {
 	margin-bottom: 48px;
 	border-bottom: 1px solid var(--border-color);
 }
-.board_input_title > input {
+.board_input_title input {
 	width: 100%;
 	font-size: var(--fs-h1);
 	border: 0 none;
 }
-.board_input_title > input::placeholder {
+.board_input_title input::placeholder {
 	font-family: "Noto Sans KR", sans-serif;
 	font-size: var(--fs-h1);
 	color: var(--border-color);
