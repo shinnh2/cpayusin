@@ -1,14 +1,15 @@
 package com.jbaacount.category.service;
 
-import com.jbaacount.board.entity.Board;
-import com.jbaacount.board.repository.BoardRepository;
-import com.jbaacount.board.service.BoardService;
-import com.jbaacount.category.entity.Category;
-import com.jbaacount.category.repository.CategoryRepository;
+import com.jbaacount.model.Board;
+import com.jbaacount.repository.BoardRepository;
+import com.jbaacount.service.BoardService;
+import com.jbaacount.model.Category;
+import com.jbaacount.repository.CategoryRepository;
 import com.jbaacount.global.exception.BusinessLogicException;
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.repository.MemberRepository;
-import com.jbaacount.member.service.MemberService;
+import com.jbaacount.model.Member;
+import com.jbaacount.repository.MemberRepository;
+import com.jbaacount.service.CategoryService;
+import com.jbaacount.service.MemberService;
 import com.jbaacount.utils.TestUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

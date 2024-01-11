@@ -1,11 +1,12 @@
 package com.jbaacount.member.service;
 
 import com.jbaacount.global.exception.BusinessLogicException;
-import com.jbaacount.member.dto.request.MemberPatchDto;
-import com.jbaacount.member.dto.request.MemberPostDto;
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.mapper.MemberMapper;
-import com.jbaacount.member.repository.MemberRepository;
+import com.jbaacount.payload.request.MemberPatchDto;
+import com.jbaacount.payload.request.MemberPostDto;
+import com.jbaacount.model.Member;
+import com.jbaacount.mapper.MemberMapper;
+import com.jbaacount.repository.MemberRepository;
+import com.jbaacount.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

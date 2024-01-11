@@ -1,17 +1,17 @@
 /*
 package com.jbaacount.test;
 
-import com.jbaacount.board.entity.Board;
-import com.jbaacount.board.service.BoardService;
-import com.jbaacount.category.entity.Category;
-import com.jbaacount.category.service.CategoryService;
-import com.jbaacount.comment.entity.Comment;
-import com.jbaacount.comment.service.CommentService;
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.service.MemberService;
-import com.jbaacount.post.entity.Post;
-import com.jbaacount.post.service.PostService;
-import com.jbaacount.vote.service.VoteService;
+import com.jbaacount.model.Board;
+import com.jbaacount.service.BoardService;
+import com.jbaacount.model.Category;
+import com.jbaacount.service.CategoryService;
+import com.jbaacount.model.Comment;
+import com.jbaacount.service.CommentService;
+import com.jbaacount.model.Member;
+import com.jbaacount.service.MemberService;
+import com.jbaacount.model.Post;
+import com.jbaacount.service.PostService;
+import com.jbaacount.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

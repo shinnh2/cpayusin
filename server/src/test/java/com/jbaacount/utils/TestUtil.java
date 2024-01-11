@@ -1,7 +1,7 @@
 package com.jbaacount.utils;
 
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.service.MemberService;
+import com.jbaacount.model.Member;
+import com.jbaacount.service.MemberService;
 
 import java.lang.reflect.Field;
 

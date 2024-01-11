@@ -1,19 +1,14 @@
 package com.jbaacount.global.auth.service;
 
-import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.exception.InvalidTokenException;
 import com.jbaacount.global.security.jwt.JwtService;
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.repository.MemberRepository;
-import com.jbaacount.redis.RedisRepository;
+import com.jbaacount.repository.RedisRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

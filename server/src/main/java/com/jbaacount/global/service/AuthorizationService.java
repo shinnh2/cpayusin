@@ -2,7 +2,7 @@ package com.jbaacount.global.service;
 
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
-import com.jbaacount.member.entity.Member;
+import com.jbaacount.model.Member;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

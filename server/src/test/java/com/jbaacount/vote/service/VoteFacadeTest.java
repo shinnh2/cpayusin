@@ -1,18 +1,18 @@
 /*
 package com.jbaacount.vote.service;
 
-import com.jbaacount.board.entity.Board;
-import com.jbaacount.board.service.BoardService;
-import com.jbaacount.category.entity.Category;
-import com.jbaacount.category.service.CategoryService;
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.repository.MemberRepository;
-import com.jbaacount.member.service.MemberService;
-import com.jbaacount.post.entity.Post;
-import com.jbaacount.post.repository.PostRepository;
-import com.jbaacount.post.service.PostService;
+import com.jbaacount.model.Board;
+import com.jbaacount.service.BoardService;
+import com.jbaacount.model.Category;
+import com.jbaacount.service.CategoryService;
+import com.jbaacount.model.Member;
+import com.jbaacount.repository.MemberRepository;
+import com.jbaacount.service.MemberService;
+import com.jbaacount.model.Post;
+import com.jbaacount.repository.PostRepository;
+import com.jbaacount.service.PostService;
 import com.jbaacount.utils.TestUtil;
-import com.jbaacount.vote.repository.VoteRepository;
+import com.jbaacount.repository.VoteRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

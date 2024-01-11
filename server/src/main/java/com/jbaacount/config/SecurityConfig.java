@@ -9,7 +9,7 @@ import com.jbaacount.global.security.filter.JwtVerificationFilter;
 import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.global.security.userdetails.MemberDetailsService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
-import com.jbaacount.redis.RedisRepository;
+import com.jbaacount.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
