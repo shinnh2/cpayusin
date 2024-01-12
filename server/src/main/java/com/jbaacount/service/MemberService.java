@@ -7,7 +7,7 @@ import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.MemberUpdateRequest;
 import com.jbaacount.payload.response.MemberDetailResponse;
-import com.jbaacount.payload.response.MemberRewardResponse;
+import com.jbaacount.payload.response.MemberScoreResponse;
 import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -83,7 +83,7 @@ public class MemberService
         return memberRepository.findAllMembers(keyword, memberId, pageable);
     }
 
-    public List<MemberRewardResponse> findTop3MembersByScore(LocalDateTime now)
+    public List<MemberScoreResponse> findTop3MembersByScore(LocalDateTime now)
     {
         log.info("findTop3Members");
         return memberRepository.memberResponseForReward(now);

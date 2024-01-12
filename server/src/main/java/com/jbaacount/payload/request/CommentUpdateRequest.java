@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentPatchDto
+public class CommentUpdateRequest
 {
     @NotSpace
     private String text;

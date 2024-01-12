@@ -3,7 +3,7 @@ package com.jbaacount.repository;
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
 import com.jbaacount.payload.response.MemberDetailResponse;
-import com.jbaacount.payload.response.MemberRewardResponse;
+import com.jbaacount.payload.response.MemberScoreResponse;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
@@ -53,7 +53,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
     }
 
     @Override
-    public List<MemberRewardResponse> memberResponseForReward(LocalDateTime now)
+    public List<MemberScoreResponse> memberResponseForReward(LocalDateTime now)
     {
         LocalDateTime startMonth = LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0);
         LocalDateTime endMonth = startMonth.plusMonths(1);
@@ -76,8 +76,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 .limit(3)
                 .fetch();
 
-        List<MemberRewardResponse> responses = memberListTuple.stream()
-                .map(tuple -> new MemberRewardResponse(tuple.get(member.id), tuple.get(member.nickname), tuple.get(member.score)))
+        List<MemberScoreResponse> responses = memberListTuple.stream()
+                .map(tuple -> new MemberScoreResponse(tuple.get(member.id), tuple.get(member.nickname), tuple.get(member.score)))
                 .collect(Collectors.toList());
 
         return responses;

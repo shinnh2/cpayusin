@@ -1,6 +1,6 @@
 package com.jbaacount.service;
 
-import com.jbaacount.payload.response.VisitorResponseDto;
+import com.jbaacount.payload.response.VisitorResponse;
 import com.jbaacount.model.Visitor;
 import com.jbaacount.repository.VisitorRepository;
 import lombok.RequiredArgsConstructor;
@@ -67,11 +67,11 @@ public class VisitorService
         }
     }
 
-    public VisitorResponseDto getVisitorResponse()
+    public VisitorResponse getVisitorResponse()
     {
         LocalDate today = LocalDate.now();
 
-        VisitorResponseDto response = VisitorResponseDto.builder()
+        VisitorResponse response = VisitorResponse.builder()
                 .yesterday(getYesterdayVisitors(today))
                 .today(getTodayVisitors(today))
                 .total(getTotalVisitors())

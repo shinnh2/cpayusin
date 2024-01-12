@@ -3,7 +3,7 @@ package com.jbaacount.controller;
 import com.jbaacount.global.dto.PageInfo;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.CommentCreateRequest;
-import com.jbaacount.payload.request.CommentPatchDto;
+import com.jbaacount.payload.request.CommentUpdateRequest;
 import com.jbaacount.payload.response.CommentMultiResponse;
 import com.jbaacount.payload.response.CommentResponseForProfile;
 import com.jbaacount.payload.response.CommentSingleResponse;
@@ -40,7 +40,7 @@ public class CommentController
     }
 
     @PatchMapping("/comment/update")
-    public ResponseEntity<GlobalResponse<CommentSingleResponse>> updateComment(@RequestBody @Valid CommentPatchDto request,
+    public ResponseEntity<GlobalResponse<CommentSingleResponse>> updateComment(@RequestBody @Valid CommentUpdateRequest request,
                                                                                @RequestParam("comment") Long commentId,
                                                                                @AuthenticationPrincipal Member currentMember)
     {

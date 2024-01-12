@@ -7,7 +7,7 @@ import com.jbaacount.payload.request.MemberUpdateRequest;
 import com.jbaacount.payload.request.NicknameRequest;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.payload.response.MemberDetailResponse;
-import com.jbaacount.payload.response.MemberRewardResponse;
+import com.jbaacount.payload.response.MemberScoreResponse;
 import com.jbaacount.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +67,7 @@ public class MemberController
     }
 
     @GetMapping("/score")
-    public ResponseEntity<GlobalResponse<List<MemberRewardResponse>>> get3MembersByScore()
+    public ResponseEntity<GlobalResponse<List<MemberScoreResponse>>> get3MembersByScore()
     {
         LocalDateTime now = LocalDateTime.now();
         log.info("date = {}", now.getYear() + " " + now.getMonthValue());

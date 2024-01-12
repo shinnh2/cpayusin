@@ -7,7 +7,7 @@ import com.jbaacount.model.Comment;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.CommentCreateRequest;
-import com.jbaacount.payload.request.CommentPatchDto;
+import com.jbaacount.payload.request.CommentUpdateRequest;
 import com.jbaacount.payload.response.CommentMultiResponse;
 import com.jbaacount.payload.response.CommentResponseForProfile;
 import com.jbaacount.payload.response.CommentSingleResponse;
@@ -67,7 +67,7 @@ public class CommentService
     }
 
     @Transactional
-    public CommentSingleResponse updateComment(CommentPatchDto request, Long commentId, Member currentMember)
+    public CommentSingleResponse updateComment(CommentUpdateRequest request, Long commentId, Member currentMember)
     {
         Comment comment = getComment(commentId);
         authService.isTheSameUser(comment.getMember().getId(), currentMember.getId());
