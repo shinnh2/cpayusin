@@ -1,7 +1,6 @@
 package com.jbaacount.controller;
 
 import com.jbaacount.global.dto.PageInfo;
-import com.jbaacount.mapper.CommentMapper;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.CommentCreateRequest;
 import com.jbaacount.payload.request.CommentPatchDto;
@@ -11,7 +10,6 @@ import com.jbaacount.payload.response.CommentSingleResponse;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.CommentService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -25,16 +23,14 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/api/v1")
 @RestController
 public class CommentController
 {
     private final CommentService commentService;
-    private final CommentMapper commentMapper;
 
-
-    @PostMapping("/{post-id}/comment")
-    public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@PathVariable("post-id") @Positive Long postId,
+    @PostMapping("/comment/create")
+    public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@RequestParam("post") Long postId,
                                       @RequestBody @Valid CommentCreateRequest request,
                                       @AuthenticationPrincipal Member member)
     {
@@ -44,27 +40,27 @@ public class CommentController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @PatchMapping("/comment/{comment-id}")
-    public ResponseEntity updateComment(@RequestBody @Valid CommentPatchDto request,
-                                        @PathVariable("comment-id") @Positive Long commentId,
-                                        @AuthenticationPrincipal Member currentMember)
+    @PatchMapping("/comment/update")
+    public ResponseEntity<GlobalResponse<CommentSingleResponse>> updateComment(@RequestBody @Valid CommentPatchDto request,
+                                                                               @RequestParam("comment") Long commentId,
+                                                                               @AuthenticationPrincipal Member currentMember)
     {
         var data = commentService.updateComment(request, commentId, currentMember);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/comment/{comment-id}")
-    public ResponseEntity getComment(@PathVariable("comment-id") @Positive Long commentId,
-                                     @AuthenticationPrincipal Member currentMember)
+    @GetMapping("/comment/single-info")
+    public ResponseEntity<GlobalResponse<CommentSingleResponse>> getComment(@RequestParam("comment") Long commentId,
+                                                                            @AuthenticationPrincipal Member currentMember)
     {
         var data = commentService.getCommentSingleResponse(commentId, currentMember);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/{post-id}/comments")
-    public ResponseEntity<GlobalResponse<List<CommentMultiResponse>>> getAllComments(@PathVariable("post-id") @Positive Long postId,
+    @GetMapping("/comment/multi-info")
+    public ResponseEntity<GlobalResponse<List<CommentMultiResponse>>> getAllComments(@RequestParam("post") Long postId,
                                                                                      @AuthenticationPrincipal Member currentMember)
     {
         var data = commentService.getAllComments(postId, currentMember);
@@ -72,18 +68,18 @@ public class CommentController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/profile/{member-id}/comments")
-    public ResponseEntity<GlobalResponse<List<CommentResponseForProfile>>> getAllCommentsForProfile(@PathVariable("member-id") @Positive Long memberId,
+    @GetMapping("/profile/my-comments")
+    public ResponseEntity<GlobalResponse<List<CommentResponseForProfile>>> getAllCommentsForProfile(@AuthenticationPrincipal Member member,
                                                                                                     @PageableDefault(size = 8) Pageable pageable)
     {
-        var data = commentService.getAllCommentsForProfile(memberId, pageable.previousOrFirst());
+        var data = commentService.getAllCommentsForProfile(member.getId(), pageable.previousOrFirst());
 
         return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }
 
 
-    @DeleteMapping("/comment/{comment-id}")
-    public ResponseEntity deleteComment(@PathVariable("comment-id") @Positive Long commentId,
+    @DeleteMapping("/comment/delete")
+    public ResponseEntity deleteComment(@RequestParam("comment") Long commentId,
                                         @AuthenticationPrincipal Member currentMember)
     {
         commentService.deleteComment(commentId, currentMember);

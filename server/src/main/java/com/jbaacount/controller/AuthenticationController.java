@@ -1,19 +1,16 @@
 package com.jbaacount.controller;
 
 import com.jbaacount.global.security.dto.LoginDto;
-import com.jbaacount.mapper.MemberMapper;
-import com.jbaacount.payload.request.MemberMailDto;
 import com.jbaacount.payload.request.MemberRegisterRequest;
+import com.jbaacount.payload.request.PasswordResetRequest;
 import com.jbaacount.payload.response.AuthenticationResponse;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.payload.response.MemberDetailResponse;
 import com.jbaacount.service.AuthenticationService;
-import com.jbaacount.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1")
 public class AuthenticationController
 {
-    private final MemberMapper memberMapper;
     private final AuthenticationService authenticationService;
-    private final MemberService memberService;
 
     @PostMapping("/login")
     public ResponseEntity<GlobalResponse<AuthenticationResponse>> login(@RequestBody LoginDto loginDto)
@@ -40,9 +35,10 @@ public class AuthenticationController
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(value = "Refresh") String refreshToken)
     {
-        authenticationService.logout(refreshToken);
+        var data = authenticationService.logout(refreshToken);
+        log.info("logout completed successfully");
 
-        return new ResponseEntity<>("logout completed successfully", HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @PostMapping("/reissue")
@@ -57,7 +53,7 @@ public class AuthenticationController
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity enrollMember(@RequestBody @Valid MemberRegisterRequest request)
+    public ResponseEntity<GlobalResponse<MemberDetailResponse>> enrollMember(@RequestBody @Valid MemberRegisterRequest request)
     {
         var data = authenticationService.register(request);
 
@@ -67,21 +63,22 @@ public class AuthenticationController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-
-    @GetMapping("/verification-code")
-    public ResponseEntity verifyCode(@RequestBody MemberMailDto mailDto)
+    @GetMapping("/verification")
+    public ResponseEntity<GlobalResponse<Boolean>> verifyCode(@RequestParam String email,
+                                                              @RequestParam String code)
     {
-        boolean response = authenticationService.verifyCode(mailDto.getEmail(), mailDto.getVerificationCode());
+        Boolean data = authenticationService.verifyCode(email, code);
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @PatchMapping("/reset-password")
-    public ResponseEntity resetPassword(@RequestBody @Valid MemberMailDto mailDto)
+    public ResponseEntity<GlobalResponse<MemberDetailResponse>> resetPassword(@RequestParam String email,
+                                                                              @RequestBody @Valid PasswordResetRequest request)
     {
-        MemberDetailResponse response = memberMapper.toMemberDetailResponse(authenticationService.resetPassword(mailDto.getEmail(), mailDto.getPassword()));
+        var data = authenticationService.resetPassword(email, request.getPassword());
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
 

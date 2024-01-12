@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/visitor")
+@RequestMapping("/api/v1/visitor")
 @RequiredArgsConstructor
 public class VisitorController
 {

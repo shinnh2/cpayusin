@@ -44,7 +44,6 @@ public class MailService
     }
 
 
-
     public boolean verifyCodeForResetPassword(String email, String inputCode)
     {
         Member member = memberService.findMemberByEmail(email);

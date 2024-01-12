@@ -62,15 +62,14 @@ public class AuthenticationService
     }
 
     @Transactional
-    public Member resetPassword(String email, String password)
+    public MemberDetailResponse resetPassword(String email, String password)
     {
         Member member = memberService.findMemberByEmail(email);
 
         member.updatePassword(passwordEncoder.encode(password.toString()));
 
-        return member;
+        return MemberMapper.INSTANCE.toMemberDetailResponse(member);
     }
-
 
     public AuthenticationResponse login(String email)
     {
@@ -88,14 +87,14 @@ public class AuthenticationService
         return response;
     }
 
-    public void logout(String refreshToken)
+    public String logout(String refreshToken)
     {
         jwtService.isValidToken(refreshToken);
 
         if(hasKey(refreshToken))
         {
             redisRepository.deleteRefreshToken(refreshToken);
-            return;
+            return "로그아웃에 성공했습니다";
         }
 
         throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);

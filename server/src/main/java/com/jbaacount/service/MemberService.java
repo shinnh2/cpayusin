@@ -5,7 +5,7 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.MemberPatchDto;
+import com.jbaacount.payload.request.MemberUpdateRequest;
 import com.jbaacount.payload.response.MemberDetailResponse;
 import com.jbaacount.payload.response.MemberRewardResponse;
 import com.jbaacount.repository.MemberRepository;
@@ -40,7 +40,7 @@ public class MemberService
     }
 
     @Transactional
-    public MemberDetailResponse updateMember(Long memberId, MemberPatchDto request, MultipartFile multipartFile, Member currentMember)
+    public MemberDetailResponse updateMember(Long memberId, MemberUpdateRequest request, MultipartFile multipartFile, Member currentMember)
     {
         Member findMember = getMemberById(memberId);
 

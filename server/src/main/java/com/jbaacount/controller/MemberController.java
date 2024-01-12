@@ -2,7 +2,7 @@ package com.jbaacount.controller;
 
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.MemberPatchDto;
+import com.jbaacount.payload.request.MemberUpdateRequest;
 import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.payload.response.MemberDetailResponse;
@@ -33,7 +33,7 @@ public class MemberController
     private final MemberService memberService;
 
     @PatchMapping("/update")
-    public ResponseEntity updateMember(@RequestPart(value = "data", required = false) @Valid MemberPatchDto patchDto,
+    public ResponseEntity<GlobalResponse<MemberDetailResponse>> updateMember(@RequestPart(value = "data", required = false) @Valid MemberUpdateRequest patchDto,
                                        @RequestPart(value = "image", required = false)MultipartFile multipartFile,
                                        @AuthenticationPrincipal Member currentUser)
     {
@@ -46,7 +46,7 @@ public class MemberController
 
 
     @GetMapping("/single-info")
-    public ResponseEntity getMember(@AuthenticationPrincipal Member member)
+    public ResponseEntity<GlobalResponse<MemberDetailResponse>> getMember(@AuthenticationPrincipal Member member)
     {
         var data = memberService.getMemberDetailResponse(member.getId());
 
@@ -77,25 +77,29 @@ public class MemberController
 
 
     @DeleteMapping("/delete")
-    public ResponseEntity deleteMember(@AuthenticationPrincipal Member member)
+    public ResponseEntity<GlobalResponse<String>> deleteMember(@AuthenticationPrincipal Member member)
     {
         log.info("===deleteMember===");
 
         memberService.deleteById(member);
 
         log.info("user deleted successfully, deleted id = {}", member.getId());
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(new GlobalResponse<>("유저가 삭제되었습니다."));
     }
 
     @GetMapping("/verify/email")
-    public ResponseEntity checkExistEmail(@RequestBody MemberRegisterRequest memberRegisterRequest)
+    public ResponseEntity<GlobalResponse<String>> checkExistEmail(@RequestBody MemberRegisterRequest memberRegisterRequest)
     {
-        return ResponseEntity.ok(memberService.checkExistEmail(memberRegisterRequest.getEmail()));
+        var data = memberService.checkExistEmail(memberRegisterRequest.getEmail());
+
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @GetMapping("/verify/nickname")
-    public ResponseEntity checkExistNickname(@RequestBody MemberRegisterRequest memberRegisterRequest)
+    public ResponseEntity<GlobalResponse<String>> checkExistNickname(@RequestBody MemberRegisterRequest memberRegisterRequest)
     {
-        return ResponseEntity.ok(memberService.checkExistNickname(memberRegisterRequest.getNickname()));
+        var data = memberService.checkExistNickname(memberRegisterRequest.getNickname());
+
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 }
