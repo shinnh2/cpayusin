@@ -1,7 +1,6 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.global.dto.SingleResponseDto;
-import com.jbaacount.payload.response.VisitorResponseDto;
+import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.VisitorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +20,8 @@ public class VisitorController
     @GetMapping
     public ResponseEntity getVisitors()
     {
-        VisitorResponseDto response = visitorService.getVisitorResponse();
+        var data = visitorService.getVisitorResponse();
 
-        return ResponseEntity.ok(new SingleResponseDto<>(response));
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 }

@@ -3,12 +3,11 @@ package com.jbaacount.service;
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
-import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
-import com.jbaacount.global.service.AuthorizationService;
-import com.jbaacount.payload.request.MemberPatchDto;
-import com.jbaacount.payload.response.MemberResponseDto;
-import com.jbaacount.payload.response.MemberRewardResponse;
+import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
+import com.jbaacount.payload.request.MemberPatchDto;
+import com.jbaacount.payload.response.MemberDetailResponse;
+import com.jbaacount.payload.response.MemberRewardResponse;
 import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,40 +23,26 @@ import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class MemberService
 {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final CustomAuthorityUtils authorityUtils;
     private final AuthorizationService authorizationService;
     private final FileService fileService;
 
-    public Member createMember(Member member)
+
+    @Transactional
+    public Member save(Member member)
     {
-        log.info("===createMember===");
-        String email = member.getEmail();
-        String nickname = member.getNickname();
-
-        verifyExistEmail(email);
-        verifyExistNickname(nickname);
-
-        log.info("email = {}", email);
-        log.info("nickname = {}", nickname);
-
-        Member savedMember = memberRepository.save(member);
-        savedMember.setPassword(passwordEncoder.encode(member.getPassword()));
-        List<String> roles = authorityUtils.createRoles(email);
-        savedMember.setRoles(roles);
-
-        return savedMember;
+        return memberRepository.save(member);
     }
 
-    public Member updateMember(Long memberId, MemberPatchDto request, MultipartFile multipartFile, Member currentMember)
+    @Transactional
+    public MemberDetailResponse updateMember(Long memberId, MemberPatchDto request, MultipartFile multipartFile, Member currentMember)
     {
         Member findMember = getMemberById(memberId);
-        authorizationService.isTheSameUser(memberId, currentMember.getId());
 
         log.info("===updateMember===");
         log.info("findMember email = {}", findMember.getEmail());
@@ -77,33 +62,36 @@ public class MemberService
                     .ifPresent(password -> findMember.updatePassword(passwordEncoder.encode(password)));
         }
 
-        return findMember;
+        return MemberMapper.INSTANCE.toMemberDetailResponse(findMember);
     }
 
-    @Transactional(readOnly = true)
     public Member getMemberById(long id)
     {
         return memberRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
     }
 
-    @Transactional(readOnly = true)
-    public SliceDto<MemberResponseDto> getAllMembers(String keyword, Long memberId, Pageable pageable)
+    public MemberDetailResponse getMemberDetailResponse(Long memberId)
+    {
+        Member member = getMemberById(memberId);
+
+        return MemberMapper.INSTANCE.toMemberDetailResponse(member);
+    }
+
+    public SliceDto<MemberDetailResponse> getAllMembers(String keyword, Long memberId, Pageable pageable)
     {
         return memberRepository.findAllMembers(keyword, memberId, pageable);
     }
 
-    @Transactional(readOnly = true)
     public List<MemberRewardResponse> findTop3MembersByScore(LocalDateTime now)
     {
         log.info("findTop3Members");
         return memberRepository.memberResponseForReward(now);
     }
 
-    public void deleteById(long memberId, Member currentMember)
+    @Transactional
+    public void deleteById(Member member)
     {
-        Member member = getMemberById(memberId);
-        authorizationService.checkPermission(memberId, currentMember);
 
         log.info("deleted Member nickname = {}", member.getNickname());
 
@@ -113,22 +101,20 @@ public class MemberService
             fileService.deleteProfilePhoto(member);
         }
 
-        memberRepository.deleteById(memberId);
+        memberRepository.deleteById(member.getId());
     }
 
-    private void verifyExistEmail(String email)
+    public boolean verifyExistEmail(String email)
     {
-        memberRepository.findByEmail(email)
-                .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.EMAIL_ALREADY_EXIST);});
+        return memberRepository.existsByEmail(email);
     }
 
-    private void verifyExistNickname(String nickname)
+
+    public boolean verifyExistNickname(String nickname)
     {
-         memberRepository.findByNickname(nickname)
-                 .ifPresent(e -> {throw new BusinessLogicException(ExceptionMessage.NICKNAME_ALREADY_EXIST);});
+         return memberRepository.existsByNickname(nickname);
     }
 
-    @Transactional(readOnly = true)
     public String checkExistEmail(String email)
     {
         boolean response = memberRepository.findByEmail(email).isPresent();
@@ -136,7 +122,6 @@ public class MemberService
         return response ? "이미 사용중인 이메일입니다." : "사용할 수 있는 이메일입니다.";
     }
 
-    @Transactional(readOnly = true)
     public String checkExistNickname(String nickname)
     {
         boolean response = memberRepository.findByNickname(nickname).isPresent();
@@ -144,10 +129,10 @@ public class MemberService
         return response ? "이미 사용중인 닉네임입니다." : "사용할 수 있는 닉네임입니다.";
     }
 
-    @Transactional(readOnly = true)
     public Member findMemberByEmail(String email)
     {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
     }
+
 }

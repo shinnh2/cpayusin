@@ -1,7 +1,7 @@
 package com.jbaacount.repository;
 
 import com.jbaacount.payload.response.BoardAndCategoryResponse;
-import com.jbaacount.payload.response.BoardResponseDto;
+import com.jbaacount.payload.response.BoardResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,7 +21,7 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
     private final CategoryRepository categoryRepository;
 
     @Override
-    public List<BoardResponseDto> findAllBoards()
+    public List<BoardResponse> findAllBoards()
     {
         return query
                 .select(extractBoardsInfo())
@@ -64,9 +64,9 @@ public class BoardRepositoryImpl implements BoardRepositoryCustom
                 board.orderIndex);
     }
 
-    private ConstructorExpression<BoardResponseDto> extractBoardsInfo()
+    private ConstructorExpression<BoardResponse> extractBoardsInfo()
     {
-        return Projections.constructor(BoardResponseDto.class,
+        return Projections.constructor(BoardResponse.class,
                 board.id,
                 board.name,
                 board.orderIndex);

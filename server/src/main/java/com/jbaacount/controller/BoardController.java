@@ -1,22 +1,17 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.payload.request.BoardPatchDto;
-import com.jbaacount.payload.request.BoardPostDto;
 import com.jbaacount.payload.response.BoardAndCategoryResponse;
-import com.jbaacount.payload.response.BoardResponseDto;
-import com.jbaacount.model.Board;
-import com.jbaacount.mapper.BoardMapper;
+import com.jbaacount.payload.response.BoardResponse;
+import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.BoardService;
-import com.jbaacount.global.dto.SingleResponseDto;
-import com.jbaacount.model.Member;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -27,59 +22,28 @@ import java.util.List;
 public class BoardController
 {
     private final BoardService boardService;
-    private final BoardMapper boardMapper;
-
-    @PostMapping("/manage/board")
-    public ResponseEntity saveBoard(@RequestBody @Valid BoardPostDto request,
-                                    @AuthenticationPrincipal Member curentMember)
-    {
-        log.info("name = {}", request.getName());
-
-        Board board = boardMapper.boardPostToBoard(request);
-        Board savedBoard = boardService.createBoard(board, curentMember);
-        BoardResponseDto response = boardMapper.boardToResponse(savedBoard);
-
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
-    }
-
-    @PatchMapping("/manage/board")
-    public ResponseEntity updateBoard(@RequestBody @Valid List<BoardPatchDto> requests,
-                                      @AuthenticationPrincipal Member currentMember)
-    {
-        log.info("bulk update 시작");
-        boardService.bulkUpdateBoards(requests, currentMember);
-        log.info("bulk update 종료");
-
-        List<BoardAndCategoryResponse> response = boardService.getAllBoardAndCategory();
-
-        return new ResponseEntity(response, HttpStatus.OK);
-    }
-
     @GetMapping("/board/{board-id}")
-    public ResponseEntity getBoard(@PathVariable("board-id") @Positive Long boardId)
+    public ResponseEntity<GlobalResponse<BoardResponse>> getBoard(@PathVariable("board-id") @Positive Long boardId)
     {
-        Board board = boardService.getBoardById(boardId);
-        BoardResponseDto response = boardMapper.boardToResponse(board);
+        var data = boardService.getBoardResponse(boardId);
 
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @GetMapping("/board")
-    public ResponseEntity getAllBoards()
+    public ResponseEntity<GlobalResponse<List<BoardResponse>>> getAllBoards()
     {
-        List<BoardResponseDto> response = boardService.getAllBoards();
+        var data = boardService.getAllBoards();
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @GetMapping("/board/all")
-    public ResponseEntity getAllBoardAndCategory()
+    public ResponseEntity<GlobalResponse<List<BoardAndCategoryResponse>>> getAllBoardAndCategory()
     {
-        List<BoardAndCategoryResponse> response = boardService.getAllBoardAndCategory();
+        var data = boardService.getAllBoardAndCategory();
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
-
-
 
 }

@@ -15,4 +15,8 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     @Query("select m from Member m where REPLACE(lower(m.nickname), ' ', '') = REPLACE(lower(:nickname), ' ', '')")
     Optional<Member> findByNickname(@Param("nickname") String nickname);
+
+    boolean existsByEmail(@Param("email") String email);
+
+    boolean existsByNickname(@Param("nickname") String nickname);
 }

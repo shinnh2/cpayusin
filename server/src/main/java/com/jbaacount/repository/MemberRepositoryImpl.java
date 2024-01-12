@@ -2,15 +2,12 @@ package com.jbaacount.repository;
 
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
-import com.jbaacount.payload.response.MemberInfoForResponse;
-import com.jbaacount.payload.response.MemberResponseDto;
+import com.jbaacount.payload.response.MemberDetailResponse;
 import com.jbaacount.payload.response.MemberRewardResponse;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
-import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.jbaacount.model.QFile.file;
 import static com.jbaacount.model.QMember.member;
 import static com.jbaacount.model.QPost.post;
 import static com.jbaacount.model.QVote.vote;
@@ -33,13 +31,13 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
     private final PaginationUtils paginationUtils;
 
     @Override
-    public SliceDto<MemberResponseDto> findAllMembers(String keyword, Long memberId, Pageable pageable)
+    public SliceDto<MemberDetailResponse> findAllMembers(String keyword, Long memberId, Pageable pageable)
     {
         log.info("===findAllMembers in repository===");
-        List<MemberResponseDto> memberDto = query
-                .select(memberToResponse())
+        List<MemberDetailResponse> memberDto = query
+                .select(getMemberList())
                 .from(member)
-                .leftJoin(member.file)
+                .leftJoin(member.file, file)
                 .where(ltMemberId(memberId))
                 .where(checkEmailKeyword(keyword))
                 .where(checkNicknameKeyword(keyword))
@@ -49,7 +47,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
 
         log.info("list size = {}", memberDto.size());
 
-        Slice<MemberResponseDto> slice = paginationUtils.toSlice(pageable, memberDto);
+        Slice<MemberDetailResponse> slice = paginationUtils.toSlice(pageable, memberDto);
 
         return new SliceDto<>(memberDto, slice);
     }
@@ -85,29 +83,17 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         return responses;
     }
 
-    private ConstructorExpression<MemberResponseDto> memberToResponse()
+    private ConstructorExpression<MemberDetailResponse> getMemberList()
     {
-        StringExpression url = new CaseBuilder()
-                .when(member.file.isNotNull())
-                .then(member.file.url)
-                .otherwise((String) null);
-
         log.info("===memberToResponse===");
-        return Projections.constructor(MemberResponseDto.class,
+        return Projections.constructor(MemberDetailResponse.class,
                 member.id,
                 member.nickname,
                 member.email,
-                url,
+                member.file != null ? member.file.url : null,
+                member.score,
                 member.createdAt,
                 member.modifiedAt);
-    }
-
-    private ConstructorExpression extractMemberForReward()
-    {
-        return Projections.constructor(MemberInfoForResponse.class,
-                member.id,
-                member.nickname,
-                member.score);
     }
 
 

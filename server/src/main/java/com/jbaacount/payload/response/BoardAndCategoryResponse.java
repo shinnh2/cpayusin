@@ -15,7 +15,7 @@ public class BoardAndCategoryResponse
     private String name;
     private Long orderIndex;
 
-    private List<CategoryResponseDto> categories = new ArrayList<>();
+    private List<CategoryResponse> categories = new ArrayList<>();
 
     @QueryProjection
     public BoardAndCategoryResponse(Long id, String name, Long orderIndex)

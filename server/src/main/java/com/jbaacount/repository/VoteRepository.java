@@ -36,9 +36,21 @@ public interface VoteRepository extends JpaRepository<Vote, Long>
 
     void deleteVoteByPostId(@Param("postId") Long postId);
 
-    void deleteVoteByCommentId(@Param("commentId")Long commentId);
+    void deleteVoteByCommentId(@Param("commentId") Long commentId);
 
     @Transactional
     @Modifying
     void deleteByCommentId(Long commentId);
+
+    boolean existsVoteByMemberAndPost(Member member, Post post);
+
+    boolean existsVoteByMemberAndComment(Member member, Comment comment);
+
+    @Query("SELECT COUNT(*) FROM Vote v " +
+            "WHERE v.member.id = :memberId AND v.post.id = :postId")
+    boolean existsVoteByMemberIdAndPostId(@Param("memberId") Long memberId, @Param("postId") Long postId);
+
+    @Query("SELECT COUNT(*) FROM Vote v " +
+            "WHERE v.member.id = :memberId AND v.comment.id = :commentId")
+    boolean existsVoteByMemberIdAndCommentId(@Param("memberId") Long memberId, @Param("commentId") Long commentId);
 }

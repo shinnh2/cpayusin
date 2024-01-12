@@ -87,4 +87,15 @@ public class VoteService
     {
         voteRepository.deleteVoteByCommentId(commentId);
     }
+
+
+    public boolean existByMemberAndPost(Long memberId, Long postId)
+    {
+        return voteRepository.existsVoteByMemberIdAndPostId(memberId, postId);
+    }
+
+    public boolean existByMemberAndComment(Long memberId, Long commentId)
+    {
+        return voteRepository.existsVoteByMemberIdAndCommentId(memberId, commentId);
+    }
 }

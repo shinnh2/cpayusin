@@ -1,12 +1,12 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.payload.response.CategoryResponseDto;
+import com.jbaacount.payload.response.CategoryResponse;
 
 import java.util.List;
 
 public interface CategoryRepositoryCustom
 {
-    List<CategoryResponseDto> findAllCategories(Long boardId);
+    List<CategoryResponse> findAllCategories(Long boardId);
 
     long countCategory(Long boardId);
 

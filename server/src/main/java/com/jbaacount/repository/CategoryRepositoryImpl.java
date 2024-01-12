@@ -1,6 +1,6 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.payload.response.CategoryResponseDto;
+import com.jbaacount.payload.response.CategoryResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -18,7 +18,7 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
     private final JPAQueryFactory query;
 
     @Override
-    public List<CategoryResponseDto> findAllCategories(Long boardId)
+    public List<CategoryResponse> findAllCategories(Long boardId)
     {
         return query
                 .select(extractCategories())
@@ -38,9 +38,9 @@ public class CategoryRepositoryImpl implements CategoryRepositoryCustom
                 .fetchOne();
     }
 
-    private ConstructorExpression<CategoryResponseDto> extractCategories()
+    private ConstructorExpression<CategoryResponse> extractCategories()
     {
-        return Projections.constructor(CategoryResponseDto.class,
+        return Projections.constructor(CategoryResponse.class,
                 category.id,
                 category.name,
                 category.isAdminOnly,

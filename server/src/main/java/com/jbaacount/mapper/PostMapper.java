@@ -1,72 +1,42 @@
 package com.jbaacount.mapper;
 
-import com.jbaacount.payload.response.FileResponseDto;
 import com.jbaacount.model.File;
-import com.jbaacount.payload.response.MemberInfoForResponse;
-import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.PostPostDto;
-import com.jbaacount.payload.response.PostSingleResponseDto;
 import com.jbaacount.model.Post;
-import com.jbaacount.model.Vote;
-import com.jbaacount.repository.VoteRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.jbaacount.payload.request.PostPostDto;
+import com.jbaacount.payload.response.FileResponse;
+import com.jbaacount.payload.response.PostSingleResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.factory.Mappers;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-@RequiredArgsConstructor
-@Component
-public class PostMapper
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface PostMapper
 {
-    private final MemberMapper memberMapper;
-    private final VoteRepository voteRepository;
+    PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
+    Post toPostEntity(PostPostDto request);
 
-    public Post postDtoToPostEntity(PostPostDto request)
+    default PostSingleResponse toPostSingleResponse(Post entity, boolean voteStatus)
     {
-        if(request == null)
-            return null;
-
-        Post post = Post.builder()
-                .title(request.getTitle())
-                .content(request.getContent())
-                .build();
-
-        return post;
-    }
-
-    public PostSingleResponseDto postEntityToResponse(Post entity, Member currentMember)
-    {
-        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(entity.getMember());
-        boolean voteStatus = false;
-
-        if(currentMember != null)
-        {
-            Optional<Vote> vote = voteRepository.checkMemberVotedPostOrNot(currentMember, entity);
-            voteStatus = vote.isPresent();
-        }
-
-        List<File> files = entity.getFiles();
-        List<FileResponseDto> fileResponses = new ArrayList<>();
-        for (File file : files)
-        {
-            fileResponses.add(new FileResponseDto(file));
-        }
-
-        PostSingleResponseDto response = PostSingleResponseDto.builder()
+        return PostSingleResponse.builder()
+                .memberId(entity.getMember().getId())
+                .nickname(entity.getMember().getNickname())
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
-                .files(fileResponses)
+                .files(mapFiles(entity.getFiles()))
                 .voteCount(entity.getVoteCount())
                 .voteStatus(voteStatus)
                 .createdAt(entity.getCreatedAt())
-                .modifiedAt(entity.getModifiedAt())
-                .member(memberResponse)
                 .build();
-
-        return response;
     }
 
+    default List<FileResponse> mapFiles(List<File> files)
+    {
+        if(files == null)
+            return null;
+
+        return FileMapper.INSTANCE.toFileResponseList(files);
+    }
 }

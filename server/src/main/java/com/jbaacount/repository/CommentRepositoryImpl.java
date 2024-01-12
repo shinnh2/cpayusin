@@ -1,21 +1,21 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.global.dto.PageDto;
-import com.jbaacount.model.Member;
-import com.jbaacount.model.QMember;
-import com.jbaacount.model.Vote;
 import com.jbaacount.payload.response.CommentMultiResponse;
 import com.jbaacount.payload.response.CommentResponseForProfile;
-import com.jbaacount.payload.response.MemberInfoForResponse;
+import com.jbaacount.payload.response.MemberSimpleResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.jbaacount.model.QComment.comment;
 import static com.jbaacount.model.QMember.member;
@@ -24,17 +24,14 @@ import static com.jbaacount.model.QMember.member;
 public class CommentRepositoryImpl implements CommentRepositoryCustom
 {
     private final JPAQueryFactory query;
-    private final VoteRepository voteRepository;
-    //private final PaginationUtils paginationUtils;
 
     @Override
-    public List<CommentMultiResponse> getAllComments(Long postId, Member member)
+    public List<CommentMultiResponse> getAllComments(Long postId)
     {
         List<CommentMultiResponse> listComments = query
                 .select(extractCommentDto())
                 .from(comment)
                 .leftJoin(comment.parent)
-                .join(comment.member, QMember.member)
                 .where(comment.post.id.eq(postId))
                 .orderBy(comment.parent.id.asc().nullsFirst(), comment.createdAt.asc())
                 .fetch();
@@ -45,7 +42,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
 
         for (CommentMultiResponse comment : listComments)
         {
-            comment.setVoteStatus(checkMemberVotedCommentOrNot(member, comment.getId()));
             commentMap.put(comment.getId(), comment);
 
             if(comment.getParentId() == null)
@@ -62,26 +58,8 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
 
         return parentComments;
     }
-
-    /*@Override
-    public SliceDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Long last, Pageable pageable)
-    {
-        List<CommentResponseForProfile> comments = query
-                .select(extractAllCommentsForProfile())
-                .from(comment)
-                .where(ltCommentId(last))
-                .where(comment.member.id.eq(memberId))
-                .limit(pageable.getPageSize() + 1)
-                .orderBy(comment.id.desc())
-                .fetch();
-
-        Slice<CommentResponseForProfile> slice = paginationUtils.toSlice(pageable, comments);
-
-        return new SliceDto<>(comments, slice);
-    }*/
-
     @Override
-    public PageDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
+    public Page<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
     {
         List<CommentResponseForProfile> content = query
                 .select(extractAllCommentsForProfile())
@@ -92,15 +70,13 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 .orderBy(comment.id.desc())
                 .fetch();
 
-        Long total = query
+        JPAQuery<Long> count = query
                 .select(comment.count())
                 .from(comment)
-                .where(comment.member.id.eq(memberId))
-                .fetchOne();
+                .where(comment.member.id.eq(memberId));
 
-        PageImpl<CommentResponseForProfile> pageDto = new PageImpl<>(content, pageable, total);
 
-        return new PageDto<>(pageDto);
+        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
     }
 
 
@@ -125,27 +101,10 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 extractMemberInfo());
     }
 
-    private ConstructorExpression<MemberInfoForResponse> extractMemberInfo()
+    private ConstructorExpression<MemberSimpleResponse> extractMemberInfo()
     {
-        return Projections.constructor(MemberInfoForResponse.class,
+        return Projections.constructor(MemberSimpleResponse.class,
                 member.id,
                 member.nickname);
-    }
-
-    private boolean checkMemberVotedCommentOrNot(Member member, Long commentId)
-    {
-        if(member == null)
-            return false;
-
-        boolean voteStatus;
-        Optional<Vote> optionalVote = voteRepository.checkMemberVotedCommentOrNot(member.getId(), commentId);
-        voteStatus = optionalVote.isPresent();
-
-        return voteStatus;
-    }
-
-    private BooleanExpression ltCommentId(Long commentId)
-    {
-        return commentId != null ? comment.id.lt(commentId) : null;
     }
 }

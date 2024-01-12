@@ -1,61 +1,30 @@
 package com.jbaacount.mapper;
 
-import com.jbaacount.payload.request.CommentPostDto;
-import com.jbaacount.payload.response.CommentSingleResponse;
 import com.jbaacount.model.Comment;
-import com.jbaacount.payload.response.MemberInfoForResponse;
-import com.jbaacount.model.Member;
-import com.jbaacount.model.Vote;
-import com.jbaacount.repository.VoteRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.jbaacount.payload.request.CommentCreateRequest;
+import com.jbaacount.payload.response.CommentSingleResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.factory.Mappers;
 
-import java.util.Optional;
-
-@Component
-@RequiredArgsConstructor
-public class CommentMapper
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface CommentMapper
 {
-    private final MemberMapper memberMapper;
-    private final VoteRepository voteRepository;
-    public Comment postToComment(CommentPostDto request)
+    CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
+    Comment toCommentEntity(CommentCreateRequest request);
+
+    default CommentSingleResponse toCommentSingleResponse(Comment entity, boolean voteStatus)
     {
-        Comment comment = Comment.builder()
-                .text(request.getText())
-                .build();
-
-        return comment;
-    }
-
-
-    public CommentSingleResponse commentToResponse(Comment entity, Member currentMember)
-    {
-        Long parentId = null;
-        if(entity.getParent() != null)
-        {
-            parentId = entity.getParent().getId();
-        }
-
-        MemberInfoForResponse memberResponse = memberMapper.memberToMemberInfo(entity.getMember());
-
-        boolean voteStatus = false;
-
-        if(currentMember != null)
-        {
-            Optional<Vote> optionalVote = voteRepository.checkMemberVotedCommentOrNot(currentMember.getId(), entity.getId());
-            voteStatus = optionalVote.isPresent();
-        }
-
-        CommentSingleResponse response = CommentSingleResponse.builder()
-                .id(entity.getId())
-                .parentId(parentId)
+        return CommentSingleResponse.builder()
+                .memberId(entity.getMember().getId())
+                .nickname(entity.getMember().getNickname())
+                .commentId(entity.getId())
+                .parentId(entity.getParent().getId())
                 .text(entity.getText())
                 .voteCount(entity.getVoteCount())
                 .voteStatus(voteStatus)
                 .createdAt(entity.getCreatedAt())
-                .member(memberResponse)
                 .build();
-
-        return response;
     }
+
 }

@@ -1,16 +1,14 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.global.dto.SingleResponseDto;
 import com.jbaacount.global.dto.SliceDto;
-import com.jbaacount.payload.request.MemberPatchDto;
-import com.jbaacount.payload.request.MemberPostDto;
-import com.jbaacount.payload.response.MemberResponseDto;
-import com.jbaacount.payload.response.MemberRewardResponse;
 import com.jbaacount.model.Member;
-import com.jbaacount.mapper.MemberMapper;
+import com.jbaacount.payload.request.MemberPatchDto;
+import com.jbaacount.payload.request.MemberRegisterRequest;
+import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.MemberDetailResponse;
+import com.jbaacount.payload.response.MemberRewardResponse;
 import com.jbaacount.service.MemberService;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -28,83 +26,76 @@ import java.util.List;
 @Slf4j
 @Validated
 @RequiredArgsConstructor
-@RequestMapping("/members")
+@RequestMapping("/api/v1/member")
 @RestController
 public class MemberController
 {
     private final MemberService memberService;
 
-    private final MemberMapper memberMapper;
-
-
-
-    @PatchMapping("/{member-id}")
+    @PatchMapping("/update")
     public ResponseEntity updateMember(@RequestPart(value = "data", required = false) @Valid MemberPatchDto patchDto,
                                        @RequestPart(value = "image", required = false)MultipartFile multipartFile,
-                                       @PathVariable("member-id")@Positive long memberId,
                                        @AuthenticationPrincipal Member currentUser)
     {
-        Member updatedMember = memberService.updateMember(memberId, patchDto, multipartFile, currentUser);
-        MemberResponseDto response = memberMapper.memberToResponse(updatedMember);
+        var data = memberService.updateMember(currentUser.getId(), patchDto, multipartFile, currentUser);
 
         log.info("===updateMember===");
         log.info("user updated successfully");
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
 
-    @GetMapping("/{member-id}")
-    public ResponseEntity getMember(@PathVariable("member-id") @Positive long memberId)
+    @GetMapping("/single-info")
+    public ResponseEntity getMember(@AuthenticationPrincipal Member member)
     {
-        Member member = memberService.getMemberById(memberId);
-        MemberResponseDto response = memberMapper.memberToResponse(member);
+        var data = memberService.getMemberDetailResponse(member.getId());
 
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping
-    public ResponseEntity getAllMembers(@RequestParam(value = "keyword", required = false) String keyword,
+    @GetMapping("/multi-info")
+    public ResponseEntity getMemberList(@RequestParam(value = "keyword", required = false) String keyword,
                                         @RequestParam(required = false) Long member,
                                         @PageableDefault(size = 8)Pageable pageable)
 
     {
         log.info("===getAllMembers===");
-        SliceDto<MemberResponseDto> response = memberService.getAllMembers(keyword, member, pageable);
+        SliceDto<MemberDetailResponse> response = memberService.getAllMembers(keyword, member, pageable);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @GetMapping("/score")
-    public ResponseEntity get3MembersByScore()
+    public ResponseEntity<GlobalResponse<List<MemberRewardResponse>>> get3MembersByScore()
     {
         LocalDateTime now = LocalDateTime.now();
         log.info("date = {}", now.getYear() + " " + now.getMonthValue());
-        List<MemberRewardResponse> response = memberService.findTop3MembersByScore(now);
+        var data = memberService.findTop3MembersByScore(now);
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
 
-    @DeleteMapping("/{member-id}")
-    public ResponseEntity deleteMember(@PathVariable("member-id") @Positive long memberId,
-                                       @AuthenticationPrincipal Member member)
+    @DeleteMapping("/delete")
+    public ResponseEntity deleteMember(@AuthenticationPrincipal Member member)
     {
         log.info("===deleteMember===");
-        log.info("user deleted successfully, deleted id = {}", memberId);
-        memberService.deleteById(memberId, member);
 
+        memberService.deleteById(member);
+
+        log.info("user deleted successfully, deleted id = {}", member.getId());
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/verify/email")
-    public ResponseEntity checkExistEmail(@RequestBody MemberPostDto memberPostDto)
+    public ResponseEntity checkExistEmail(@RequestBody MemberRegisterRequest memberRegisterRequest)
     {
-        return ResponseEntity.ok(memberService.checkExistEmail(memberPostDto.getEmail()));
+        return ResponseEntity.ok(memberService.checkExistEmail(memberRegisterRequest.getEmail()));
     }
 
     @GetMapping("/verify/nickname")
-    public ResponseEntity checkExistNickname(@RequestBody MemberPostDto memberPostDto)
+    public ResponseEntity checkExistNickname(@RequestBody MemberRegisterRequest memberRegisterRequest)
     {
-        return ResponseEntity.ok(memberService.checkExistNickname(memberPostDto.getNickname()));
+        return ResponseEntity.ok(memberService.checkExistNickname(memberRegisterRequest.getNickname()));
     }
 }

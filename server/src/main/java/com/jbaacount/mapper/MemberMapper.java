@@ -1,58 +1,51 @@
 package com.jbaacount.mapper;
 
-import com.jbaacount.payload.request.MemberPostDto;
-import com.jbaacount.payload.response.MemberInfoForResponse;
-import com.jbaacount.payload.response.MemberResponseDto;
+import com.jbaacount.model.File;
 import com.jbaacount.model.Member;
-import org.springframework.stereotype.Component;
+import com.jbaacount.payload.request.MemberRegisterRequest;
+import com.jbaacount.payload.response.MemberDetailResponse;
+import com.jbaacount.payload.response.MemberSimpleResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.factory.Mappers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-@Component
-public class MemberMapper
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface MemberMapper
 {
-    public Member postToMember(MemberPostDto postDto)
+    MemberMapper INSTANCE = Mappers.getMapper(MemberMapper.class);
+
+    Member toMemberEntity(MemberRegisterRequest postDto);
+
+    default MemberDetailResponse toMemberDetailResponse(Member member)
     {
-        if(postDto == null)
+        if ( member == null ) {
+            return null;
+        }
+
+        MemberDetailResponse memberDetailResponse = new MemberDetailResponse();
+
+        memberDetailResponse.setId( member.getId() );
+        memberDetailResponse.setNickname( member.getNickname() );
+        memberDetailResponse.setEmail( member.getEmail() );
+        memberDetailResponse.setScore( member.getScore() );
+        memberDetailResponse.setUrl(mapFiles(member.getFile()));
+        memberDetailResponse.setCreatedAt( member.getCreatedAt() );
+        memberDetailResponse.setModifiedAt( member.getModifiedAt() );
+
+        return memberDetailResponse;
+    }
+
+    List<MemberDetailResponse> toMemberDetailList(List<Member> members);
+
+    MemberSimpleResponse toMemberSimpleInfo(Member member);
+
+    default String mapFiles(File file)
+    {
+        if(file == null)
             return null;
 
-        Member member = Member.builder()
-                .nickname(postDto.getNickname())
-                .email(postDto.getEmail())
-                .password(postDto.getPassword())
-                .build();
-
-        return member;
-    }
-
-    public MemberResponseDto memberToResponse(Member member)
-    {
-        MemberResponseDto response = new MemberResponseDto();
-        response.setId(member.getId());
-        response.setNickname(member.getNickname());
-        response.setEmail(member.getEmail());
-        response.setProfileImage(member.getFile() != null ? member.getFile().getUrl() : null);
-        response.setScore(member.getScore());
-        response.setCreatedAt(member.getCreatedAt());
-        response.setModifiedAt(member.getModifiedAt());
-
-        return response;
-    }
-
-    public List<MemberResponseDto> membersToResponseList(List<Member> members)
-    {
-        return members.stream()
-                .map(member -> memberToResponse(member))
-                .collect(Collectors.toList());
-    }
-
-    public MemberInfoForResponse memberToMemberInfo(Member member)
-    {
-        MemberInfoForResponse response = new MemberInfoForResponse();
-        response.setId(member.getId());
-        response.setNickname(member.getNickname());
-
-        return response;
+        return file.getUrl();
     }
 }

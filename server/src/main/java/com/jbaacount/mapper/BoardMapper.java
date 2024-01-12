@@ -1,35 +1,18 @@
 package com.jbaacount.mapper;
 
-import com.jbaacount.payload.request.BoardPostDto;
-import com.jbaacount.payload.response.BoardResponseDto;
 import com.jbaacount.model.Board;
-import org.springframework.stereotype.Component;
+import com.jbaacount.payload.request.BoardCreateRequest;
+import com.jbaacount.payload.response.BoardResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.factory.Mappers;
 
-@Component
-public class BoardMapper
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface BoardMapper
 {
-    public Board boardPostToBoard(BoardPostDto request)
-    {
-        if(request == null)
-            return null;
+    BoardMapper INSTANCE = Mappers.getMapper(BoardMapper.class);
 
-        Board board = Board.builder()
-                .name(request.getName())
-                .isAdminOnly(request.getIsAdminOnly())
-                .build();
+    Board toBoardEntity(BoardCreateRequest request);
+    BoardResponse boardToResponse(Board entity);
 
-        return board;
-    }
-
-
-    public BoardResponseDto boardToResponse(Board entity)
-    {
-        BoardResponseDto response = BoardResponseDto.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .orderIndex(entity.getOrderIndex())
-                .build();
-
-        return response;
-    }
 }

@@ -1,52 +1,41 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.payload.request.CategoryPostDto;
-import com.jbaacount.payload.response.CategoryResponseDto;
-import com.jbaacount.model.Category;
-import com.jbaacount.mapper.CategoryMapper;
+import com.jbaacount.payload.response.CategoryResponse;
+import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.CategoryService;
-import com.jbaacount.global.dto.SingleResponseDto;
-import com.jbaacount.model.Member;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Slf4j
 @RestController
-@RequestMapping
+@RequestMapping("/api/v1/category")
 public class CategoryController
 {
     private final CategoryService categoryService;
-    private final CategoryMapper categoryMapper;
 
-    @PostMapping("/manage/category")
-    public ResponseEntity createCategory(@RequestBody @Valid CategoryPostDto request,
-                                         @AuthenticationPrincipal Member currentMember)
+    @GetMapping("/single-info")
+    public ResponseEntity<GlobalResponse<CategoryResponse>> getCategory(@RequestParam(name = "board") Long boardId)
     {
-        Category category = categoryMapper.postToCategory(request);
-        Long boardId = request.getBoardId();
+        var data = categoryService.getCategoryResponse(boardId);
 
-        log.info("postDto is admin = {}", request.getIsAdminOnly());
-        Category savedCategory = categoryService.createCategory(category, boardId, currentMember);
-        CategoryResponseDto response = categoryMapper.categoryToResponse(savedCategory);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
+    }
 
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
+    @GetMapping("/multi-info")
+    public ResponseEntity<GlobalResponse<List<CategoryResponse>>> getAllCategories(@RequestParam Long board)
+    {
+        var data = categoryService.getAllCategories(board);
+
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
 
-    @GetMapping("/board/{board-id}/category")
-    public ResponseEntity getAllCategories(@PathVariable("board-id") @Positive Long boardId)
-    {
-        List<CategoryResponseDto> response = categoryService.getAllCategories(boardId);
-
-        return new ResponseEntity(response, HttpStatus.OK);
-    }
 }

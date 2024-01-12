@@ -1,19 +1,20 @@
 package com.jbaacount.service;
 
-import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
-import com.jbaacount.global.service.AuthorizationService;
+import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Category;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.PostPatchDto;
-import com.jbaacount.payload.response.PostMultiResponseDto;
+import com.jbaacount.payload.response.PostMultiResponse;
 import com.jbaacount.payload.response.PostResponseForProfile;
+import com.jbaacount.payload.response.PostSingleResponse;
 import com.jbaacount.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +25,7 @@ import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class PostService
 {
@@ -35,7 +36,8 @@ public class PostService
     private final VoteService voteService;
     private final FileService fileService;
 
-    public Post createPost(Post request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
+    @Transactional
+    public PostSingleResponse createPost(Post request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
     {
         Board board = boardService.getBoardById(boardId);
         authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
@@ -63,9 +65,10 @@ public class PostService
         log.info("member score = {}", request.getMember().getScore());
         Post savedPost = postRepository.save(request);
 
-        return savedPost;
+        return PostMapper.INSTANCE.toPostSingleResponse(savedPost, false);
     }
 
+    @Transactional
     public Post updatePost(Long postId, PostPatchDto request, List<MultipartFile> files, Member currentMember)
     {
         Post post = getPostById(postId);
@@ -97,32 +100,28 @@ public class PostService
         return post;
     }
 
-    @Transactional(readOnly = true)
+
     public Post getPostById(Long id)
     {
         return postRepository.findById(id)
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND));
     }
 
-
-    @Transactional(readOnly = true)
-    public PageDto<PostResponseForProfile> getAllPostsByMemberId(Long memberId, Pageable pageable)
+    public PostSingleResponse getPostSingleResponse(Long id, Member member)
     {
-        return postRepository.getAllPostsByMemberId(memberId, pageable);
+        Post post = getPostById(id);
+        boolean voteStatus = false;
+
+        if(member != null)
+            voteStatus = voteService.existByMemberAndPost(member.getId(), post.getId());
+
+        return PostMapper.INSTANCE.toPostSingleResponse(post, voteStatus);
     }
 
-    @Transactional(readOnly = true)
-    public PageDto<PostMultiResponseDto> getAllPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
+    public Page<PostResponseForProfile> getMyPosts(Member member, Pageable pageable)
     {
-        return postRepository.getAllPostsByCategoryId(categoryId, keyword, pageable);
+        return postRepository.getPostsByMemberId(member.getId(), pageable);
     }
-
-    @Transactional(readOnly = true)
-    public PageDto<PostMultiResponseDto> getAllPostsByBoardId(Long boardId, String keyword, Pageable pageable)
-    {
-        return postRepository.getAllPostsByBoardId(boardId, keyword, pageable);
-    }
-
     public void deletePostById(Long postId, Member currentMember)
     {
         Post post = getPostById(postId);
@@ -132,6 +131,16 @@ public class PostService
         fileService.deleteUploadedFile(post);
 
         postRepository.deleteById(postId);
+    }
+
+    public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
+    {
+        return postRepository.getPostsByBoardId(boardId, keyword, pageable);
+    }
+
+    public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
+    {
+        return postRepository.getPostsByCategoryId(categoryId, keyword, pageable);
     }
 
     private void checkBoardHasCategory(Board board, Category category)

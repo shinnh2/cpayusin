@@ -1,18 +1,20 @@
 package com.jbaacount.service;
 
-import com.jbaacount.global.dto.PageDto;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
-import com.jbaacount.global.service.AuthorizationService;
+import com.jbaacount.mapper.CommentMapper;
 import com.jbaacount.model.Comment;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
+import com.jbaacount.payload.request.CommentCreateRequest;
 import com.jbaacount.payload.request.CommentPatchDto;
 import com.jbaacount.payload.response.CommentMultiResponse;
 import com.jbaacount.payload.response.CommentResponseForProfile;
+import com.jbaacount.payload.response.CommentSingleResponse;
 import com.jbaacount.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,10 +31,15 @@ public class CommentService
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final AuthorizationService authService;
+    private final MemberService memberService;
+    private final VoteService voteService;
 
-    public Comment saveComment(Comment comment, Long postId, Long parentId, Member currentMember)
+    public CommentSingleResponse saveComment(CommentCreateRequest request, Long postId, Long parentId, Member member)
     {
         Post post = postService.getPostById(postId);
+        Comment comment = CommentMapper.INSTANCE.toCommentEntity(request);
+        Member currentMember = memberService.getMemberById(member.getId());
+
 
         comment.addPost(post);
         comment.addMember(currentMember);
@@ -55,10 +62,10 @@ public class CommentService
 
         Comment savedComment = commentRepository.save(comment);
 
-        return savedComment;
+        return getCommentSingleResponse(savedComment.getId(), member);
     }
 
-    public Comment updateComment(CommentPatchDto request, Long commentId, Member currentMember)
+    public CommentSingleResponse updateComment(CommentPatchDto request, Long commentId, Member currentMember)
     {
         Comment comment = getComment(commentId);
         authService.isTheSameUser(comment.getMember().getId(), currentMember.getId());
@@ -66,7 +73,7 @@ public class CommentService
         Optional.ofNullable(request.getText())
                 .ifPresent(text -> comment.updateText(text));
 
-        return comment;
+        return getCommentSingleResponse(commentId, currentMember);
     }
 
     @Transactional(readOnly = true)
@@ -77,15 +84,34 @@ public class CommentService
 
 
     @Transactional(readOnly = true)
-    public List<CommentMultiResponse> getAllComments(Long postId, Member currentMember)
+    public List<CommentMultiResponse> getAllComments(Long postId, Member member)
     {
-        return commentRepository.getAllComments(postId, currentMember);
+        var list = commentRepository.getAllComments(postId);
+
+        for (CommentMultiResponse response : list)
+        {
+            if(member != null)
+                response.setVoteStatus(checkVoteStatus(member.getId(), response.getId()));
+        }
+
+        return list;
     }
 
     @Transactional(readOnly = true)
-    public PageDto<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
+    public Page<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
     {
         return commentRepository.getAllCommentsForProfile(memberId, pageable);
+    }
+
+    public CommentSingleResponse getCommentSingleResponse(Long commentId, Member member)
+    {
+        Comment comment = getComment(commentId);
+        boolean voteStatus = false;
+
+        if(member != null)
+            voteStatus = checkVoteStatus(member.getId(), commentId);
+
+        return CommentMapper.INSTANCE.toCommentSingleResponse(comment, voteStatus);
     }
 
     public void deleteComment(Long commentId, Member currentMember)
@@ -105,6 +131,14 @@ public class CommentService
     {
         if(comment.getPost() != post)
             throw new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND);
+    }
+
+    public boolean checkVoteStatus(Long memberId, Long commentId)
+    {
+        if(memberId == null)
+            return false;
+
+        return voteService.existByMemberAndComment(memberId, commentId);
     }
 
 }

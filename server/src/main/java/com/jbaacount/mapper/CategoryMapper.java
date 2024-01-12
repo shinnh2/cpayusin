@@ -1,39 +1,18 @@
 package com.jbaacount.mapper;
 
-import com.jbaacount.payload.request.CategoryPostDto;
-import com.jbaacount.payload.response.CategoryResponseDto;
 import com.jbaacount.model.Category;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import com.jbaacount.payload.request.CategoryCreateRequest;
+import com.jbaacount.payload.response.CategoryResponse;
+import org.mapstruct.Mapper;
+import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.factory.Mappers;
 
-@RequiredArgsConstructor
-@Component
-public class CategoryMapper
+
+@Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+public interface CategoryMapper
 {
-    private final PostMapper postMapper;
+    CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
+    Category toCategoryEntity(CategoryCreateRequest request);
 
-    public Category postToCategory(CategoryPostDto request)
-    {
-        if(request == null)
-            return null;
-
-        Category category = Category
-                .builder()
-                .name(request.getName())
-                .isAdminOnly(request.getIsAdminOnly())
-                .build();
-
-        return category;
-    }
-
-    public CategoryResponseDto categoryToResponse(Category entity)
-    {
-        CategoryResponseDto response = new CategoryResponseDto();
-        response.setId(entity.getId());
-        response.setCategoryName(entity.getName());
-        response.setAdminOnly(entity.getIsAdminOnly());
-        response.setOrderIndex(entity.getOrderIndex());
-
-        return response;
-    }
+    CategoryResponse toCategoryResponse(Category entity);
 }

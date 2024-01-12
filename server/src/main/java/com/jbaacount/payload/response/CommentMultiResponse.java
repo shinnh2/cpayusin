@@ -16,11 +16,11 @@ public class CommentMultiResponse
     private int voteCount;
     private boolean voteStatus;
     private LocalDateTime createdAt;
-    private MemberInfoForResponse member;
+    private MemberSimpleResponse member;
     private List<CommentMultiResponse> children = new ArrayList<>();
 
     @QueryProjection
-    public CommentMultiResponse(Long id, Long parentId, String text, int voteCount, LocalDateTime createdAt, MemberInfoForResponse member)
+    public CommentMultiResponse(Long id, Long parentId, String text, int voteCount, LocalDateTime createdAt, MemberSimpleResponse member)
     {
         this.id = id;
         this.parentId = parentId;

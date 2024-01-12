@@ -1,13 +1,14 @@
 package com.jbaacount.service;
 
-import com.jbaacount.payload.request.BoardPatchDto;
+import com.jbaacount.mapper.BoardMapper;
+import com.jbaacount.payload.request.BoardCreateRequest;
+import com.jbaacount.payload.request.BoardUpdateRequest;
 import com.jbaacount.payload.response.BoardAndCategoryResponse;
-import com.jbaacount.payload.response.BoardResponseDto;
+import com.jbaacount.payload.response.BoardResponse;
 import com.jbaacount.model.Board;
 import com.jbaacount.repository.BoardRepository;
-import com.jbaacount.payload.request.CategoryPatchDto;
+import com.jbaacount.payload.request.CategoryUpdateRequest;
 import com.jbaacount.model.Category;
-import com.jbaacount.global.service.AuthorizationService;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 @Service
 public class BoardService
 {
@@ -30,22 +31,25 @@ public class BoardService
     private final FileService fileService;
     private final VoteService voteService;
 
-    public Board createBoard(Board board, Member currentMember)
+    public BoardResponse createBoard(BoardCreateRequest request, Member currentMember)
     {
         authorizationService.isAdmin(currentMember);
+
+        Board board = BoardMapper.INSTANCE.toBoardEntity(request);
 
         long orderIndex = boardRepository.countBoard();
         board.updateOrderIndex(orderIndex + 1);
 
-        return boardRepository.save(board);
+        return BoardMapper.INSTANCE.boardToResponse(boardRepository.save(board));
     }
 
 
-    public void bulkUpdateBoards(List<BoardPatchDto> requests, Member currentMember)
+    @Transactional
+    public void bulkUpdateBoards(List<BoardUpdateRequest> requests, Member currentMember)
     {
         authorizationService.isAdmin(currentMember);
 
-        for(BoardPatchDto request : requests)
+        for(BoardUpdateRequest request : requests)
         {
             //boardId, orderIndex = 필수
             //name, isAdminOnly, category = 있으면 변경
@@ -69,8 +73,8 @@ public class BoardService
             {
                 //orderIndex, categoryId = 필수
                 //name, isAdminOnly = 있으면 변경
-                List<CategoryPatchDto> categoryPatchList = request.getCategory();
-                for(CategoryPatchDto categoryRequest : categoryPatchList)
+                List<CategoryUpdateRequest> categoryPatchList = request.getCategory();
+                for(CategoryUpdateRequest categoryRequest : categoryPatchList)
                 {
                     Long categoryId = categoryRequest.getCategoryId();
                     Category category = categoryService.getCategory(categoryId);
@@ -97,25 +101,32 @@ public class BoardService
     }
 
 
-    @Transactional(readOnly = true)
     public Board getBoardById(Long boardId)
     {
         return boardRepository.findById(boardId)
                 .orElseThrow();
     }
 
-    @Transactional(readOnly = true)
-    public List<BoardResponseDto> getAllBoards()
+    public BoardResponse getBoardResponse(Long boardId)
+    {
+        Board board = getBoardById(boardId);
+
+        return BoardMapper.INSTANCE.boardToResponse(board);
+    }
+
+
+    public List<BoardResponse> getAllBoards()
     {
         return boardRepository.findAllBoards();
     }
 
-    @Transactional(readOnly = true)
+
     public List<BoardAndCategoryResponse> getAllBoardAndCategory()
     {
         return boardRepository.findAllBoardAndCategory();
     }
 
+    @Transactional
     public void deleteBoard(Long boardId)
     {
         Board board = getBoardById(boardId);
@@ -136,6 +147,7 @@ public class BoardService
         boardRepository.deleteById(boardId);
     }
 
+    @Transactional
     public void deleteCategory(Long categoryId)
     {
         Category category = categoryService.getCategory(categoryId);

@@ -11,11 +11,13 @@ import java.time.LocalDateTime;
 @Data
 public class CommentSingleResponse
 {
-    private Long id;
+    private Long memberId;
+    private String nickname;
+
+    private Long commentId;
     private Long parentId;
     private String text;
     private int voteCount;
     private boolean voteStatus;
     private LocalDateTime createdAt;
-    private MemberInfoForResponse member;
 }

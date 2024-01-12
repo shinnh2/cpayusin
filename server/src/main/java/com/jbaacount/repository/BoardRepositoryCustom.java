@@ -1,13 +1,13 @@
 package com.jbaacount.repository;
 
 import com.jbaacount.payload.response.BoardAndCategoryResponse;
-import com.jbaacount.payload.response.BoardResponseDto;
+import com.jbaacount.payload.response.BoardResponse;
 
 import java.util.List;
 
 public interface BoardRepositoryCustom
 {
-    List<BoardResponseDto> findAllBoards();
+    List<BoardResponse> findAllBoards();
 
     List<BoardAndCategoryResponse> findAllBoardAndCategory();
 

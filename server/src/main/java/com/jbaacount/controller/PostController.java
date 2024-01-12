@@ -1,16 +1,14 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.global.dto.PageDto;
-import com.jbaacount.global.dto.SingleResponseDto;
+import com.jbaacount.global.dto.PageInfo;
+import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Member;
-import com.jbaacount.service.MemberService;
+import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.PostPatchDto;
 import com.jbaacount.payload.request.PostPostDto;
-import com.jbaacount.payload.response.PostMultiResponseDto;
-import com.jbaacount.payload.response.PostResponseForProfile;
-import com.jbaacount.payload.response.PostSingleResponseDto;
-import com.jbaacount.model.Post;
-import com.jbaacount.mapper.PostMapper;
+import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.PostSingleResponse;
+import com.jbaacount.service.MemberService;
 import com.jbaacount.service.PostService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -21,6 +19,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RequiredArgsConstructor
+@RequestMapping("/api/v1")
 @Slf4j
 @RestController
 public class PostController
@@ -36,8 +36,8 @@ public class PostController
     private final PostMapper postMapper;
     private final MemberService memberService;
 
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity savePost(@RequestPart(value = "data") @Valid PostPostDto request,
+    @PostMapping(name = "/post/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<GlobalResponse<PostSingleResponse>> savePost(@RequestPart(value = "data") @Valid PostPostDto request,
                                    @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                    @AuthenticationPrincipal Member currentMember)
     {
@@ -48,65 +48,66 @@ public class PostController
         log.info("category id = {}", categoryId);
         log.info("board Id = {}", boardId);
 
-        Post post = postMapper.postDtoToPostEntity(request);
-        Post savedPost = postService.createPost(post, files, categoryId, boardId, member);
-        PostSingleResponseDto response = postMapper.postEntityToResponse(savedPost, member);
+        Post post = postMapper.toPostEntity(request);
+        var data = postService.createPost(post, files, categoryId, boardId, member);
 
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.CREATED);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @PatchMapping("/{post-id}")
+    @PatchMapping("/post/update/{post-id}")
     public ResponseEntity updatePost(@RequestPart(value = "data") @Valid PostPatchDto request,
                                      @PathVariable("post-id") @Positive Long postId,
                                      @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                      @AuthenticationPrincipal Member currentMember)
     {
         Post post = postService.updatePost(postId, request, files, currentMember);
-        PostSingleResponseDto response = postMapper.postEntityToResponse(post, currentMember);
 
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+        var data = postService.getPostSingleResponse(post.getId(), currentMember);
+
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/{post-id}")
+    @GetMapping("/post/single-info/{post-id}")
     public ResponseEntity getPost(@PathVariable("post-id") @Positive Long postId,
                                   @AuthenticationPrincipal Member currentMember)
     {
-        PostSingleResponseDto response = postMapper.postEntityToResponse(postService.getPostById(postId), currentMember);
+        var data = postService.getPostSingleResponse(postId, currentMember);
 
-        return new ResponseEntity(new SingleResponseDto<>(response), HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/category/{category-id}/posts")
-    public ResponseEntity<PageDto<PostMultiResponseDto>> getAllPostsByCategoryId(@PathVariable("category-id") @Positive Long categoryId,
-                                                @RequestParam(required = false) String keyword,
-                                                @PageableDefault(size = 8) Pageable pageable)
+    @GetMapping("/profile/my-posts")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
+    public ResponseEntity getMyPosts(@AuthenticationPrincipal Member member,
+                                     @PageableDefault Pageable pageable)
     {
-        PageDto<PostMultiResponseDto> response = postService.getAllPostsByCategoryId(categoryId, keyword, pageable.previousOrFirst());
+        var data = postService.getMyPosts(member, pageable);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }
 
-    @GetMapping("/board/{board-id}/posts")
-    public ResponseEntity<PageDto<PostMultiResponseDto>> getAllPostsByBoardId(@PathVariable("board-id") @Positive Long boardId,
-                                                  @RequestParam(required = false) String keyword,
-                                                  @PageableDefault(size = 8) Pageable pageable)
+    @GetMapping("/post/board/{boardId}")
+    public ResponseEntity getAllByBoardId(@PageableDefault Pageable pageable,
+                                          @RequestParam(required = false) String keyword,
+                                          @PathVariable("boardId") long boardId)
     {
-        PageDto<PostMultiResponseDto> response = postService.getAllPostsByBoardId(boardId, keyword, pageable.previousOrFirst());
+        var data = postService.getPostsByBoardId(boardId, keyword, pageable.previousOrFirst());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }
 
-
-    @GetMapping("/profile/{member-id}/posts")
-    public ResponseEntity<PageDto<PostResponseForProfile>> getAllPostsByMemberId(@PathVariable("member-id") @Positive Long memberId,
-                                                @PageableDefault(size = 8) Pageable pageable)
+    @GetMapping("/post/category/{categoryId}")
+    public ResponseEntity getPostsByCategoryId(@PageableDefault Pageable pageable,
+                                          @RequestParam(required = false) String keyword,
+                                          @PathVariable("categoryId") long categoryId)
     {
-        PageDto<PostResponseForProfile> response = postService.getAllPostsByMemberId(memberId, pageable.previousOrFirst());
+        var data = postService.getPostsByCategoryId(categoryId, keyword, pageable.previousOrFirst());
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }
 
-    @DeleteMapping("/{post-id}")
+
+    @DeleteMapping("/post/{post-id}")
     public ResponseEntity deletePost(@PathVariable("post-id") @Positive Long postId,
                                      @AuthenticationPrincipal Member currentMember)
     {
