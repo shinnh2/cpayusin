@@ -9,18 +9,19 @@ import com.jbaacount.global.security.filter.JwtVerificationFilter;
 import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.global.security.userdetails.MemberDetailsService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
-import com.jbaacount.redis.RedisRepository;
+import com.jbaacount.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.CorsUtils;
@@ -31,7 +32,8 @@ import java.util.List;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @RequiredArgsConstructor
-@Component
+@Configuration
+@EnableWebSecurity
 public class SecurityConfig
 {
     private final JwtService jwtService;
@@ -59,8 +61,8 @@ public class SecurityConfig
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
                         .requestMatchers(HttpMethod.GET).permitAll()
-                        .requestMatchers(HttpMethod.PATCH, "/members/help/reset-password").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/members/login", "/members/sign-up").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/login", "/api/v1/sign-up").permitAll()
                         .requestMatchers(HttpMethod.POST).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.PATCH).hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE).hasAnyRole("USER", "ADMIN")
@@ -102,7 +104,7 @@ public class SecurityConfig
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
             JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtService, redisRepository);
-            jwtAuthenticationFilter.setFilterProcessesUrl("/members/login");
+            jwtAuthenticationFilter.setFilterProcessesUrl("/api/v1/login");
             jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler());
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 

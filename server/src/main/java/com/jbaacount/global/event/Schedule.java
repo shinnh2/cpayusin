@@ -1,7 +1,7 @@
 package com.jbaacount.global.event;
 
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.repository.MemberRepository;
+import com.jbaacount.model.Member;
+import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

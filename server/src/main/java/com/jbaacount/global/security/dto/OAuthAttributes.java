@@ -1,6 +1,6 @@
 package com.jbaacount.global.security.dto;
 
-import com.jbaacount.member.entity.Platform;
+import com.jbaacount.model.Platform;
 import lombok.Builder;
 import lombok.Getter;
 
