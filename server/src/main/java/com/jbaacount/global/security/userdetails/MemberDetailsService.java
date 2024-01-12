@@ -1,8 +1,8 @@
 package com.jbaacount.global.security.userdetails;
 
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
-import com.jbaacount.member.entity.Member;
-import com.jbaacount.member.repository.MemberRepository;
+import com.jbaacount.model.Member;
+import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
