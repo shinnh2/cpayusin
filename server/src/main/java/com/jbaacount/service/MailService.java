@@ -1,23 +1,16 @@
 package com.jbaacount.service;
 
-import com.jbaacount.global.exception.BusinessLogicException;
-import com.jbaacount.global.exception.ExceptionMessage;
-import com.jbaacount.model.Member;
+import com.jbaacount.repository.RedisRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Random;
 
 @RequiredArgsConstructor
@@ -25,55 +18,20 @@ import java.util.Random;
 @Service
 public class MailService
 {
-    private final PasswordEncoder passwordEncoder;
     private final SpringTemplateEngine templateEngine;
     private final JavaMailSender mailSender;
-    private final RedisTemplate<String, String> redisTemplate;
-    private final MemberService memberService;
+    private final RedisRepository redisRepository;
     private final String WORDS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-    @Transactional
-    public String sendMailForRestPassword(String to)
-    {
-        Member member = memberService.findMemberByEmail(to);
-
-        String verificationCode = generateVerificationCode();
-        member.setVerificationCode(verificationCode);
-
-        return sendMail(to, verificationCode);
-    }
-
-
-    public boolean verifyCodeForResetPassword(String email, String inputCode)
-    {
-        Member member = memberService.findMemberByEmail(email);
-
-        if((member.getVerificationCode().equals(inputCode)))
-        {
-            if(member.getVerificationCodeExpiry().isAfter(LocalDateTime.now()))
-            {
-                member.setVerificationCode(null);
-                member.setVerificationCodeExpiry(null);
-                return true;
-            }
-
-            else
-            {
-                throw new BusinessLogicException(ExceptionMessage.EXPIRED_VERIFICATION_CODE);
-            }
-        }
-
-        throw new BusinessLogicException(ExceptionMessage.INVALID_VERIFICATION_CODE);
-    }
 
     public String sendVerificationCode(String email)
     {
         String verificationCode = generateVerificationCode();
-        redisTemplate.opsForValue().set(email, verificationCode, Duration.ofMinutes(5));
+        redisRepository.saveEmailAndVerificationCodeWith5Minutes(email, verificationCode);
 
-        return sendMail(email, verificationCode);
+        String response = sendMail(email, verificationCode);
+
+        return response;
     }
-
 
     private String sendMail(String email, String verificationCode)
     {
@@ -97,7 +55,7 @@ public class MailService
         log.info("mail verification code = {}", verificationCode);
         log.info("email = {}", email);
 
-        return verificationCode;
+        return "인증코드가 발송되었습니다. 5분 내로 인증을 완료해주세요.";
     }
 
     private String generateVerificationCode()

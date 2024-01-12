@@ -1,10 +1,10 @@
 package com.jbaacount.controller;
 
 import com.jbaacount.model.Member;
+import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.VoteFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,10 +26,10 @@ public class VoteController
     {
         boolean response = voteFacade.votePost(currentMember, postId);
         if(response)
-            return new ResponseEntity<>("좋아요 성공", HttpStatus.CREATED);
+            return ResponseEntity.ok(new GlobalResponse<>("좋아요 성공"));
 
         else
-            return new ResponseEntity<>("좋아요 취소", HttpStatus.OK);
+            return ResponseEntity.ok(new GlobalResponse<>("좋아요 취소"));
     }
 
     @PostMapping("/comment")
@@ -39,9 +39,9 @@ public class VoteController
         boolean response = voteFacade.voteComment(currentMember, commentId);
 
         if(response)
-            return new ResponseEntity<>("좋아요 성공", HttpStatus.CREATED);
+            return ResponseEntity.ok(new GlobalResponse<>("좋아요 성공"));
 
         else
-            return new ResponseEntity<>("좋아요 취소", HttpStatus.OK);
+            return ResponseEntity.ok(new GlobalResponse<>("좋아요 취소"));
     }
 }

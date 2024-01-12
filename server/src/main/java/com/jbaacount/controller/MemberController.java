@@ -2,8 +2,9 @@ package com.jbaacount.controller;
 
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.model.Member;
+import com.jbaacount.payload.request.EmailRequest;
 import com.jbaacount.payload.request.MemberUpdateRequest;
-import com.jbaacount.payload.request.MemberRegisterRequest;
+import com.jbaacount.payload.request.NicknameRequest;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.payload.response.MemberDetailResponse;
 import com.jbaacount.payload.response.MemberRewardResponse;
@@ -87,18 +88,18 @@ public class MemberController
         return ResponseEntity.ok(new GlobalResponse<>("유저가 삭제되었습니다."));
     }
 
-    @GetMapping("/verify/email")
-    public ResponseEntity<GlobalResponse<String>> checkExistEmail(@RequestBody MemberRegisterRequest memberRegisterRequest)
+    @GetMapping("/verify-email")
+    public ResponseEntity<GlobalResponse<String>> checkExistEmail(@RequestBody @Valid EmailRequest request)
     {
-        var data = memberService.checkExistEmail(memberRegisterRequest.getEmail());
+        var data = memberService.checkExistEmail(request.getEmail());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/verify/nickname")
-    public ResponseEntity<GlobalResponse<String>> checkExistNickname(@RequestBody MemberRegisterRequest memberRegisterRequest)
+    @GetMapping("/verify-nickname")
+    public ResponseEntity<GlobalResponse<String>> checkExistNickname(@RequestBody @Valid NicknameRequest request)
     {
-        var data = memberService.checkExistNickname(memberRegisterRequest.getNickname());
+        var data = memberService.checkExistNickname(request.getNickname());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

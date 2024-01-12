@@ -21,9 +21,7 @@ public class MailController
     @GetMapping
     public ResponseEntity<GlobalResponse<String>> sendVerificationCode(@RequestParam String email)
     {
-        mailService.sendVerificationCode(email);
-
-        String data = "인증코드가 발송되었습니다. 5분 내로 인증을 완료해주세요.";
+        var data = mailService.sendVerificationCode(email);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

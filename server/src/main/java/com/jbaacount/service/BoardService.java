@@ -31,6 +31,7 @@ public class BoardService
     private final FileService fileService;
     private final VoteService voteService;
 
+    @Transactional
     public BoardResponse createBoard(BoardCreateRequest request, Member currentMember)
     {
         authorizationService.isAdmin(currentMember);
@@ -40,7 +41,8 @@ public class BoardService
         long orderIndex = boardRepository.countBoard();
         board.updateOrderIndex(orderIndex + 1);
 
-        return BoardMapper.INSTANCE.boardToResponse(boardRepository.save(board));
+        BoardResponse response = BoardMapper.INSTANCE.boardToResponse(boardRepository.save(board));
+        return response;
     }
 
 

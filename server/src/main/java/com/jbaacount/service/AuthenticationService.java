@@ -14,7 +14,6 @@ import com.jbaacount.repository.RedisRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +30,6 @@ public class AuthenticationService
 {
     private final MemberService memberService;
     private final CustomAuthorityUtils authorityUtils;
-    private final RedisTemplate<String, String> redisTemplate;
     private final RedisRepository redisRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
@@ -39,24 +37,31 @@ public class AuthenticationService
     public MemberDetailResponse register(MemberRegisterRequest request)
     {
         Member member = MemberMapper.INSTANCE.toMemberEntity(request);
-
-        Member savedMember = memberService.save(member);
-        savedMember.setPassword(passwordEncoder.encode(member.getPassword()));
+        member.updatePassword(passwordEncoder.encode(request.getPassword()));
         List<String> roles = authorityUtils.createRoles(request.getEmail());
-        savedMember.setRoles(roles);
+        member.setRoles(roles);
+        Member savedMember = memberService.save(member);
+
         return MemberMapper.INSTANCE.toMemberDetailResponse(savedMember);
 
     }
 
-    public boolean verifyCode(String email, String inputCode)
+    public String verifyCode(String email, String inputCode)
     {
-        String verificationCode = redisTemplate.opsForValue().get(email);
+        log.info("email = {}", email);
+        String verificationCode = redisRepository.getVerificationCodeByEmail(email);
+        log.info("verification code = {}", verificationCode);
 
         if(verificationCode == null)
             throw new BusinessLogicException(ExceptionMessage.EXPIRED_VERIFICATION_CODE);
 
         if(verificationCode.equals(inputCode))
-            return true;
+        {
+            redisRepository.deleteEmailAfterVerification(email);
+            log.info("email removed from redis successfully");
+            return "인증이 완료되었습니다.";
+        }
+
 
         throw new BusinessLogicException(ExceptionMessage.INVALID_VERIFICATION_CODE);
     }
@@ -91,18 +96,19 @@ public class AuthenticationService
     {
         jwtService.isValidToken(refreshToken);
 
-        if(hasKey(refreshToken))
+        if(redisRepository.hasKey(refreshToken))
         {
             redisRepository.deleteRefreshToken(refreshToken);
+
             return "로그아웃에 성공했습니다";
         }
 
         throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
     }
 
-    public String reissue(String accessToken, String refreshToken)
+    public AuthenticationResponse reissue(String accessToken, String refreshToken)
     {
-        if(hasKey(refreshToken))
+        if(redisRepository.hasKey(refreshToken))
         {
             log.info("===reissue===");
             log.info("accessToken = {}", accessToken);
@@ -110,9 +116,21 @@ public class AuthenticationService
 
             Claims claims = jwtService.getClaims(accessToken.substring(7));
             String email = claims.getSubject();
-            List roles = (List) claims.get("roles");
 
-            return jwtService.generateAccessToken(email, roles);
+            Member member = memberService.findMemberByEmail(email);
+
+            String renewedAccessToken = jwtService.generateAccessToken(email, member.getRoles());
+
+
+            redisRepository.saveRefreshToken(refreshToken, email);
+
+            return AuthenticationResponse.builder()
+                    .memberId(member.getId())
+                    .nickname(member.getNickname())
+                    .role(member.getRoles())
+                    .accessToken(renewedAccessToken)
+                    .refreshToken(refreshToken)
+                    .build();
         }
 
         throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
@@ -125,16 +143,6 @@ public class AuthenticationService
         return response;
     }
 
-    private Boolean hasKey(String refreshToken)
-    {
-        try{
-            jwtService.isValidToken(refreshToken);
-        }catch (RuntimeException ex){
-            log.error(ex.getMessage(), ex);
-            return false;
-        }
 
-        return redisTemplate.hasKey(refreshToken);
-    }
 
 }

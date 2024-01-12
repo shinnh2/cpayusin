@@ -12,11 +12,13 @@ public class CategorySimpleResponse
 {
     private Long id;
     private String name;
+    private Boolean isRemoved;
 
     @QueryProjection
-    public CategorySimpleResponse(Long categoryId, String categoryName)
+    public CategorySimpleResponse(Long categoryId, String categoryName, Boolean isRemoved)
     {
         this.id = categoryId;
         this.name = categoryName;
+        this.isRemoved = isRemoved;
     }
 }

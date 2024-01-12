@@ -16,15 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Slf4j
-@RequestMapping
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
-@RestController("/api/v1")
+@RestController
 public class BoardController
 {
     private final BoardService boardService;
     @GetMapping("/board/{board-id}")
     public ResponseEntity<GlobalResponse<BoardResponse>> getBoard(@PathVariable("board-id") @Positive Long boardId)
     {
+        log.info("board id = {}", boardId);
         var data = boardService.getBoardResponse(boardId);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
@@ -38,7 +39,7 @@ public class BoardController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/board/all")
+    @GetMapping("/board-category")
     public ResponseEntity<GlobalResponse<List<BoardAndCategoryResponse>>> getAllBoardAndCategory()
     {
         var data = boardService.getAllBoardAndCategory();

@@ -89,9 +89,9 @@ public class VoteService
     }
 
 
-    public boolean existByMemberAndPost(Long memberId, Long postId)
+    public boolean existByMemberAndPost(Member member, Post post)
     {
-        return voteRepository.existsVoteByMemberIdAndPostId(memberId, postId);
+        return voteRepository.existsVoteByMemberAndPost(member, post);
     }
 
     public boolean existByMemberAndComment(Long memberId, Long commentId)

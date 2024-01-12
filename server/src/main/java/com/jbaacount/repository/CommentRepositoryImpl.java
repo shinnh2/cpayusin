@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jbaacount.model.QComment.comment;
-import static com.jbaacount.model.QMember.member;
 
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom
@@ -87,6 +86,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 comment.post.id,
                 comment.text,
                 comment.voteCount,
+                comment.isRemoved,
                 comment.createdAt);
     }
 
@@ -97,6 +97,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 comment.parent.id,
                 comment.text,
                 comment.voteCount,
+                comment.isRemoved,
                 comment.createdAt,
                 extractMemberInfo());
     }
@@ -104,7 +105,7 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
     private ConstructorExpression<MemberSimpleResponse> extractMemberInfo()
     {
         return Projections.constructor(MemberSimpleResponse.class,
-                member.id,
-                member.nickname);
+                comment.member.id,
+                comment.member.nickname);
     }
 }

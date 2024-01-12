@@ -7,7 +7,8 @@ import com.jbaacount.model.Board;
 import com.jbaacount.model.Category;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
-import com.jbaacount.payload.request.PostPatchDto;
+import com.jbaacount.payload.request.PostCreateRequest;
+import com.jbaacount.payload.request.PostUpdateRequest;
 import com.jbaacount.payload.response.PostMultiResponse;
 import com.jbaacount.payload.response.PostResponseForProfile;
 import com.jbaacount.payload.response.PostSingleResponse;
@@ -37,15 +38,11 @@ public class PostService
     private final FileService fileService;
 
     @Transactional
-    public PostSingleResponse createPost(Post request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
+    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
     {
+        Post post = PostMapper.INSTANCE.toPostEntity(request);
         Board board = boardService.getBoardById(boardId);
         authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
-
-        if(files != null && !files.isEmpty())
-        {
-            fileService.storeFiles(files, request);
-        }
 
         if(categoryId != null)
         {
@@ -53,32 +50,32 @@ public class PostService
             checkBoardHasCategory(board, category);
 
             authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
-            request.addCategory(category);
+            post.addCategory(category);
+        }
+        post.addMember(currentMember);
+        post.addBoard(board);
+
+        Post savedPost = postRepository.save(post);
+
+        if(files != null && !files.isEmpty())
+        {
+            fileService.storeFiles(files, savedPost);
         }
 
-        log.info("===postService - createPost===");
-        log.info("post saved successfully = {}", request.getTitle());
-
-        request.addMember(currentMember);
-        request.addBoard(board);
         currentMember.getScoreByPost();
-        log.info("member score = {}", request.getMember().getScore());
-        Post savedPost = postRepository.save(request);
+
 
         return PostMapper.INSTANCE.toPostSingleResponse(savedPost, false);
     }
 
     @Transactional
-    public Post updatePost(Long postId, PostPatchDto request, List<MultipartFile> files, Member currentMember)
+    public PostSingleResponse updatePost(Long postId, PostUpdateRequest request, List<MultipartFile> files, Member currentMember)
     {
         Post post = getPostById(postId);
         //Only the owner of the post has the authority to update
         authorizationService.isTheSameUser(post.getMember().getId(), currentMember.getId());
 
-        Optional.ofNullable(request.getTitle())
-                .ifPresent(title -> post.updateTitle(title));
-        Optional.ofNullable(request.getContent())
-                .ifPresent(content -> post.updateContent(content));
+        PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
 
         Optional.ofNullable(request.getCategoryId())
                 .ifPresent(categoryId ->
@@ -91,13 +88,20 @@ public class PostService
                     post.addBoard(board);
                 });
 
-        if(!files.isEmpty())
+
+        if(files != null && !files.isEmpty())
         {
             fileService.deleteUploadedFile(post);
             fileService.storeFiles(files, post);
         }
 
-        return post;
+        else
+        {
+            fileService.deleteUploadedFile(post);
+            log.info("file removed");
+        }
+
+        return PostMapper.INSTANCE.toPostSingleResponse(post, checkIfAlreadyVote(currentMember, post));
     }
 
 
@@ -110,10 +114,7 @@ public class PostService
     public PostSingleResponse getPostSingleResponse(Long id, Member member)
     {
         Post post = getPostById(id);
-        boolean voteStatus = false;
-
-        if(member != null)
-            voteStatus = voteService.existByMemberAndPost(member.getId(), post.getId());
+        boolean voteStatus = checkIfAlreadyVote(member, post);
 
         return PostMapper.INSTANCE.toPostSingleResponse(post, voteStatus);
     }
@@ -141,6 +142,16 @@ public class PostService
     public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
     {
         return postRepository.getPostsByCategoryId(categoryId, keyword, pageable);
+    }
+
+    private boolean checkIfAlreadyVote(Member member, Post post)
+    {
+        boolean voteStatus = false;
+
+        if(member != null)
+            voteStatus = voteService.existByMemberAndPost(member, post);
+
+        return voteStatus;
     }
 
     private void checkBoardHasCategory(Board board, Category category)

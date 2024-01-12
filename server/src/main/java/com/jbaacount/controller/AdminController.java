@@ -13,7 +13,6 @@ import com.jbaacount.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,33 +29,33 @@ public class AdminController
     private final BoardService boardService;
     private final CategoryService categoryService;
 
-    @PostMapping("/create/board")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping("/board/create")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<GlobalResponse<BoardResponse>> saveBoard(@RequestBody @Valid BoardCreateRequest request,
-                                                                   @AuthenticationPrincipal Member curentMember)
+                                                                   @AuthenticationPrincipal Member currentMember)
     {
-        log.info("name = {}", request.getName());
+        log.info("role = {}", currentMember.getRoles());
 
-        var data = boardService.createBoard(request, curentMember);
+        var data = boardService.createBoard(request, currentMember);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @PatchMapping("/board/update")
-    @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public ResponseEntity updateBoard(@RequestBody @Valid List<BoardUpdateRequest> requests,
-                                      @AuthenticationPrincipal Member currentMember)
+    public ResponseEntity<GlobalResponse<List<BoardAndCategoryResponse>>> updateBoard(@RequestBody @Valid List<BoardUpdateRequest> requests,
+                                                                                      @AuthenticationPrincipal Member currentMember)
     {
+        log.info("role = {}", currentMember.getRoles());
         log.info("bulk update 시작");
         boardService.bulkUpdateBoards(requests, currentMember);
         log.info("bulk update 종료");
 
-        List<BoardAndCategoryResponse> response = boardService.getAllBoardAndCategory();
+        var data = boardService.getAllBoardAndCategory();
 
-        return new ResponseEntity(response, HttpStatus.OK);
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @PostMapping("/create/category")
+    @PostMapping("/category/create")
     public ResponseEntity<GlobalResponse<CategoryResponse>> createCategory(@RequestBody @Valid CategoryCreateRequest request,
                                                                            @RequestParam Long board,
                                                                            @AuthenticationPrincipal Member currentMember)

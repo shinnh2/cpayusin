@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -31,11 +30,11 @@ public class CommentController
 
     @PostMapping("/comment/create")
     public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@RequestParam("post") Long postId,
-                                      @RequestBody @Valid CommentCreateRequest request,
-                                      @AuthenticationPrincipal Member member)
+                                                                             @RequestBody @Valid CommentCreateRequest request,
+                                                                             @RequestParam(required = false, name = "parent") Long parentId,
+                                                                             @AuthenticationPrincipal Member member)
     {
-
-        var data = commentService.saveComment(request, postId, request.getParentId(), member);
+        var data = commentService.saveComment(request, postId, parentId, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
@@ -50,8 +49,8 @@ public class CommentController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/comment/single-info")
-    public ResponseEntity<GlobalResponse<CommentSingleResponse>> getComment(@RequestParam("comment") Long commentId,
+    @GetMapping("/comment/{comment-id}")
+    public ResponseEntity<GlobalResponse<CommentSingleResponse>> getComment(@PathVariable("comment-id") Long commentId,
                                                                             @AuthenticationPrincipal Member currentMember)
     {
         var data = commentService.getCommentSingleResponse(commentId, currentMember);
@@ -59,7 +58,7 @@ public class CommentController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/comment/multi-info")
+    @GetMapping("/comment")
     public ResponseEntity<GlobalResponse<List<CommentMultiResponse>>> getAllComments(@RequestParam("post") Long postId,
                                                                                      @AuthenticationPrincipal Member currentMember)
     {
@@ -78,12 +77,12 @@ public class CommentController
     }
 
 
-    @DeleteMapping("/comment/delete")
-    public ResponseEntity deleteComment(@RequestParam("comment") Long commentId,
+    @DeleteMapping("/comment/{comment-id}")
+    public ResponseEntity deleteComment(@PathVariable("comment-id") Long commentId,
                                         @AuthenticationPrincipal Member currentMember)
     {
         commentService.deleteComment(commentId, currentMember);
 
-        return new ResponseEntity(HttpStatus.NO_CONTENT);
+        return ResponseEntity.ok(new GlobalResponse("댓글을 삭제했습니다."));
     }
 }

@@ -2,7 +2,8 @@ package com.jbaacount.mapper;
 
 import com.jbaacount.model.File;
 import com.jbaacount.model.Post;
-import com.jbaacount.payload.request.PostPostDto;
+import com.jbaacount.payload.request.PostCreateRequest;
+import com.jbaacount.payload.request.PostUpdateRequest;
 import com.jbaacount.payload.response.FileResponse;
 import com.jbaacount.payload.response.PostSingleResponse;
 import org.mapstruct.Mapper;
@@ -15,12 +16,32 @@ import java.util.List;
 public interface PostMapper
 {
     PostMapper INSTANCE = Mappers.getMapper(PostMapper.class);
-    Post toPostEntity(PostPostDto request);
+    Post toPostEntity(PostCreateRequest request);
+
+    default void updatePostFromUpdateRequest(PostUpdateRequest postUpdateRequest, Post post)
+    {
+        if ( postUpdateRequest == null ) {
+            return;
+        }
+
+        if ( postUpdateRequest.getTitle() != null ) {
+            post.updateTitle( postUpdateRequest.getTitle() );
+        }
+        if ( postUpdateRequest.getContent() != null ) {
+            post.updateContent( postUpdateRequest.getContent() );
+        }
+    }
 
     default PostSingleResponse toPostSingleResponse(Post entity, boolean voteStatus)
     {
+        if( entity == null) {
+            return null;
+        }
+
         return PostSingleResponse.builder()
                 .memberId(entity.getMember().getId())
+                .boardId(entity.getBoard().getId())
+                .categoryId(entity.getCategory().getId())
                 .nickname(entity.getMember().getNickname())
                 .id(entity.getId())
                 .title(entity.getTitle())

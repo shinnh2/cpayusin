@@ -12,15 +12,17 @@ public class CommentResponseForProfile
     private Long postId;
     private String text;
     private Integer voteCount;
+    private Boolean isRemoved;
     private LocalDateTime createdAt;
 
     @QueryProjection
-    public CommentResponseForProfile(Long id, Long postId, String text, Integer voteCount, LocalDateTime createdAt)
+    public CommentResponseForProfile(Long id, Long postId, String text, Integer voteCount, Boolean isRemoved, LocalDateTime createdAt)
     {
         this.id = id;
         this.postId = postId;
         this.text = text;
         this.voteCount = voteCount;
+        this.isRemoved = isRemoved;
         this.createdAt = createdAt;
     }
 }

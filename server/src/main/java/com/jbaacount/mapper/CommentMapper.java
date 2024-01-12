@@ -15,14 +15,19 @@ public interface CommentMapper
 
     default CommentSingleResponse toCommentSingleResponse(Comment entity, boolean voteStatus)
     {
+        Long parentId = null;
+        if(entity.getParent() != null)
+            parentId = entity.getParent().getId();
+
         return CommentSingleResponse.builder()
                 .memberId(entity.getMember().getId())
                 .nickname(entity.getMember().getNickname())
                 .commentId(entity.getId())
-                .parentId(entity.getParent().getId())
+                .parentId(parentId)
                 .text(entity.getText())
                 .voteCount(entity.getVoteCount())
                 .voteStatus(voteStatus)
+                .isRemoved(entity.isRemoved())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

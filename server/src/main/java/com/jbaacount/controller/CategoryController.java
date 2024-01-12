@@ -6,10 +6,7 @@ import com.jbaacount.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,15 +18,15 @@ public class CategoryController
 {
     private final CategoryService categoryService;
 
-    @GetMapping("/single-info")
-    public ResponseEntity<GlobalResponse<CategoryResponse>> getCategory(@RequestParam(name = "board") Long boardId)
+    @GetMapping("{category-id}")
+    public ResponseEntity<GlobalResponse<CategoryResponse>> getCategory(@PathVariable("category-id") Long categoryId)
     {
-        var data = categoryService.getCategoryResponse(boardId);
+        var data = categoryService.getCategoryResponse(categoryId);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/multi-info")
+    @GetMapping
     public ResponseEntity<GlobalResponse<List<CategoryResponse>>> getAllCategories(@RequestParam Long board)
     {
         var data = categoryService.getAllCategories(board);

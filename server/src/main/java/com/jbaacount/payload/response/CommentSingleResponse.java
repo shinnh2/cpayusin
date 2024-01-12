@@ -19,5 +19,6 @@ public class CommentSingleResponse
     private String text;
     private int voteCount;
     private boolean voteStatus;
+    private Boolean isRemoved;
     private LocalDateTime createdAt;
 }

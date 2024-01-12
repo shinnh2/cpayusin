@@ -10,7 +10,6 @@ import com.jbaacount.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,14 +41,14 @@ public class AuthenticationController
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<String> reissue(@RequestHeader(value = "Authorization") String accessToken, @RequestHeader(value = "Refresh") String refreshToken)
+    public ResponseEntity<GlobalResponse<AuthenticationResponse>> reissue(@RequestHeader(value = "Authorization") String accessToken,
+                                                                          @RequestHeader(value = "Refresh") String refreshToken)
     {
-        String newAccessToken = authenticationService.reissue(accessToken, refreshToken);
-        log.info("new access token = {}", newAccessToken);
+        var data = authenticationService.reissue(accessToken, refreshToken);
 
-        HttpHeaders response = authenticationService.setHeadersWithNewAccessToken(newAccessToken);
+        authenticationService.setHeadersWithNewAccessToken(data.getAccessToken());
 
-        return ResponseEntity.ok().headers(response).body("New accessToken has been issued successfully");
+        return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @PostMapping("/sign-up")
@@ -64,10 +63,10 @@ public class AuthenticationController
     }
 
     @GetMapping("/verification")
-    public ResponseEntity<GlobalResponse<Boolean>> verifyCode(@RequestParam String email,
+    public ResponseEntity<GlobalResponse<String>> verifyCode(@RequestParam String email,
                                                               @RequestParam String code)
     {
-        Boolean data = authenticationService.verifyCode(email, code);
+        var data = authenticationService.verifyCode(email, code);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
@@ -80,8 +79,4 @@ public class AuthenticationController
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
-
-
-
-
 }

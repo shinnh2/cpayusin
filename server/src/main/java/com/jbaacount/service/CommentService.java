@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class CommentService
@@ -34,6 +34,7 @@ public class CommentService
     private final MemberService memberService;
     private final VoteService voteService;
 
+    @Transactional
     public CommentSingleResponse saveComment(CommentCreateRequest request, Long postId, Long parentId, Member member)
     {
         Post post = postService.getPostById(postId);
@@ -65,6 +66,7 @@ public class CommentService
         return getCommentSingleResponse(savedComment.getId(), member);
     }
 
+    @Transactional
     public CommentSingleResponse updateComment(CommentPatchDto request, Long commentId, Member currentMember)
     {
         Comment comment = getComment(commentId);
@@ -76,7 +78,6 @@ public class CommentService
         return getCommentSingleResponse(commentId, currentMember);
     }
 
-    @Transactional(readOnly = true)
     public Comment getComment(Long commentId)
     {
         return commentRepository.findById(commentId).orElseThrow();
@@ -88,16 +89,27 @@ public class CommentService
     {
         var list = commentRepository.getAllComments(postId);
 
-        for (CommentMultiResponse response : list)
+        if(member != null)
         {
-            if(member != null)
-                response.setVoteStatus(checkVoteStatus(member.getId(), response.getId()));
+            for (CommentMultiResponse response : list)
+            {
+                response.setVoteStatus(checkVoteStatus(member, response.getId()));
+
+                if(!response.getChildren().isEmpty())
+                {
+                    List<CommentMultiResponse> children = response.getChildren();
+                    for (CommentMultiResponse child : children)
+                    {
+                        child.setVoteStatus(checkVoteStatus(member, child.getId()));
+                    }
+                }
+            }
         }
 
         return list;
     }
 
-    @Transactional(readOnly = true)
+
     public Page<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
     {
         return commentRepository.getAllCommentsForProfile(memberId, pageable);
@@ -106,18 +118,16 @@ public class CommentService
     public CommentSingleResponse getCommentSingleResponse(Long commentId, Member member)
     {
         Comment comment = getComment(commentId);
-        boolean voteStatus = false;
 
-        if(member != null)
-            voteStatus = checkVoteStatus(member.getId(), commentId);
+        boolean voteStatus = checkVoteStatus(member, commentId);
 
         return CommentMapper.INSTANCE.toCommentSingleResponse(comment, voteStatus);
     }
 
+    @Transactional
     public void deleteComment(Long commentId, Member currentMember)
     {
         Comment comment = getComment(commentId);
-
         authService.checkPermission(comment.getMember().getId(), currentMember);
 
         if(comment.getChildren().isEmpty())
@@ -133,12 +143,14 @@ public class CommentService
             throw new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND);
     }
 
-    public boolean checkVoteStatus(Long memberId, Long commentId)
+    public boolean checkVoteStatus(Member member, Long commentId)
     {
-        if(memberId == null)
+        if(member == null)
             return false;
 
-        return voteService.existByMemberAndComment(memberId, commentId);
+        log.info("member id = {}", member.getId());
+        log.info("comment id = {}", commentId);
+        return voteService.existByMemberAndComment(member.getId(), commentId);
     }
 
 }
