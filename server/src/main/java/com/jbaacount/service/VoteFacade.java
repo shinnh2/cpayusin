@@ -1,11 +1,8 @@
 package com.jbaacount.service;
 
 import com.jbaacount.model.Comment;
-import com.jbaacount.global.exception.BusinessLogicException;
-import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
-import com.jbaacount.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -16,12 +13,12 @@ import org.springframework.stereotype.Component;
 public class VoteFacade
 {
     private final VoteService voteService;
-    private final PostRepository postRepository;
+    private final PostService postService;
     private final CommentService commentService;
 
     public boolean votePost(Member currentMember, Long postId) throws InterruptedException
     {
-        Post post = findPostById(postId);
+        Post post = postService.getPostById(postId);
 
         int retryCount = 0;
         int maxRetries = 100;
@@ -60,13 +57,5 @@ public class VoteFacade
         }
 
         throw new RuntimeException("잠시 후 다시 시도해주세요");
-    }
-
-    private Post findPostById(Long postId)
-    {
-        log.info("===find post by id===");
-        log.info("post id = {}", postId);
-        return postRepository.findById(postId)
-                .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND));
     }
 }
