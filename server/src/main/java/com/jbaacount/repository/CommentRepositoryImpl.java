@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.jbaacount.model.QComment.comment;
+import static com.jbaacount.service.UtilService.calculateTime;
 
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom
@@ -34,6 +35,11 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 .where(comment.post.id.eq(postId))
                 .orderBy(comment.parent.id.asc().nullsFirst(), comment.createdAt.asc())
                 .fetch();
+
+        for (CommentMultiResponse response : listComments)
+        {
+            response.setTimeInfo(calculateTime(response.getCreatedAt()));
+        }
 
 
         Map<Long, CommentMultiResponse> commentMap = new HashMap<>();
@@ -68,6 +74,11 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 .offset(pageable.getOffset())
                 .orderBy(comment.id.desc())
                 .fetch();
+
+        for (CommentResponseForProfile response : content)
+        {
+            response.setTimeInfo(calculateTime(response.getCreatedAt()));
+        }
 
         JPAQuery<Long> count = query
                 .select(comment.count())

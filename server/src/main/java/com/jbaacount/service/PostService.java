@@ -31,7 +31,7 @@ import java.util.Optional;
 public class PostService
 {
     private final PostRepository postRepository;
-    private final AuthorizationService authorizationService;
+    private final UtilService utilService;
     private final CategoryService categoryService;
     private final BoardService boardService;
     private final VoteService voteService;
@@ -42,14 +42,14 @@ public class PostService
     {
         Post post = PostMapper.INSTANCE.toPostEntity(request);
         Board board = boardService.getBoardById(boardId);
-        authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
+        utilService.isUserAllowed(board.getIsAdminOnly(), currentMember);
 
         if(categoryId != null)
         {
             Category category = categoryService.getCategory(categoryId);
             checkBoardHasCategory(board, category);
 
-            authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
+            utilService.isUserAllowed(category.getIsAdminOnly(), currentMember);
             post.addCategory(category);
         }
         post.addMember(currentMember);
@@ -73,7 +73,7 @@ public class PostService
     {
         Post post = getPostById(postId);
         //Only the owner of the post has the authority to update
-        authorizationService.isTheSameUser(post.getMember().getId(), currentMember.getId());
+        utilService.isTheSameUser(post.getMember().getId(), currentMember.getId());
 
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
 
@@ -81,7 +81,7 @@ public class PostService
                 .ifPresent(categoryId ->
                 {
                     Category category = categoryService.getCategory(categoryId);
-                    authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
+                    utilService.isUserAllowed(category.getIsAdminOnly(), currentMember);
                     Board board = category.getBoard();
 
                     post.addCategory(category);
@@ -126,7 +126,7 @@ public class PostService
     public void deletePostById(Long postId, Member currentMember)
     {
         Post post = getPostById(postId);
-        authorizationService.checkPermission(post.getMember().getId(), currentMember);
+        utilService.checkPermission(post.getMember().getId(), currentMember);
 
         voteService.deleteVoteByPostId(postId);
         fileService.deleteUploadedFile(post);

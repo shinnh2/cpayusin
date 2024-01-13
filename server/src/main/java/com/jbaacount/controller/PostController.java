@@ -5,6 +5,7 @@ import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.PostCreateRequest;
 import com.jbaacount.payload.request.PostUpdateRequest;
 import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.PostResponseForProfile;
 import com.jbaacount.payload.response.PostSingleResponse;
 import com.jbaacount.service.MemberService;
 import com.jbaacount.service.PostService;
@@ -47,7 +48,7 @@ public class PostController
     }
 
     @PatchMapping("/post/update/{post-id}")
-    public ResponseEntity updatePost(@RequestPart(value = "data") @Valid PostUpdateRequest request,
+    public ResponseEntity<GlobalResponse<PostSingleResponse>> updatePost(@RequestPart(value = "data") @Valid PostUpdateRequest request,
                                      @PathVariable("post-id") @Positive Long postId,
                                      @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                      @AuthenticationPrincipal Member currentMember)
@@ -58,7 +59,7 @@ public class PostController
     }
 
     @GetMapping("/post/{post-id}")
-    public ResponseEntity getPost(@PathVariable("post-id") @Positive Long postId,
+    public ResponseEntity<GlobalResponse<PostSingleResponse>> getPost(@PathVariable("post-id") @Positive Long postId,
                                   @AuthenticationPrincipal Member currentMember)
     {
         var data = postService.getPostSingleResponse(postId, currentMember);
@@ -68,8 +69,8 @@ public class PostController
 
     @GetMapping("/profile/my-posts")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity getMyPosts(@AuthenticationPrincipal Member member,
-                                     @PageableDefault Pageable pageable)
+    public ResponseEntity<GlobalResponse<List<PostResponseForProfile>>> getMyPosts(@AuthenticationPrincipal Member member,
+                                                                                   @PageableDefault Pageable pageable)
     {
         var data = postService.getMyPosts(member, pageable.previousOrFirst());
 

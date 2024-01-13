@@ -1,5 +1,6 @@
 package com.jbaacount.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,9 @@ public class PostMultiResponse
     private String content;
     private Integer commentsCount;
 
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
+    private String timeInfo;
 
     @QueryProjection
     public PostMultiResponse(BoardSimpleResponse board,

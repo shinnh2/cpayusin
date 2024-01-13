@@ -1,5 +1,6 @@
 package com.jbaacount.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,5 +21,8 @@ public class CommentSingleResponse
     private int voteCount;
     private boolean voteStatus;
     private Boolean isRemoved;
+
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
+    private String timeInfo;
 }

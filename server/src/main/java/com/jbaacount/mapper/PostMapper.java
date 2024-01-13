@@ -12,6 +12,8 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
+import static com.jbaacount.service.UtilService.calculateTime;
+
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PostMapper
 {
@@ -49,7 +51,7 @@ public interface PostMapper
                 .files(mapFiles(entity.getFiles()))
                 .voteCount(entity.getVoteCount())
                 .voteStatus(voteStatus)
-                .createdAt(entity.getCreatedAt())
+                .createdAt(calculateTime(entity.getCreatedAt()))
                 .build();
     }
 

@@ -29,7 +29,7 @@ public class MemberService
 {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
-    private final AuthorizationService authorizationService;
+    private final UtilService utilService;
     private final FileService fileService;
 
 

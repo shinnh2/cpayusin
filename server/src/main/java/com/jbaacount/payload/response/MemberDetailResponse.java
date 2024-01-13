@@ -1,5 +1,6 @@
 package com.jbaacount.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
@@ -22,12 +23,13 @@ public class MemberDetailResponse
 
     private int score;
 
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
+    private String timeInfo;
 
-    private LocalDateTime modifiedAt;
 
     @QueryProjection
-    public MemberDetailResponse(Long id, String nickname, String email, String url, int score, LocalDateTime createdAt, LocalDateTime modifiedAt)
+    public MemberDetailResponse(Long id, String nickname, String email, String url, int score, LocalDateTime createdAt)
     {
         this.id = id;
         this.nickname = nickname;
@@ -35,6 +37,5 @@ public class MemberDetailResponse
         this.url = url;
         this.score = score;
         this.createdAt = createdAt;
-        this.modifiedAt = modifiedAt;
     }
 }

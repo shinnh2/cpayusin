@@ -24,14 +24,14 @@ import java.util.List;
 public class CategoryService
 {
     private final CategoryRepository categoryRepository;
-    private final AuthorizationService authorizationService;
+    private final UtilService utilService;
     private final BoardRepository boardRepository;
 
     @Transactional
     public CategoryResponse createCategory(CategoryCreateRequest request, Long boardId, Member member)
     {
         Category category = CategoryMapper.INSTANCE.toCategoryEntity(request);
-        authorizationService.isAdmin(member);
+        utilService.isAdmin(member);
         category.addBoard(getBoard(boardId));
 
         long orderIndex = categoryRepository.countCategory(boardId);

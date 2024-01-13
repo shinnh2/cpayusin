@@ -14,6 +14,7 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.util.List;
 
 import static com.jbaacount.model.QPost.post;
+import static com.jbaacount.service.UtilService.calculateTime;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom
@@ -33,6 +34,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .offset(pageable.getOffset())
                 .fetch();
 
+        calculateTimeInfo(data);
+
         JPAQuery<Long> count = query
                 .select(post.count())
                 .from(post)
@@ -41,6 +44,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom
 
         return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
     }
+
+
 
     @Override
     public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
@@ -55,6 +60,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .offset(pageable.getOffset())
                 .fetch();
 
+        calculateTimeInfo(data);
+
         JPAQuery<Long> count = query
                 .select(post.count())
                 .from(post)
@@ -67,7 +74,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     @Override
     public Page<PostResponseForProfile> getPostsByMemberId(Long memberId, Pageable pageable)
     {
-        List<PostResponseForProfile> content = query
+        List<PostResponseForProfile> data = query
                 .select(extractPostsForProfile())
                 .from(post)
                 .where(post.member.id.eq(memberId))
@@ -76,13 +83,18 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .offset(pageable.getOffset())
                 .fetch();
 
+        for (PostResponseForProfile response : data)
+        {
+            response.setTimeInfo(calculateTime(response.getCreatedAt()));
+        }
+
         JPAQuery<Long> count = query
                 .select(post.count())
                 .from(post)
                 .where(post.member.id.eq(memberId));
 
 
-        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
+        return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
     }
 
     private ConstructorExpression<PostResponseForProfile> extractPostsForProfile()
@@ -131,6 +143,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private BooleanExpression titleCondition(String keyword)
     {
         return keyword != null ? post.title.lower().contains(keyword.toLowerCase()) : null;
+    }
+
+    private static void calculateTimeInfo(List<PostMultiResponse> data)
+    {
+        for (PostMultiResponse datum : data)
+        {
+            datum.setTimeInfo(calculateTime(datum.getCreatedAt()));
+        }
     }
 
 }

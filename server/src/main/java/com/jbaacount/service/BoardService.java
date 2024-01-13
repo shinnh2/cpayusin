@@ -27,14 +27,14 @@ public class BoardService
 {
     private final BoardRepository boardRepository;
     private final CategoryService categoryService;
-    private final AuthorizationService authorizationService;
+    private final UtilService utilService;
     private final FileService fileService;
     private final VoteService voteService;
 
     @Transactional
     public BoardResponse createBoard(BoardCreateRequest request, Member currentMember)
     {
-        authorizationService.isAdmin(currentMember);
+        utilService.isAdmin(currentMember);
 
         Board board = BoardMapper.INSTANCE.toBoardEntity(request);
 
@@ -49,7 +49,7 @@ public class BoardService
     @Transactional
     public void bulkUpdateBoards(List<BoardUpdateRequest> requests, Member currentMember)
     {
-        authorizationService.isAdmin(currentMember);
+        utilService.isAdmin(currentMember);
 
         for(BoardUpdateRequest request : requests)
         {

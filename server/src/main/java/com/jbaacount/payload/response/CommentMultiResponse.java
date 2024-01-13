@@ -1,5 +1,6 @@
 package com.jbaacount.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 
@@ -17,7 +18,10 @@ public class CommentMultiResponse
     private Boolean voteStatus;
     private Boolean isRemoved;
 
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
+    private String timeInfo;
+
     private MemberSimpleResponse member;
     private List<CommentMultiResponse> children = new ArrayList<>();
 

@@ -30,7 +30,7 @@ public class CommentService
 {
     private final CommentRepository commentRepository;
     private final PostService postService;
-    private final AuthorizationService authService;
+    private final UtilService authService;
     private final MemberService memberService;
     private final VoteService voteService;
 
