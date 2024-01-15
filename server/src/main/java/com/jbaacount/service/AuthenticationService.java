@@ -76,22 +76,6 @@ public class AuthenticationService
         return MemberMapper.INSTANCE.toMemberDetailResponse(member);
     }
 
-    public AuthenticationResponse login(String email)
-    {
-        String refreshToken = jwtService.generateRefreshToken(email);
-        Member member = memberService.findMemberByEmail(email);
-        redisRepository.saveRefreshToken(refreshToken, email);
-
-        AuthenticationResponse response = AuthenticationResponse.builder()
-                .memberId(member.getId())
-                .nickname(member.getNickname())
-                .role(member.getRoles())
-                .refreshToken(refreshToken)
-                .build();
-
-        return response;
-    }
-
     public String logout(String refreshToken)
     {
         jwtService.isValidToken(refreshToken);
@@ -126,7 +110,7 @@ public class AuthenticationService
 
             return AuthenticationResponse.builder()
                     .memberId(member.getId())
-                    .nickname(member.getNickname())
+                    .email(email)
                     .role(member.getRoles())
                     .accessToken(renewedAccessToken)
                     .refreshToken(refreshToken)
