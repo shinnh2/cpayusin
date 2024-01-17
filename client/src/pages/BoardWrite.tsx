@@ -5,7 +5,8 @@ import EditorUnit from "../components/EditorUnit";
 import boardData from "./../data/boardData.json";
 import Input from "../components/Input";
 import axios from "axios";
-import { useEffect, useState, useRef, ReactElement } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface FormType {
 	title: string;
@@ -17,6 +18,7 @@ interface FormType {
 const BoardWrite = () => {
 	const api = process.env.REACT_APP_API_URL;
 	const [accessToken, setAccessToken] = useState("");
+	const navigate = useNavigate();
 	const [data, setData] = useState<any[]>([]);
 	// const [selectItemBoard, setSeletItemBoard] = useState<any[]>([]);
 	useEffect(() => {
@@ -86,11 +88,10 @@ const BoardWrite = () => {
 				Authorization: `${localStorage.getItem("accessToken")}`,
 			},
 		};
-		console.log(formData);
 		axios
 			.post(`${api}/`, formData, postAxiosConfig)
-			.then((response) => {
-				console.log("글 작성 성공 !!!!", response.data);
+			.then((_) => {
+				navigate(`/board/${boardId}`);
 			})
 			.catch((error) => {
 				if (error.response) {
@@ -107,9 +108,6 @@ const BoardWrite = () => {
 				}
 				console.error("에러 구성:", error.config);
 			});
-	};
-	const handleWriteComplete = () => {
-		console.log(boardData);
 	};
 
 	return (

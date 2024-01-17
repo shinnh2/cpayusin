@@ -580,6 +580,9 @@ header .header_button_wrap .header_links.active {
 	margin-right: 16px;
 }
 /* board list */
+.no_board_list {
+	padding: 48px 0;
+}
 .board_list_box {
 	padding: 0 16px;
 	margin-top: 16px;
