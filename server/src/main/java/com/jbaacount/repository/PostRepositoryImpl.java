@@ -1,6 +1,9 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.payload.response.*;
+import com.jbaacount.mapper.PostMapper;
+import com.jbaacount.model.Post;
+import com.jbaacount.payload.response.PostMultiResponse;
+import com.jbaacount.payload.response.PostResponseForProfile;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.model.QPost.post;
@@ -24,8 +28,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     @Override
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
-        List<PostMultiResponse> data = query
-                .select(extractPostResponse())
+        List<PostMultiResponse> data = new ArrayList<>();
+
+        List<Post> result = query
+                .select(post)
                 .from(post)
                 .where(post.board.id.eq(boardId))
                 .where(titleCondition(keyword))
@@ -33,8 +39,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .fetch();
-
-        calculateTimeInfo(data);
+        for (Post post : result)
+        {
+            PostMultiResponse response = PostMapper.INSTANCE.toPostMultiResponse(post);
+            response.setCommentsCount(post.getComments().size());
+            response.setTimeInfo(calculateTime(post.getCreatedAt()));
+            data.add(response);
+        }
 
         JPAQuery<Long> count = query
                 .select(post.count())
@@ -44,8 +55,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom
 
         return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
     }
-
-
 
     @Override
     public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
@@ -108,8 +117,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private ConstructorExpression<PostMultiResponse> extractPostResponse()
     {
         return Projections.constructor(PostMultiResponse.class,
-                getBoardInfo(),
-                getMemberInfo(),
+                post.member.id,
+                post.member.nickname,
+                post.board.id,
+                post.board.name,
                 post.category.id,
                 post.category.name,
                 post.id,
@@ -117,20 +128,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 post.content,
                 post.comments.size(),
                 post.createdAt);
-    }
-
-    private ConstructorExpression<BoardSimpleResponse> getBoardInfo()
-    {
-        return Projections.constructor(BoardSimpleResponse.class,
-                post.board.id,
-                post.board.name);
-    }
-
-    private ConstructorExpression<MemberSimpleResponse> getMemberInfo()
-    {
-        return Projections.constructor(MemberSimpleResponse.class,
-                post.member.id,
-                post.member.nickname);
     }
 
 

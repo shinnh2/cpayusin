@@ -5,8 +5,10 @@ import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.PostCreateRequest;
 import com.jbaacount.payload.request.PostUpdateRequest;
 import com.jbaacount.payload.response.FileResponse;
+import com.jbaacount.payload.response.PostMultiResponse;
 import com.jbaacount.payload.response.PostSingleResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
@@ -66,4 +68,14 @@ public interface PostMapper
 
         return FileMapper.INSTANCE.toFileResponseList(files);
     }
+
+
+    @Mapping(target = "memberId", source = "member.id")
+    @Mapping(target = "memberName", source = "member.nickname")
+    @Mapping(target = "boardId", source = "board.id")
+    @Mapping(target = "boardName", source = "board.name")
+    @Mapping(target = "categoryId", source = "category.id")
+    @Mapping(target = "categoryName", source = "category.name")
+    PostMultiResponse toPostMultiResponse(Post post);
+
 }
