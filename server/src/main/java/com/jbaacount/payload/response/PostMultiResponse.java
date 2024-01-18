@@ -14,11 +14,10 @@ import java.time.LocalDateTime;
 public class PostMultiResponse
 {
     private BoardSimpleResponse board;
-
-    private CategorySimpleResponse category;
-
     private MemberSimpleResponse member;
 
+    private Long categoryId;
+    private String categoryName;
     private Long postId;
     private String title;
     private String content;
@@ -30,7 +29,8 @@ public class PostMultiResponse
 
     @QueryProjection
     public PostMultiResponse(BoardSimpleResponse board,
-                             CategorySimpleResponse category,
+                             Long categoryId,
+                             String categoryName,
                              MemberSimpleResponse member,
                              Long postId,
                              String title,
@@ -39,7 +39,8 @@ public class PostMultiResponse
                              LocalDateTime createdAt)
     {
         this.board = board;
-        this.category = category;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
         this.member = member;
         this.postId = postId;
         this.title = title;

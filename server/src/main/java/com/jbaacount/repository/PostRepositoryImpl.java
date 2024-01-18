@@ -109,8 +109,9 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     {
         return Projections.constructor(PostMultiResponse.class,
                 getBoardInfo(),
-                getCategoryInfo(),
                 getMemberInfo(),
+                post.category.id,
+                post.category.name,
                 post.id,
                 post.title,
                 post.content,
@@ -123,13 +124,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom
         return Projections.constructor(BoardSimpleResponse.class,
                 post.board.id,
                 post.board.name);
-    }
-
-    private ConstructorExpression<CategorySimpleResponse> getCategoryInfo()
-    {
-        return Projections.constructor(CategorySimpleResponse.class,
-                post.category.id,
-                post.category.name);
     }
 
     private ConstructorExpression<MemberSimpleResponse> getMemberInfo()
