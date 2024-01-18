@@ -40,10 +40,14 @@ public interface PostMapper
             return null;
         }
 
+        Long categoryId = null;
+        if(entity.getCategory() != null)
+            categoryId = entity.getCategory().getId();
+
         return PostSingleResponse.builder()
                 .memberId(entity.getMember().getId())
                 .boardId(entity.getBoard().getId())
-                .categoryId(entity.getCategory().getId())
+                .categoryId(categoryId)
                 .nickname(entity.getMember().getNickname())
                 .id(entity.getId())
                 .title(entity.getTitle())
