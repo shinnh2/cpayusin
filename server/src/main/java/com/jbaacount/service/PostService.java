@@ -136,7 +136,8 @@ public class PostService
 
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
-        return postRepository.getPostsByBoardId(boardId, keyword, pageable);
+       return postRepository.getPostsByBoardId(boardId, keyword, pageable);
+
     }
 
     public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)

@@ -2,20 +2,22 @@ import boardData from "./../data/boardData.json";
 import { ReactComponent as IconHome } from "./../assets/icon_home.svg";
 import iconArrowDown from "./../assets/icon_arrow_down.svg";
 import { MouseEvent, useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import axios from "axios";
 
 const createMenuNode = (data: any[]) => {
+	const api = process.env.REACT_APP_API_URL;
 	return data.map((el: any, idx: number) => (
 		<li key={idx} className="nav_menu_item">
 			{el.name ? (
-				<a href="" onClick={clickHandler}>
+				<NavLink to={`/board/${el.id}`} onClick={clickHandler}>
 					{el.name}
 					{el.categories && el.categories.length !== 0 ? (
 						<i className="toggle_updown">
 							<img src={iconArrowDown} alt="메뉴 펼치기 접기 토글 아이콘" />
 						</i>
 					) : null}
-				</a>
+				</NavLink>
 			) : (
 				<a href="">{el.categoryName}</a>
 			)}
@@ -27,7 +29,7 @@ const createMenuNode = (data: any[]) => {
 };
 
 const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>): void => {
-	event.preventDefault();
+	//event.preventDefault();
 	event.currentTarget.classList.toggle("unfold");
 };
 

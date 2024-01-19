@@ -1,6 +1,7 @@
 package com.jbaacount.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,13 +14,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class PostMultiResponse
 {
-    private BoardSimpleResponse board;
+    private Long memberId;
+    private String memberName;
 
-    private CategorySimpleResponse category;
+    private Long boardId;
+    private String boardName;
+    private Long categoryId;
+    private String categoryName;
 
-    private MemberSimpleResponse member;
-
-    private Long postId;
+    @JsonProperty("postId")
+    private Long id;
     private String title;
     private String content;
     private Integer commentsCount;
@@ -29,19 +33,15 @@ public class PostMultiResponse
     private String timeInfo;
 
     @QueryProjection
-    public PostMultiResponse(BoardSimpleResponse board,
-                             CategorySimpleResponse category,
-                             MemberSimpleResponse member,
-                             Long postId,
-                             String title,
-                             String content,
-                             Integer commentsCount,
-                             LocalDateTime createdAt)
+    public PostMultiResponse(Long memberId, String memberName, Long boardId, String boardName, Long categoryId, String categoryName, Long id, String title, String content, Integer commentsCount, LocalDateTime createdAt)
     {
-        this.board = board;
-        this.category = category;
-        this.member = member;
-        this.postId = postId;
+        this.memberId = memberId;
+        this.memberName = memberName;
+        this.boardId = boardId;
+        this.boardName = boardName;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.id = id;
         this.title = title;
         this.content = content;
         this.commentsCount = commentsCount;

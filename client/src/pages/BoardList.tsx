@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoardItem from "../components/Boarditem";
 import boardListData from "../data/boardListData.json";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 
 const BoardList = () => {
 	//의사코드
@@ -16,11 +18,48 @@ const BoardList = () => {
 	3. 페이지네이션 클릭이벤트
 	4. 이전 다음 버튼 클릭이벤트
 	*/
-	const totalPages = boardListData.pageInfo.totalPages;
-	const maxPageValue = 5;
-	const maxPage = totalPages >= maxPageValue ? maxPageValue : totalPages;
+
+	const [pageInfo, setPageInfo] = useState({
+		totalPages: 1,
+		maxPaginationValue: 5,
+	});
 	const [nowPage, setNowPage] = useState(1);
-	const [pagenation, setPagenation] = useState(generatePageRange(1, maxPage));
+	const [pagenation, setPagenation] = useState(
+		generatePageRange(1, pageInfo.totalPages)
+	);
+	const params = useParams();
+	const api = process.env.REACT_APP_API_URL;
+	const [data, setData] = useState<any[]>([]);
+	useEffect(() => {
+		console.log(params.boardId);
+		axios
+			.get(`${api}/board/${params.boardId}/posts?page=1&size=8`)
+			.then((response) => {
+				console.log(response.data);
+				const pageInfo = response.data.pageInfo;
+				const totalPageNum = pageInfo.totalPages;
+				const maxPaginationNum = totalPageNum >= 5 ? 5 : totalPageNum;
+				setPageInfo({
+					totalPages: totalPageNum,
+					maxPaginationValue: maxPaginationNum,
+				});
+				setPagenation(generatePageRange(1, totalPageNum));
+				setData(response.data.data);
+			})
+			.catch((error) => {
+				console.error("에러", error);
+			});
+	}, [params.boardId]);
+	useEffect(() => {
+		axios
+			.get(`${api}/board/${params.boardId}/posts?page=${nowPage}&size=8`)
+			.then((response) => {
+				setData(response.data.data);
+			})
+			.catch((error) => {
+				console.error("에러", error);
+			});
+	}, [nowPage]);
 
 	//페이지네이션 범위 설정 함수
 	function generatePageRange(start: number, end: number) {
@@ -39,8 +78,10 @@ const BoardList = () => {
 		3. 그 외를 포함해 [현재 페이지-1]로 설정한다.
 		*/
 		if (nowPage === 1) return;
-		if (nowPage % maxPage === 1)
-			setPagenation(generatePageRange(nowPage - maxPage, nowPage - 1));
+		if (nowPage % pageInfo.maxPaginationValue === 1)
+			setPagenation(
+				generatePageRange(nowPage - pageInfo.maxPaginationValue, nowPage - 1)
+			);
 		setNowPage(nowPage - 1);
 	};
 	const handleClickNext = () => {
@@ -52,27 +93,36 @@ const BoardList = () => {
 			- [현재 페이지+maxPage]>=totalPages 라면: 범위를 ([현재 페이지+1], totalPages)로 설정한다.
 		3. 그 외를 포함해 [현재 페이지+1]로 설정한다.
 		*/
-		if (nowPage === totalPages) return;
-		if (nowPage % maxPage === 0) {
-			if (nowPage + maxPage >= totalPages)
-				setPagenation(generatePageRange(nowPage + 1, totalPages));
-			else setPagenation(generatePageRange(nowPage + 1, nowPage + maxPage));
+		if (nowPage === pageInfo.totalPages) return;
+		if (nowPage % pageInfo.maxPaginationValue === 0) {
+			if (nowPage + pageInfo.maxPaginationValue >= pageInfo.totalPages)
+				setPagenation(generatePageRange(nowPage + 1, pageInfo.totalPages));
+			else
+				setPagenation(
+					generatePageRange(nowPage + 1, nowPage + pageInfo.maxPaginationValue)
+				);
 		}
 		setNowPage(nowPage + 1);
 	};
 
 	return (
 		<div>
-			<h3>게시판 이름</h3>
-			<ul className="board_box board_list_box">
-				{boardListData.data.map((el, idx) => {
-					return (
-						<li key={idx}>
-							<BoardItem data={el} />
-						</li>
-					);
-				})}
-			</ul>
+			<h3>게시판 이름: {params.boardId}</h3>
+
+			{data.length === 0 ? (
+				<div className="no_board_list">등록된 게시글이 없습니다.</div>
+			) : (
+				<ul className="board_box board_list_box">
+					{data.map((el, idx) => {
+						return (
+							<li key={idx}>
+								<BoardItem data={el} />
+							</li>
+						);
+					})}
+				</ul>
+			)}
+
 			<div className="pagination">
 				<button className="arrow left" onClick={handleClickPrev}>
 					이전
