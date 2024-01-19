@@ -60,16 +60,6 @@ public class Board extends BaseEntity
         this.type = boardType;
     }
 
-    public void updateName(String name)
-    {
-        this.name = name;
-    }
-
-    public void changeBoardAuthority(Boolean isAdminOnly)
-    {
-        this.isAdminOnly = isAdminOnly;
-    }
-
     public void updateOrderIndex(Integer orderIndex)
     {
         this.orderIndex = orderIndex;

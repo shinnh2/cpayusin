@@ -5,9 +5,11 @@ import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.BoardMapper;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
+import com.jbaacount.model.Post;
 import com.jbaacount.model.type.BoardType;
 import com.jbaacount.payload.request.BoardCreateRequest;
 import com.jbaacount.payload.request.BoardUpdateRequest;
+import com.jbaacount.payload.request.CategoryUpdateRequest;
 import com.jbaacount.payload.response.BoardChildrenResponse;
 import com.jbaacount.payload.response.BoardMenuResponse;
 import com.jbaacount.payload.response.BoardResponse;
@@ -65,34 +67,42 @@ public class BoardService
     {
         utilService.isAdmin(currentMember);
 
-        requests.forEach(request ->
-                {
-                    Board board = getBoardById(request.getId());
-                    if(request.getIsDeleted() != null || request.getIsDeleted().equals(true))
-                        boardRepository.delete(board);
+        for(BoardUpdateRequest request : requests)
+        {
+            Board board = getBoardById(request.getId());
+            if(request.getIsDeleted() != null && request.getIsDeleted().equals(true))
+                deleteBoard(board);
 
-                    BoardMapper.INSTANCE.updateBoard(request, board);
-                    board.setType(BoardType.BOARD.getCode());
+            else{
+                BoardMapper.INSTANCE.updateBoard(request, board);
+                board.setParent(null);
+                board.setType(BoardType.BOARD.getCode());
 
-                    if(request.getCategory() != null & !request.getCategory().isEmpty())
-                    {
-                        request.getCategory().forEach(categoryRequest -> {
-                            Board category = getBoardById(categoryRequest.getId());
+                if(!request.getCategory().isEmpty())
+                    updateCategory(board, request.getCategory());
+            }
 
-                            if(categoryRequest.getIsDeleted() != null || categoryRequest.getIsDeleted().equals(true))
-                                boardRepository.delete(category);
 
-                            else {
-                                BoardMapper.INSTANCE.updateBoard(categoryRequest, board);
-                                category.setType(BoardType.CATEGORY.getCode());
-                                category.addParent(board);
-                            }
-                        });
-                    }
-                }
-        );
+        }
 
         log.info("업데이트 종료");
+    }
+
+    public void updateCategory(Board parent, List<CategoryUpdateRequest> requests)
+    {
+        for(CategoryUpdateRequest request : requests)
+        {
+            Board category = getBoardById(request.getId());
+
+            if(request.getIsDeleted() != null && request.getIsDeleted().equals(true))
+                deleteBoard(category);
+
+            else{
+                BoardMapper.INSTANCE.updateBoard(request, category);
+                category.addParent(parent);
+            }
+
+        }
     }
 
     public Board getBoardById(Long boardId)
@@ -140,6 +150,20 @@ public class BoardService
                         .collect(Collectors.toList())));
 
         return boardList;
+    }
+
+    @Transactional
+    public void deleteBoard(Board board)
+    {
+        if(!board.getPosts().isEmpty())
+        {
+            for(Post post : board.getPosts())
+            {
+                fileService.deleteUploadedFile(post);
+                voteService.deleteVoteByPostId(post.getId());
+            }
+        }
+        boardRepository.delete(board);
     }
 
 }
