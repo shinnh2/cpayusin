@@ -5,13 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class BoardResponse
+@NoArgsConstructor
+public class BoardChildrenResponse
 {
     private Long id;
 
     private String name;
+
+    private String type;
 
     private Integer orderIndex;
 

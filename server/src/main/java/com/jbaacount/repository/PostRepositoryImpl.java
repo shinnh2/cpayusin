@@ -1,6 +1,5 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.response.PostMultiResponse;
 import com.jbaacount.payload.response.PostResponseForProfile;
@@ -26,7 +25,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private final JPAQueryFactory query;
 
     @Override
-    public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
+    public Page<Post> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
         List<PostMultiResponse> data = new ArrayList<>();
 
@@ -39,13 +38,13 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .fetch();
-        for (Post post : result)
+        /*for (Post post : result)
         {
             PostMultiResponse response = PostMapper.INSTANCE.toPostMultiResponse(post);
             response.setCommentsCount(post.getComments().size());
             response.setTimeInfo(calculateTime(post.getCreatedAt()));
             data.add(response);
-        }
+        }*/
 
         JPAQuery<Long> count = query
                 .select(post.count())
@@ -53,31 +52,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .where(titleCondition(keyword))
                 .where(post.board.id.eq(boardId));
 
-        return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
-    }
-
-    @Override
-    public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
-    {
-        List<PostMultiResponse> data = query
-                .select(extractPostResponse())
-                .from(post)
-                .where(post.category.id.eq(categoryId))
-                .where(titleCondition(keyword))
-                .orderBy(post.createdAt.desc())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .fetch();
-
-        calculateTimeInfo(data);
-
-        JPAQuery<Long> count = query
-                .select(post.count())
-                .from(post)
-                .where(titleCondition(keyword))
-                .where(post.category.id.eq(categoryId));
-
-        return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
+        return PageableExecutionUtils.getPage(result, pageable, count::fetchOne);
     }
 
     @Override
@@ -121,8 +96,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 post.member.nickname,
                 post.board.id,
                 post.board.name,
-                post.category.id,
-                post.category.name,
                 post.id,
                 post.title,
                 post.content,

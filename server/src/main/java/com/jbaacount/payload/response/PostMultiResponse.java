@@ -19,8 +19,6 @@ public class PostMultiResponse
 
     private Long boardId;
     private String boardName;
-    private Long categoryId;
-    private String categoryName;
 
     @JsonProperty("postId")
     private Long id;
@@ -33,14 +31,13 @@ public class PostMultiResponse
     private String timeInfo;
 
     @QueryProjection
-    public PostMultiResponse(Long memberId, String memberName, Long boardId, String boardName, Long categoryId, String categoryName, Long id, String title, String content, Integer commentsCount, LocalDateTime createdAt)
+    public PostMultiResponse(Long memberId, String memberName, Long boardId, String boardName, Long id, String title, String content, Integer commentsCount, LocalDateTime createdAt)
     {
         this.memberId = memberId;
         this.memberName = memberName;
         this.boardId = boardId;
         this.boardName = boardName;
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
+
         this.id = id;
         this.title = title;
         this.content = content;

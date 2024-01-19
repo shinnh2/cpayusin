@@ -4,7 +4,6 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Board;
-import com.jbaacount.model.Category;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.PostCreateRequest;
@@ -22,7 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
+
+import static com.jbaacount.service.UtilService.calculateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,26 +32,17 @@ public class PostService
 {
     private final PostRepository postRepository;
     private final UtilService utilService;
-    private final CategoryService categoryService;
     private final BoardService boardService;
     private final VoteService voteService;
     private final FileService fileService;
 
     @Transactional
-    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
+    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Long boardId, Member currentMember)
     {
         Post post = PostMapper.INSTANCE.toPostEntity(request);
         Board board = boardService.getBoardById(boardId);
         utilService.isUserAllowed(board.getIsAdminOnly(), currentMember);
 
-        if(categoryId != null)
-        {
-            Category category = categoryService.getCategory(categoryId);
-            checkBoardHasCategory(board, category);
-
-            utilService.isUserAllowed(category.getIsAdminOnly(), currentMember);
-            post.addCategory(category);
-        }
         post.addMember(currentMember);
         post.addBoard(board);
 
@@ -76,17 +67,6 @@ public class PostService
         utilService.isTheSameUser(post.getMember().getId(), currentMember.getId());
 
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
-
-        Optional.ofNullable(request.getCategoryId())
-                .ifPresent(categoryId ->
-                {
-                    Category category = categoryService.getCategory(categoryId);
-                    utilService.isUserAllowed(category.getIsAdminOnly(), currentMember);
-                    Board board = category.getBoard();
-
-                    post.addCategory(category);
-                    post.addBoard(board);
-                });
 
 
         if(files != null && !files.isEmpty())
@@ -136,13 +116,11 @@ public class PostService
 
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
-       return postRepository.getPostsByBoardId(boardId, keyword, pageable);
+        Page<Post> posts = postRepository.getPostsByBoardId(boardId, keyword, pageable);
 
-    }
+        var data = posts.map(post -> PostMapper.INSTANCE.toPostMultiResponse(post, calculateTime(post.getCreatedAt())));
 
-    public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
-    {
-        return postRepository.getPostsByCategoryId(categoryId, keyword, pageable);
+        return data;
     }
 
     private boolean checkIfAlreadyVote(Member member, Post post)
@@ -155,9 +133,4 @@ public class PostService
         return voteStatus;
     }
 
-    private void checkBoardHasCategory(Board board, Category category)
-    {
-        if(!board.getCategories().contains(category))
-            throw new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND);
-    }
 }

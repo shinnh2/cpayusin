@@ -33,10 +33,6 @@ public class Post extends BaseEntity
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
@@ -63,15 +59,6 @@ public class Post extends BaseEntity
 
         this.member = member;
         member.getPosts().add(this);
-    }
-
-    public void addCategory(Category category)
-    {
-        if(this.category != null)
-            this.category.getPosts().remove(this);
-
-        this.category = category;
-        category.getPosts().add(this);
     }
 
     public void addBoard(Board board)

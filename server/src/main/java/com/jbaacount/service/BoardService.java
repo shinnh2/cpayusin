@@ -1,23 +1,26 @@
 package com.jbaacount.service;
 
+import com.jbaacount.global.exception.BusinessLogicException;
+import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.BoardMapper;
+import com.jbaacount.model.Board;
+import com.jbaacount.model.Member;
+import com.jbaacount.model.type.BoardType;
 import com.jbaacount.payload.request.BoardCreateRequest;
 import com.jbaacount.payload.request.BoardUpdateRequest;
-import com.jbaacount.payload.response.BoardAndCategoryResponse;
+import com.jbaacount.payload.response.BoardChildrenResponse;
+import com.jbaacount.payload.response.BoardMenuResponse;
 import com.jbaacount.payload.response.BoardResponse;
-import com.jbaacount.model.Board;
+import com.jbaacount.payload.response.BoardTypeResponse;
 import com.jbaacount.repository.BoardRepository;
-import com.jbaacount.payload.request.CategoryUpdateRequest;
-import com.jbaacount.model.Category;
-import com.jbaacount.model.Member;
-import com.jbaacount.model.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -26,7 +29,6 @@ import java.util.Optional;
 public class BoardService
 {
     private final BoardRepository boardRepository;
-    private final CategoryService categoryService;
     private final UtilService utilService;
     private final FileService fileService;
     private final VoteService voteService;
@@ -37,9 +39,21 @@ public class BoardService
         utilService.isAdmin(currentMember);
 
         Board board = BoardMapper.INSTANCE.toBoardEntity(request);
+        if (request.getParentId() != null)
+        {
+            Board parent = getBoardById(request.getParentId());
+            if (parent.getParent() != null)
+                throw new BusinessLogicException(ExceptionMessage.BOARD_TYPE_ERROR);
 
-        long orderIndex = boardRepository.countBoard();
-        board.updateOrderIndex(orderIndex + 1);
+            board.addParent(parent);
+            Integer orderIndex = boardRepository.countChildrenByParentId(parent.getId());
+            board.updateOrderIndex(orderIndex + 1);
+            board.updateBoardType(BoardType.CATEGORY.getCode());
+        } else
+        {
+            Integer orderIndex = boardRepository.countParent();
+            board.updateOrderIndex(orderIndex + 1);
+        }
 
         BoardResponse response = BoardMapper.INSTANCE.boardToResponse(boardRepository.save(board));
         return response;
@@ -51,57 +65,35 @@ public class BoardService
     {
         utilService.isAdmin(currentMember);
 
-        for(BoardUpdateRequest request : requests)
-        {
-            //boardId, orderIndex = 필수
-            //name, isAdminOnly, category = 있으면 변경
-            Board board = getBoardById(request.getBoardId());
-
-            log.info("board = {}", board.getName());
-
-            if(request.getIsDeleted() != null)
-            {
-                deleteBoard(board.getId());
-                continue;
-            }
-
-            board.updateOrderIndex(request.getOrderIndex());
-            Optional.ofNullable(request.getName())
-                            .ifPresent(boardName -> board.updateName(boardName));
-            Optional.ofNullable(request.getIsAdminOnly())
-                            .ifPresent(isAdminOnly -> board.changeBoardAuthority(isAdminOnly));
-
-            if(request.getCategory() != null && !request.getCategory().isEmpty())
-            {
-                //orderIndex, categoryId = 필수
-                //name, isAdminOnly = 있으면 변경
-                List<CategoryUpdateRequest> categoryPatchList = request.getCategory();
-                for(CategoryUpdateRequest categoryRequest : categoryPatchList)
+        requests.forEach(request ->
                 {
-                    Long categoryId = categoryRequest.getCategoryId();
-                    Category category = categoryService.getCategory(categoryId);
+                    Board board = getBoardById(request.getId());
+                    if(request.getIsDeleted() != null || request.getIsDeleted().equals(true))
+                        boardRepository.delete(board);
 
-                    category.addBoard(board);
-                    category.updateOrderIndex(categoryRequest.getOrderIndex());
+                    BoardMapper.INSTANCE.updateBoard(request, board);
+                    board.setType(BoardType.BOARD.getCode());
 
-                    if(categoryRequest.getIsDeleted() != null)
+                    if(request.getCategory() != null & !request.getCategory().isEmpty())
                     {
-                        deleteCategory(categoryId);
-                        continue;
+                        request.getCategory().forEach(categoryRequest -> {
+                            Board category = getBoardById(categoryRequest.getId());
+
+                            if(categoryRequest.getIsDeleted() != null || categoryRequest.getIsDeleted().equals(true))
+                                boardRepository.delete(category);
+
+                            else {
+                                BoardMapper.INSTANCE.updateBoard(categoryRequest, board);
+                                category.setType(BoardType.CATEGORY.getCode());
+                                category.addParent(board);
+                            }
+                        });
                     }
-
-                    Optional.ofNullable(categoryRequest.getName())
-                            .ifPresent(categoryName -> category.updateName(categoryName));
-
-                    Optional.ofNullable(categoryRequest.getIsAdminOnly())
-                            .ifPresent(isAdminOnly -> category.changeCategoryAuthority(isAdminOnly));
                 }
-            }
-        }
+        );
 
         log.info("업데이트 종료");
     }
-
 
     public Board getBoardById(Long boardId)
     {
@@ -109,59 +101,45 @@ public class BoardService
                 .orElseThrow();
     }
 
-    public BoardResponse getBoardResponse(Long boardId)
+    public BoardResponse findBoardById(Long boardId)
     {
-        Board board = getBoardById(boardId);
+        return BoardMapper.INSTANCE.boardToResponse(getBoardById(boardId));
+    }
 
-        return BoardMapper.INSTANCE.boardToResponse(board);
+    public List<BoardResponse> findCategoryByBoardId(Long boardId)
+    {
+        var result = boardRepository.findBoardByParentBoardId(boardId);
+
+        return BoardMapper.INSTANCE.toBoardResponseList(result);
+    }
+
+    public List<BoardTypeResponse> getBoardType()
+    {
+        return boardRepository.findBoardType();
     }
 
 
-    public List<BoardResponse> getAllBoards()
+    public List<BoardMenuResponse> getMenuList()
     {
-        return boardRepository.findAllBoards();
+        List<Board> result = boardRepository.findAll();
+
+        List<BoardMenuResponse> boardList = BoardMapper.INSTANCE.toBoardMenuResponse(result.stream()
+                .filter(board -> board.getType().equals(BoardType.BOARD.getCode()))
+                .sorted(Comparator.comparingInt(Board::getOrderIndex))
+                .collect(Collectors.toList()));
+
+        List<BoardChildrenResponse> categoryList = BoardMapper.INSTANCE.toChildrenList(result.stream()
+                .filter(board -> board.getType().equals(BoardType.CATEGORY.getCode()))
+                .sorted(Comparator.comparingInt(Board::getOrderIndex))
+                .collect(Collectors.toList()));
+
+
+        boardList.forEach(board -> board.setCategory(
+                categoryList.stream()
+                        .filter(category -> category.getParentId().equals(board.getId()))
+                        .collect(Collectors.toList())));
+
+        return boardList;
     }
 
-
-    public List<BoardAndCategoryResponse> getAllBoardAndCategory()
-    {
-        return boardRepository.findAllBoardAndCategory();
-    }
-
-    @Transactional
-    public void deleteBoard(Long boardId)
-    {
-        Board board = getBoardById(boardId);
-        List<Category> categories = board.getCategories();
-        for (Category category : categories)
-        {
-            List<Post> posts = category.getPosts();
-            for (Post post : posts)
-            {
-                log.info("post removed = {}", post.getTitle());
-                log.info("file removed in board service");
-
-                voteService.deleteVoteByPostId(post.getId());
-                fileService.deleteUploadedFile(post);
-            }
-        }
-
-        boardRepository.deleteById(boardId);
-    }
-
-    @Transactional
-    public void deleteCategory(Long categoryId)
-    {
-        Category category = categoryService.getCategory(categoryId);
-        List<Post> posts = category.getPosts();
-        for (Post post : posts)
-        {
-            log.info("post removed = {}", post.getTitle());
-            log.info("file removed in category service");
-
-            voteService.deleteVoteByPostId(post.getId());
-            fileService.deleteUploadedFile(post);
-        }
-
-    }
 }

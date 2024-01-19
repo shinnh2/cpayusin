@@ -42,14 +42,9 @@ public interface PostMapper
             return null;
         }
 
-        Long categoryId = null;
-        if(entity.getCategory() != null)
-            categoryId = entity.getCategory().getId();
-
         return PostSingleResponse.builder()
                 .memberId(entity.getMember().getId())
                 .boardId(entity.getBoard().getId())
-                .categoryId(categoryId)
                 .nickname(entity.getMember().getNickname())
                 .id(entity.getId())
                 .title(entity.getTitle())
@@ -70,12 +65,12 @@ public interface PostMapper
     }
 
 
-    @Mapping(target = "memberId", source = "member.id")
-    @Mapping(target = "memberName", source = "member.nickname")
-    @Mapping(target = "boardId", source = "board.id")
-    @Mapping(target = "boardName", source = "board.name")
-    @Mapping(target = "categoryId", source = "category.id")
-    @Mapping(target = "categoryName", source = "category.name")
-    PostMultiResponse toPostMultiResponse(Post post);
+    @Mapping(target = "memberId", source = "post.member.id")
+    @Mapping(target = "memberName", source = "post.member.nickname")
+    @Mapping(target = "boardId", source = "post.board.id")
+    @Mapping(target = "boardName", source = "post.board.name")
+    @Mapping(target = "commentsCount", expression = "java(post.getComments().size())")
+    @Mapping(target = "timeInfo", source = "timeInfo")
+    PostMultiResponse toPostMultiResponse(Post post, String timeInfo);
 
 }
