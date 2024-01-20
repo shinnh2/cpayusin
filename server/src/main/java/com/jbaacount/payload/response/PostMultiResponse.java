@@ -1,7 +1,6 @@
 package com.jbaacount.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,7 +19,7 @@ public class PostMultiResponse
     private Long boardId;
     private String boardName;
 
-    @JsonProperty("postId")
+
     private Long id;
     private String title;
     private String content;
