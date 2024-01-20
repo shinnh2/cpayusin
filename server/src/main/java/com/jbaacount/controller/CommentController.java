@@ -4,10 +4,7 @@ import com.jbaacount.global.dto.PageInfo;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.CommentCreateRequest;
 import com.jbaacount.payload.request.CommentUpdateRequest;
-import com.jbaacount.payload.response.CommentMultiResponse;
-import com.jbaacount.payload.response.CommentResponseForProfile;
-import com.jbaacount.payload.response.CommentSingleResponse;
-import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.*;
 import com.jbaacount.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -59,10 +56,10 @@ public class CommentController
     }
 
     @GetMapping("/comment")
-    public ResponseEntity<GlobalResponse<List<CommentMultiResponse>>> getAllComments(@RequestParam("post") Long postId,
-                                                                                     @AuthenticationPrincipal Member currentMember)
+    public ResponseEntity<GlobalResponse<List<CommentParentResponse>>> getAllComments(@RequestParam("post") Long postId,
+                                                                                      @AuthenticationPrincipal Member currentMember)
     {
-        var data = commentService.getAllComments(postId, currentMember);
+        var data = commentService.getAllCommentByPostId(postId, currentMember);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

@@ -103,15 +103,18 @@ public class PostService
     {
         return postRepository.getPostsByMemberId(member.getId(), pageable);
     }
+
+    @Transactional
     public void deletePostById(Long postId, Member currentMember)
     {
         Post post = getPostById(postId);
         utilService.checkPermission(post.getMember().getId(), currentMember);
 
-        voteService.deleteVoteByPostId(postId);
+        /*voteService.deleteVoteByPostId(postId);
         fileService.deleteUploadedFile(post);
-
+*/
         postRepository.deleteById(postId);
+        log.info("게시글이 삭제되었습니다");
     }
 
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)

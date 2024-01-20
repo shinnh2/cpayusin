@@ -44,6 +44,7 @@ public class Post extends BaseEntity
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
+
     @Builder
     public Post(String title, String content)
     {

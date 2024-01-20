@@ -1,9 +1,13 @@
 package com.jbaacount.service;
 
+import com.jbaacount.global.exception.BusinessLogicException;
+import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.model.Comment;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.model.Vote;
+import com.jbaacount.repository.CommentRepository;
+import com.jbaacount.repository.PostRepository;
 import com.jbaacount.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,46 +22,41 @@ import java.util.Optional;
 public class VoteService
 {
     private final VoteRepository voteRepository;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
-    public boolean votePost(Member currentMember, Post post)
+    public boolean votePost(Member currentMember, Long postId)
     {
+        Post post = findByPostId(postId);
         Optional<Vote> optionalVote = voteRepository.findByMemberAndPost(currentMember, post);
 
         if(optionalVote.isPresent())
         {
             voteRepository.delete(optionalVote.get());
-            log.info("===voteService===");
-            log.info("vote deleted successfully");
             post.downVote();
             return false;
         }
 
         else
         {
-            log.info("===voteService===");
-            log.info("vote saved successfully");
             Vote savedVote = voteRepository.save(new Vote(currentMember, post));
-            post.upVote();
             post.getMember().getScoreByVote();
-
+            post.upVote();
             log.info("voted post = {}", savedVote.getPost().getTitle());
             return true;
         }
     }
 
     @Transactional
-    public boolean voteComment(Member currentMember, Comment comment)
+    public boolean voteComment(Member currentMember, Long commentId)
     {
+        Comment comment = findByCommentId(commentId);
         Optional<Vote> optionalVote = voteRepository.findByMemberAndComment(currentMember, comment);
 
         if(optionalVote.isPresent())
         {
             voteRepository.delete(optionalVote.get());
-            comment.downVote();
-
-            log.info("===voteService===");
-            log.info("vote deleted successfully");
 
             return false;
         }
@@ -65,12 +64,7 @@ public class VoteService
         else
         {
             voteRepository.save(new Vote(currentMember, comment));
-            comment.upVote();
             comment.getMember().getScoreByVote();
-
-            log.info("===voteService===");
-            log.info("vote saved successfully");
-            log.info("voted comment = {}", comment.getText());
 
             return true;
         }
@@ -88,7 +82,6 @@ public class VoteService
         voteRepository.deleteVoteByCommentId(commentId);
     }
 
-
     public boolean existByMemberAndPost(Member member, Post post)
     {
         return voteRepository.existsVoteByMemberAndPost(member, post);
@@ -97,5 +90,17 @@ public class VoteService
     public boolean existByMemberAndComment(Long memberId, Long commentId)
     {
         return voteRepository.existsVoteByMemberIdAndCommentId(memberId, commentId);
+    }
+
+    private Post findByPostId(Long postId)
+    {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND));
+    }
+
+    private Comment findByCommentId(Long commentId)
+    {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.COMMENT_NOT_FOUND));
     }
 }

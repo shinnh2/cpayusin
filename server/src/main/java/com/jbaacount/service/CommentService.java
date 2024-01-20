@@ -6,11 +6,10 @@ import com.jbaacount.mapper.CommentMapper;
 import com.jbaacount.model.Comment;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
+import com.jbaacount.model.type.CommentType;
 import com.jbaacount.payload.request.CommentCreateRequest;
 import com.jbaacount.payload.request.CommentUpdateRequest;
-import com.jbaacount.payload.response.CommentMultiResponse;
-import com.jbaacount.payload.response.CommentResponseForProfile;
-import com.jbaacount.payload.response.CommentSingleResponse;
+import com.jbaacount.payload.response.*;
 import com.jbaacount.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.jbaacount.service.UtilService.calculateTime;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -54,6 +57,7 @@ public class CommentService
             }
 
             comment.addParent(parent);
+            comment.setType(CommentType.CHILD_COMMENT.getCode());
         }
 
         if(post.getMember() != currentMember)
@@ -84,31 +88,39 @@ public class CommentService
     }
 
 
-    @Transactional(readOnly = true)
-    public List<CommentMultiResponse> getAllComments(Long postId, Member member)
+    public List<CommentParentResponse> getAllCommentByPostId(Long postId, Member member)
     {
-        var list = commentRepository.getAllComments(postId);
+        log.info("postid = {}", postId);
+        List<Comment> result = commentRepository.findAllByPostId(postId);
 
-        if(member != null)
+        List<CommentParentResponse> parentList = CommentMapper.INSTANCE.toCommentParentResponseList(result.stream()
+                .filter(comment -> comment.getType().equals(CommentType.PARENT_COMMENT.getCode()))
+                .sorted(Comparator.comparing(Comment::getId))
+                .collect(Collectors.toList()));
+
+        List<CommentChildrenResponse> childrenList = CommentMapper.INSTANCE.toCommentChildrenResponseList(result.stream()
+                .filter(comment -> comment.getType().equals(CommentType.CHILD_COMMENT.getCode()))
+                .sorted(Comparator.comparing(Comment::getId))
+                .collect(Collectors.toList()));
+
+
+        for (CommentParentResponse parent : parentList)
         {
-            for (CommentMultiResponse response : list)
-            {
-                response.setVoteStatus(checkVoteStatus(member, response.getId()));
+            parent.setTimeInfo(calculateTime(parent.getCreatedAt()));
+            parent.setVoteStatus(checkVoteStatus(member, parent.getId()));
 
-                if(!response.getChildren().isEmpty())
-                {
-                    List<CommentMultiResponse> children = response.getChildren();
-                    for (CommentMultiResponse child : children)
-                    {
-                        child.setVoteStatus(checkVoteStatus(member, child.getId()));
-                    }
-                }
+            for (CommentChildrenResponse child : childrenList)
+            {
+                child.setTimeInfo(calculateTime(child.getCreatedAt()));
+                child.setVoteStatus(checkVoteStatus(member, child.getId()));
+
+                if(child.getParentId().equals(parent.getId()))
+                    parent.getChildren().add(child);
             }
         }
 
-        return list;
+        return parentList;
     }
-
 
     public Page<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
     {
@@ -133,8 +145,11 @@ public class CommentService
         if(comment.getChildren().isEmpty())
             commentRepository.deleteById(commentId);
 
+
         else
             comment.deleteComment();
+
+        voteService.deleteVoteByCommentId(commentId);
     }
 
     private void checkIfPostHasExactComment(Post post, Comment comment)

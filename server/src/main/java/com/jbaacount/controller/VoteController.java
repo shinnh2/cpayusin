@@ -2,7 +2,7 @@ package com.jbaacount.controller;
 
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.response.GlobalResponse;
-import com.jbaacount.service.VoteFacade;
+import com.jbaacount.service.VoteService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class VoteController
 {
-    private final VoteFacade voteFacade;
+    private final VoteService voteService;
 
     @PostMapping("/post")
     public ResponseEntity<?> votePost(@AuthenticationPrincipal Member currentMember,
                                       @RequestParam(name = "id") Long postId) throws InterruptedException
     {
-        boolean response = voteFacade.votePost(currentMember, postId);
+        boolean response = voteService.votePost(currentMember, postId);
         if(response)
             return ResponseEntity.ok(new GlobalResponse<>("좋아요 성공"));
 
@@ -36,7 +36,7 @@ public class VoteController
     public ResponseEntity<?> voteComment(@AuthenticationPrincipal Member currentMember,
                                          @RequestParam(name = "id") Long commentId) throws InterruptedException
     {
-        boolean response = voteFacade.voteComment(currentMember, commentId);
+        boolean response = voteService.voteComment(currentMember, commentId);
 
         if(response)
             return ResponseEntity.ok(new GlobalResponse<>("좋아요 성공"));
