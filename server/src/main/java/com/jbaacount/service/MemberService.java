@@ -40,9 +40,9 @@ public class MemberService
     }
 
     @Transactional
-    public MemberDetailResponse updateMember(Long memberId, MemberUpdateRequest request, MultipartFile multipartFile, Member currentMember)
+    public MemberDetailResponse updateMember(MemberUpdateRequest request, MultipartFile multipartFile, Member currentMember)
     {
-        Member findMember = getMemberById(memberId);
+        Member findMember = getMemberById(currentMember.getId());
 
         log.info("===updateMember===");
         log.info("findMember email = {}", findMember.getEmail());

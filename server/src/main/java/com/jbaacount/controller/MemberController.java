@@ -38,7 +38,7 @@ public class MemberController
                                        @RequestPart(value = "image", required = false)MultipartFile multipartFile,
                                        @AuthenticationPrincipal Member currentUser)
     {
-        var data = memberService.updateMember(currentUser.getId(), patchDto, multipartFile, currentUser);
+        var data = memberService.updateMember(patchDto, multipartFile, currentUser);
 
         log.info("===updateMember===");
         log.info("user updated successfully");
