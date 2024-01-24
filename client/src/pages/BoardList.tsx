@@ -33,7 +33,7 @@ const BoardList = () => {
 	useEffect(() => {
 		console.log(params.boardId);
 		axios
-			.get(`${api}/board/${params.boardId}/posts?page=1&size=8`)
+			.get(`${api}/api/v1/post/board?id=${params.boardId}&page=1&size=8`)
 			.then((response) => {
 				console.log(response.data);
 				const pageInfo = response.data.pageInfo;
@@ -52,7 +52,9 @@ const BoardList = () => {
 	}, [params.boardId]);
 	useEffect(() => {
 		axios
-			.get(`${api}/board/${params.boardId}/posts?page=${nowPage}&size=8`)
+			.get(
+				`${api}/api/v1/post/board?id=${params.boardId}&page=${nowPage}&size=8`
+			)
 			.then((response) => {
 				setData(response.data.data);
 			})
@@ -123,29 +125,33 @@ const BoardList = () => {
 				</ul>
 			)}
 
-			<div className="pagination">
-				<button className="arrow left" onClick={handleClickPrev}>
-					이전
-				</button>
-				<ul className="page_num">
-					{pagenation.map((el, idx) => {
-						return (
-							<li
-								className={
-									el === nowPage ? "page_button active" : "page_button"
-								}
-								key={idx}
-								onClick={() => handlaClickPagination(el)}
-							>
-								{el}
-							</li>
-						);
-					})}
-				</ul>
-				<button className="arrow right" onClick={handleClickNext}>
-					다음
-				</button>
-			</div>
+			{data.length === 0 ? (
+				""
+			) : (
+				<div className="pagination">
+					<button className="arrow left" onClick={handleClickPrev}>
+						이전
+					</button>
+					<ul className="page_num">
+						{pagenation.map((el, idx) => {
+							return (
+								<li
+									className={
+										el === nowPage ? "page_button active" : "page_button"
+									}
+									key={idx}
+									onClick={() => handlaClickPagination(el)}
+								>
+									{el}
+								</li>
+							);
+						})}
+					</ul>
+					<button className="arrow right" onClick={handleClickNext}>
+						다음
+					</button>
+				</div>
+			)}
 		</div>
 	);
 };
