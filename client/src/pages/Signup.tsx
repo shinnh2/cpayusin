@@ -63,7 +63,7 @@ const Signup = () => {
 		console.log(form);
 
 		axios
-			.post(`${api}/members/sign-up`, form, { withCredentials: true })
+			.post(`${api}/api/v1/sign-up`, form, { withCredentials: true })
 			.then((response) => {
 				console.log("회원가입 성공 !!!!", response.data);
 			})
