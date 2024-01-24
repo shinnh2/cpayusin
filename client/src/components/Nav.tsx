@@ -6,8 +6,7 @@ import { NavLink } from "react-router-dom";
 import axios from "axios";
 
 const createMenuNode = (data: any[]) => {
-	const api = process.env.REACT_APP_API_URL;
-	return data.map((el: any, idx: number) => (
+	return data!.map((el: any, idx: number) => (
 		<li key={idx} className="nav_menu_item">
 			{el.name ? (
 				<NavLink to={`/board/${el.id}`} onClick={clickHandler}>
@@ -38,9 +37,9 @@ const Nav = () => {
 	const [data, setData] = useState<any[]>([]);
 	useEffect(() => {
 		axios
-			.get(`${api}/board/all`)
+			.get(`${api}/api/v1/board-category`)
 			.then((response) => {
-				setData(response.data);
+				setData(response.data.data);
 			})
 			.catch((error) => {
 				console.error("에러", error);
