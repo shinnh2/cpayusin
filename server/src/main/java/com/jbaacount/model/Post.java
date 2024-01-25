@@ -23,6 +23,7 @@ public class Post extends BaseEntity
     private String title;
 
     @Lob
+    @Column(columnDefinition = "CLOB")
     private String content;
 
     @Column(nullable = false)

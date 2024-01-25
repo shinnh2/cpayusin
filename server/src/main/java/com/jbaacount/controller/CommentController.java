@@ -26,19 +26,17 @@ public class CommentController
     private final CommentService commentService;
 
     @PostMapping("/comment/create")
-    public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@RequestParam("post") Long postId,
-                                                                             @RequestBody @Valid CommentCreateRequest request,
-                                                                             @RequestParam(required = false, name = "parent") Long parentId,
+    public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@RequestBody @Valid CommentCreateRequest request,
                                                                              @AuthenticationPrincipal Member member)
     {
-        var data = commentService.saveComment(request, postId, parentId, member);
+        var data = commentService.saveComment(request, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @PatchMapping("/comment/update")
+    @PatchMapping("/comment/update/{commentId}")
     public ResponseEntity<GlobalResponse<CommentSingleResponse>> updateComment(@RequestBody @Valid CommentUpdateRequest request,
-                                                                               @RequestParam("comment") Long commentId,
+                                                                               @PathVariable("commentId") Long commentId,
                                                                                @AuthenticationPrincipal Member currentMember)
     {
         var data = commentService.updateComment(request, commentId, currentMember);

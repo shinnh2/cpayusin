@@ -38,18 +38,18 @@ public class CommentService
     private final VoteService voteService;
 
     @Transactional
-    public CommentSingleResponse saveComment(CommentCreateRequest request, Long postId, Long parentId, Member member)
+    public CommentSingleResponse saveComment(CommentCreateRequest request, Member member)
     {
-        Post post = postService.getPostById(postId);
+        Post post = postService.getPostById(request.getPostId());
         Comment comment = CommentMapper.INSTANCE.toCommentEntity(request);
         Member currentMember = memberService.getMemberById(member.getId());
 
 
         comment.addPost(post);
         comment.addMember(currentMember);
-        if(parentId != null)
+        if(request.getParentCommentId() != null)
         {
-            Comment parent = getComment(parentId);
+            Comment parent = getComment(request.getParentCommentId());
             checkIfPostHasExactComment(post, parent);
             if(parent.getParent() != null)
             {
