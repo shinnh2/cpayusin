@@ -32,8 +32,11 @@ function App() {
 							<Route path="/signup" element={<Signup />} />
 							<Route path="/validateEmail" element={<ValidateEmail />} />
 							<Route path="/newPassword" element={<NewPassword />} />
-							<Route path="/board/:boardId" element={<BoardList />} />
-							<Route path="/board/detail" element={<BoardDetail />} />
+							<Route path="/board/:boardInfo" element={<BoardList />} />
+							<Route
+								path="/board/:boardInfo/:postId"
+								element={<BoardDetail />}
+							/>
 							<Route path="/board/write" element={<BoardWrite />} />
 							<Route path="/user" element={<UserPage />} />
 							<Route path="/user/edit" element={<UserEdit />} />
