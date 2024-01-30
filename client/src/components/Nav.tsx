@@ -1,7 +1,7 @@
 import boardData from "./../data/boardData.json";
 import { ReactComponent as IconHome } from "./../assets/icon_home.svg";
 import iconArrowDown from "./../assets/icon_arrow_down.svg";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState, Dispatch } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
 
@@ -9,7 +9,11 @@ const createMenuNode = (data: any[]) => {
 	return data!.map((el: any, idx: number) => (
 		<li key={idx} className="nav_menu_item">
 			{el.name ? (
-				<NavLink to={`/board/${el.id}`} onClick={clickHandler}>
+				<NavLink
+					to={`/board/${el.id}-${el.name}`}
+					onClick={clickHandler}
+					className={({ isActive }) => (isActive ? "active" : "")}
+				>
 					{el.name}
 					{el.categories && el.categories.length !== 0 ? (
 						<i className="toggle_updown">
@@ -28,7 +32,6 @@ const createMenuNode = (data: any[]) => {
 };
 
 const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>): void => {
-	//event.preventDefault();
 	event.currentTarget.classList.toggle("unfold");
 };
 
@@ -48,7 +51,7 @@ const Nav = () => {
 	return (
 		<nav className="nav">
 			<div className="home_link">
-				<a href="./">
+				<a href="/">
 					<IconHome />
 					HOME
 				</a>
