@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Dispatch } from "react";
 import BoardItem from "../components/Boarditem";
 import boardListData from "../data/boardListData.json";
 import { useParams } from "react-router-dom";
@@ -28,14 +28,13 @@ const BoardList = () => {
 		generatePageRange(1, pageInfo.totalPages)
 	);
 	const params = useParams();
+	const [boardId, boardName] = params.boardInfo!.split("-");
 	const api = process.env.REACT_APP_API_URL;
 	const [data, setData] = useState<any[]>([]);
 	useEffect(() => {
-		console.log(params.boardId);
 		axios
-			.get(`${api}/api/v1/post/board?id=${params.boardId}&page=1&size=8`)
+			.get(`${api}/api/v1/post/board?id=${boardId}&page=1&size=8`)
 			.then((response) => {
-				console.log(response.data);
 				const pageInfo = response.data.pageInfo;
 				const totalPageNum = pageInfo.totalPages;
 				const maxPaginationNum = totalPageNum >= 5 ? 5 : totalPageNum;
@@ -49,12 +48,10 @@ const BoardList = () => {
 			.catch((error) => {
 				console.error("에러", error);
 			});
-	}, [params.boardId]);
+	}, [boardId]);
 	useEffect(() => {
 		axios
-			.get(
-				`${api}/api/v1/post/board?id=${params.boardId}&page=${nowPage}&size=8`
-			)
+			.get(`${api}/api/v1/post/board?id=${boardId}&page=${nowPage}&size=8`)
 			.then((response) => {
 				setData(response.data.data);
 			})
@@ -109,7 +106,7 @@ const BoardList = () => {
 
 	return (
 		<div>
-			<h3>게시판 이름: {params.boardId}</h3>
+			<h3>{boardName}</h3>
 
 			{data.length === 0 ? (
 				<div className="no_board_list">등록된 게시글이 없습니다.</div>

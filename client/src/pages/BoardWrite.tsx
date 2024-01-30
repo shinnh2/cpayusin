@@ -111,7 +111,7 @@ const BoardWrite = () => {
 				postAxiosConfig
 			)
 			.then((_) => {
-				navigate(`/board/${boardId}`);
+				navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
 			})
 			.catch((error) => {
 				if (error.response) {
