@@ -13,6 +13,7 @@ import BoardDetail from "./pages/BoardDetail";
 import BoardWrite from "./pages/BoardWrite";
 import UserPage from "./pages/UserPage";
 import UserEdit from "./pages/UserEdit";
+import BoardDetailEdit from "./pages/BoardDetailEdit";
 
 function App() {
 	const [isLogin, setIsLogin] = useState(false);
@@ -38,7 +39,11 @@ function App() {
 								element={<BoardDetail />}
 							/>
 							<Route path="/board/write" element={<BoardWrite />} />
-							<Route path="/user" element={<UserPage />} />
+							<Route
+								path="/board/edit/:boardInfo/:postId"
+								element={<BoardDetailEdit />}
+							/>
+							<Route path="/user/:userId" element={<UserPage />} />
 							<Route path="/user/edit" element={<UserEdit />} />
 						</Routes>
 					</main>

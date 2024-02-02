@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Button from "../components/Button";
 import axios from "axios";
+import { getAccessToken } from "../assets/tokenActions";
 
 interface BoardDetailData {
 	postId: number;
@@ -20,8 +21,11 @@ interface BoardDetailData {
 const BoardDetail = () => {
 	const api = process.env.REACT_APP_API_URL;
 	const params = useParams();
+	const [boardId, boardName] = params.boardInfo!.split("-");
 	const [postData, setPostData] = useState<BoardDetailData>();
+	const [myMemberId, setmyMemberID] = useState<number>();
 	useEffect(() => {
+		const accessToken = getAccessToken();
 		axios
 			.get(`${api}/api/v1/post/${params.postId}`)
 			.then((response) => {
@@ -30,6 +34,17 @@ const BoardDetail = () => {
 			.catch((error) => {
 				console.error("에러", error);
 			});
+
+		if (accessToken) {
+			axios
+				.get(`${api}/api/v1/member/single-info`, {
+					headers: { Authorization: accessToken },
+				})
+				.then((res) => {
+					setmyMemberID(res.data.data.id);
+				})
+				.catch((_) => {});
+		}
 	}, []);
 
 	return (
@@ -60,14 +75,19 @@ const BoardDetail = () => {
 								</label>
 							</div>
 						</div>
-						<div className="writer_action">
-							<a href="" className="link">
-								수정
-							</a>
-							<a href="" className="link">
-								삭제
-							</a>
-						</div>
+						{myMemberId === postData.memberId ? (
+							<div className="writer_action">
+								<a
+									href={`/board/edit/${boardId}-${boardName}/${params.postId}`}
+									className="link"
+								>
+									수정
+								</a>
+								<a href="" className="link">
+									삭제
+								</a>
+							</div>
+						) : null}
 					</div>
 					<div
 						className="board_content"

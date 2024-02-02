@@ -2,96 +2,99 @@ import React, { ChangeEvent } from "react";
 import SelectBox from "../components/SelectBox";
 import Button from "../components/Button";
 import EditorUnit from "../components/EditorUnit";
-import boardData from "./../data/boardData.json";
 import Input from "../components/Input";
 import axios from "axios";
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { getAccessToken } from "../assets/tokenActions";
 
 interface FormType {
 	title: string;
 	content: string;
-	// boardId: string;
-	// [key: string]: string; // 인덱스 시그니처 추가
+	categoryId?: number | string;
 }
 
-interface BoardDataType {
+interface categoryDataType {
 	id: number;
 	name: string;
 	orderIndex: number;
-	categories: Array<any[]>;
+	adminOnly: boolean;
+}
+interface postData {
+	memberId: number;
+	boardId: number;
+	categoryId: number;
+	postId: number;
+	nickname: string;
+	title: string;
+	content: string;
+	files: any[];
+	voteCount: number;
+	voteStatus: boolean;
+	createdAt: string;
 }
 
 const BoardWrite = () => {
 	const api = process.env.REACT_APP_API_URL;
 	const [accessToken, setAccessToken] = useState("");
 	const navigate = useNavigate();
-	const [data, setData] = useState<any[]>([]); //전체 게시판 목록
-	// const [selectItemBoard, setSeletItemBoard] = useState<any[]>([]);
+	const [postdata, setPostData] = useState<postData>();
+	const params = useParams();
+	const [boardId, boardName] = params.boardInfo!.split("-");
+	const [categoryItem, setCategoryItem] = useState<categoryDataType[]>([]); //카테고리 목록
+	const [nowCategoryId, setNowCategoryId] = useState(0); //현재 선택된 카테고리 id
+	const [selectValueCategory, setSelectValueCategory] = useState(""); //현재 선택된 카테고리
+	const [titleValue, setTitleValue] = useState("");
+	const editorRef = useRef<any>(null); //작성된 내용
 	useEffect(() => {
-		const accessTokenInLS = localStorage.getItem("accessToken");
-		if (accessTokenInLS) setAccessToken(accessTokenInLS);
+		//게시글 정보 받아오기
 		axios
-			.get(`${api}/api/v1/board-category`)
+			.get(`${api}/api/v1/post/${params.postId}`)
 			.then((response) => {
-				setData(response.data.data);
+				const data = response.data.data;
+				setPostData(data);
+				setTitleValue(data.title);
+				editorRef.current?.getInstance().setHTML(data.content);
+			})
+			.catch((error) => {
+				console.error("에러", error);
+			});
+		//카테고리 목록 받아오기
+		axios
+			.get(`${api}/api/v1/category?board=${boardId}`)
+			.then((response) => {
+				setCategoryItem(response.data.data);
 			})
 			.catch((error) => {
 				console.error("에러", error);
 			});
 	}, []);
-	// const [selectValueBoard, setSelectValueBoard] = useState(""); //현재 선택된 게시판
-	const [categoryItem, setCategoryItem] = useState<string[]>([]); //카테고리 목록
-	const [nowBoardData, setNowBoardData] = useState<BoardDataType>(); //현재 선택된 게시판 정보
-	// const [nowBoardId, setNowBoardId] = useState(1); //현재 선택된 게시판 id
-	const [nowCategoryId, setNowCategoryId] = useState(0); //현재 선택된 카테고리 id
-	const [selectValueCategory, setSelectValueCategory] = useState(""); //현재 선택된 카테고리
-	const [titleValue, setTitleValue] = useState("");
-	// const [form, setForm] = useState({
-	// 	title: "",
-	// 	content: "",
-	// 	boardId: -1,
-	// });
-	const editorRef = useRef<any>(null); //작성된 내용
-	//게시판 선택
-	const handleSelectboard = (board: string) => {
-		const matchedBoard = data.filter((el: any) => el.name === board)[0];
-		setNowBoardData(matchedBoard);
-		checkCategory(board);
-	};
-	//카테고리 유무 확인
-	const checkCategory = (board: string) => {
-		setCategoryItem([]);
-		if (nowBoardData !== undefined) {
-			if (nowBoardData.categories.length !== 0) {
-				const categorysArray = nowBoardData.categories.map(
-					(el: any) => el.categoryName
-				);
-				setCategoryItem(categorysArray);
-			}
-		}
-	};
 	//카테고리 선택
-	const handleSelectCategory = (category: string) => {
-		const matchedCategory: any = nowBoardData!.categories.find(
-			(el: any) => el.name === category
+	const handleSelectCategory = (categoryName: string) => {
+		const matchedCategory: categoryDataType | undefined = categoryItem!.find(
+			(el: categoryDataType) => el.name === categoryName
 		);
-		setNowCategoryId(matchedCategory.id);
-		setSelectValueCategory(category);
+		setNowCategoryId(matchedCategory!.id);
+		setSelectValueCategory(categoryName);
 	};
-	//취소 클릭시 목록으로 이동
+	//취소 클릭시 게시글로 이동
 	const cancelClickHandler = () => {
-		navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
+		navigate(`/board/${boardId}-${boardName}/${params.postId}`);
 	};
 	//제출
 	const submitHandler = () => {
-		const boardId = nowBoardData!.id.toString(); //게시판 id
-		const categoryId = nowCategoryId; //카테고리 id
 		const editorData: string = editorRef.current!.getInstance().getHTML(); //작성된 데이터
-		const form: FormType = {
-			title: titleValue,
-			content: editorData,
-		};
+		const form: FormType =
+			nowCategoryId > 0
+				? {
+						title: titleValue,
+						content: editorData,
+						categoryId: nowCategoryId,
+				  }
+				: {
+						title: titleValue,
+						content: editorData,
+				  };
 
 		const formData = new FormData();
 		formData.append(
@@ -103,19 +106,17 @@ const BoardWrite = () => {
 		const postAxiosConfig = {
 			headers: {
 				"Content-Type": "multipart/form-data", // FormData를 사용할 때 Content-Type을 변경
-				Authorization: `${localStorage.getItem("accessToken")}`,
+				Authorization: `${getAccessToken()}`,
 			},
 		};
 		axios
-			.post(
-				`${api}/api/v1/post/create?board=${boardId}${
-					nowCategoryId !== 0 ? `&category=${nowCategoryId}` : ""
-				}`,
+			.patch(
+				`${api}/api/v1/post/update/${params.postId}`,
 				formData,
 				postAxiosConfig
 			)
 			.then((_) => {
-				navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
+				navigate(`/board/${boardId}-${boardName}/${params.postId}`);
 			})
 			.catch((error) => {
 				if (error.response) {
@@ -138,16 +139,10 @@ const BoardWrite = () => {
 		<div className="board_box board_write_box">
 			<div className="board_write_head">
 				<div className="board_select_wrap">
-					<SelectBox
-						isLabel={false}
-						selectItem={data.map((el: any) => el.name)}
-						placeHolder="게시판 선택"
-						setHandleStatus={handleSelectboard}
-					/>
 					{categoryItem.length !== 0 ? (
 						<SelectBox
 							isLabel={false}
-							selectItem={categoryItem}
+							selectItem={categoryItem.map((el: categoryDataType) => el.name)}
 							placeHolder="카테고리 선택"
 							setHandleStatus={handleSelectCategory}
 						/>
@@ -172,7 +167,7 @@ const BoardWrite = () => {
 				<Button
 					buttonType="primary"
 					buttonSize="big"
-					buttonLabel="작성 완료"
+					buttonLabel="수정 완료"
 					onClick={submitHandler}
 				/>
 				<Button
