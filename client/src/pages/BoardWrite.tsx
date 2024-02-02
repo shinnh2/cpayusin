@@ -79,6 +79,10 @@ const BoardWrite = () => {
 		setNowCategoryId(matchedCategory.id);
 		setSelectValueCategory(category);
 	};
+	//취소 클릭시 목록으로 이동
+	const cancelClickHandler = () => {
+		navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
+	};
 	//제출
 	const submitHandler = () => {
 		const boardId = nowBoardData!.id.toString(); //게시판 id
@@ -171,7 +175,12 @@ const BoardWrite = () => {
 					buttonLabel="작성 완료"
 					onClick={submitHandler}
 				/>
-				<Button buttonType="no_em" buttonSize="big" buttonLabel="취소" />
+				<Button
+					buttonType="no_em"
+					buttonSize="big"
+					buttonLabel="취소"
+					onClick={cancelClickHandler}
+				/>
 			</div>
 		</div>
 	);
