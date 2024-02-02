@@ -4,17 +4,43 @@ import { NavLink, useNavigate } from "react-router-dom";
 import iconMenu from "./../assets/icon_menu.svg";
 import iconWrite from "./../assets/edit_document.svg";
 import iconLogout from "./../assets/logout.svg";
-import { isAccessToken, removeAccessToken } from "../assets/tokenActions";
+import { getAccessToken, removeAccessToken } from "../assets/tokenActions";
+import axios from "axios";
 
 export interface HeaderProps {
 	isLogin: boolean;
 	setIsLogin: Dispatch<React.SetStateAction<boolean>>;
 }
+interface userData {
+	createdAt: string;
+	email: string;
+	id: number;
+	nickname: string;
+	profileImage: string | null;
+	score: number;
+	timeInfo: string;
+}
 const Header = (props: HeaderProps) => {
+	const api = process.env.REACT_APP_API_URL;
 	const navigate = useNavigate();
+	const [userData, setUserData] = useState<userData>();
 	useEffect(() => {
-		if (isAccessToken()) props.setIsLogin(true);
-		else props.setIsLogin(false);
+		if (getAccessToken()) {
+			let token = getAccessToken();
+			axios
+				.get(`${api}/api/v1/member/single-info`, {
+					headers: { Authorization: token },
+				})
+				.then((res) => {
+					setUserData(res.data.data);
+					props.setIsLogin(true);
+				})
+				.catch((error) => {
+					console.error("에러", error);
+					console.log("토큰이 인증되지 않았습니다.");
+					props.setIsLogin(false);
+				});
+		} else props.setIsLogin(false);
 	}, []);
 	const handleLogoutClick = () => {
 		removeAccessToken();
@@ -32,7 +58,7 @@ const Header = (props: HeaderProps) => {
 				{props.isLogin ? (
 					<>
 						<a
-							href=""
+							href={`/user/${userData?.id}`}
 							className="header_btns link_profile"
 							title="클릭시 내 프로필로 이동합니다."
 						>
