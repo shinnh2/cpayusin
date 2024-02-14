@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Button from "../components/Button";
 import axios from "axios";
 import { getAccessToken } from "../assets/tokenActions";
@@ -21,6 +21,7 @@ interface BoardDetailData {
 const BoardDetail = () => {
 	const api = process.env.REACT_APP_API_URL;
 	const params = useParams();
+	const navigate = useNavigate();
 	const [boardId, boardName] = params.boardInfo!.split("-");
 	const [postData, setPostData] = useState<BoardDetailData>();
 	const [myMemberId, setmyMemberID] = useState<number>();
@@ -46,6 +47,28 @@ const BoardDetail = () => {
 				.catch((_) => {});
 		}
 	}, []);
+
+	const handleClickDeletePost = (
+		event: React.MouseEvent<HTMLAnchorElement>
+	) => {
+		event.preventDefault();
+		const accessToken = getAccessToken();
+		//팝업창으로 대체할 것
+		let isDeleteYes = window.confirm("게시물을 삭제하시겠습니까?");
+		if (isDeleteYes) {
+			console.log(params.postId);
+			axios
+				.delete(`${api}/api/v1/post/${params.postId}`, {
+					headers: { Authorization: accessToken },
+				})
+				.then((res) => {
+					navigate(`/board/${boardId}-${boardName}`);
+				})
+				.catch((error) => {
+					alert("게시물 삭제를 실패했습니다.");
+				});
+		}
+	};
 
 	return (
 		<div className="board_box board_detail_box">
@@ -83,7 +106,7 @@ const BoardDetail = () => {
 								>
 									수정
 								</a>
-								<a href="" className="link">
+								<a href="" className="link" onClick={handleClickDeletePost}>
 									삭제
 								</a>
 							</div>
