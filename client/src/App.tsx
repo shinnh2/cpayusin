@@ -15,12 +15,29 @@ import UserPage from "./pages/UserPage";
 import UserEdit from "./pages/UserEdit";
 import BoardDetailEdit from "./pages/BoardDetailEdit";
 
+export interface userDataType {
+	createdAt: string;
+	email: string;
+	id: number;
+	nickname: string;
+	profileImage: string | null;
+	score: number;
+	isAdmin: boolean;
+	timeInfo: string;
+}
+
 function App() {
 	const [isLogin, setIsLogin] = useState(false);
+	const [userData, setUserData] = useState<userDataType>();
 	return (
 		<div className="App">
 			<Router>
-				<Header isLogin={isLogin} setIsLogin={setIsLogin} />
+				<Header
+					isLogin={isLogin}
+					setIsLogin={setIsLogin}
+					setUserData={setUserData}
+					userData={userData}
+				/>
 				<div className="page_wrap">
 					<Nav />
 					<main className="container">
@@ -43,7 +60,10 @@ function App() {
 								path="/board/edit/:boardInfo/:postId"
 								element={<BoardDetailEdit />}
 							/>
-							<Route path="/user/:userId" element={<UserPage />} />
+							<Route
+								path="/user/:userId"
+								element={<UserPage userData={userData} />}
+							/>
 							<Route path="/user/edit" element={<UserEdit />} />
 						</Routes>
 					</main>
