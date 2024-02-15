@@ -1,6 +1,5 @@
 import { useEffect, useState, Dispatch } from "react";
 import BoardItem from "../components/Boarditem";
-import boardListData from "../data/boardListData.json";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 
