@@ -347,7 +347,7 @@ header .header_button_wrap .header_links.active {
 	font-size: 0;
 }
 .link_profile {
-	background-color: var(--border-color);
+	background-color: var(--primary-container-color);
 }
 .link_write {
 	background-color: var(--primary-container-color);
@@ -816,7 +816,15 @@ header .header_button_wrap .header_links.active {
 	height: 120px;
 	border-radius: 100%;
 	margin-right: 16px;
-	background: var(--border-color); /* 임시 속성 */
+	background: var(--primary-container-color);
+	overflow: hidden;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.profile_img_wrap .profile_img_default {
+	width: 80px;
+	height: 80px;
 }
 .user_info_wrap {
 	margin-right: 16px;
@@ -859,8 +867,17 @@ header .header_button_wrap .header_links.active {
 	height: 2px;
 	background-color: var(--primary-color);
 }
-.tab_content ul li {
+.tab_content ul .board_item {
 	border-bottom: 1px solid var(--border-color);
+}
+.tab_content .no_board_list {
+	padding: 48px 24px;
+}
+.tabContentItem {
+	display: none;
+}
+.tabContentItem.show {
+	display: block;
 }
 /* user edit */
 .user_edit_wrap {
