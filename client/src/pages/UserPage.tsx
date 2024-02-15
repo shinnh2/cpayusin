@@ -1,43 +1,56 @@
 import Button from "../components/Button";
-import BoardItem from "../components/Boarditem";
 import CommentItem from "../components/CommentItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { isAccessToken } from "../assets/tokenActions";
+import { userDataType } from "./../App";
+import BoardListPagination from "../components/BoardListPagination";
+import iconUser from "./../assets/icon_user.svg";
 
-// const dummyData = {
-// 	id: 53,
-// 	title: "JPA란",
-// 	content: "~~~~~~",
-// 	files: [
-// 		{
-// 			originalFileName: "orca.jfif",
-// 			storedFileName: "ddfd5ebb-c490-4b9c-bdc0-75c2ccc9e437.jfif",
-// 			url: "https://jbaccount.s3.ap-northeast-2.amazonaws.com/post/ddfd5ebb-c490-4b9c-bdc0-75c2ccc9e437.jfif",
-// 		},
-// 	],
-// 	voteCount: 0,
-// 	voteStatus: false,
-// 	member: {
-// 		id: 1,
-// 		nickname: "운영자",
-// 	},
-// 	createdAt: "2023-09-07T18:48:14.6994829",
-// 	modifiedAt: "2023-09-07T18:48:14.6994829",
-// };
+// interface userDataType {
+// 	createdAt: string;
+// 	email: string;
+// 	id: number;
+// 	nickname: string;
+// 	profileImage: string | null;
+// 	score: number;
+//  isAdmin: boolean;
+// 	timeInfo: string;
+// }
 
-const UserPage = () => {
+interface userPageProps {
+	userData: userDataType | undefined;
+}
+
+const UserPage: React.FC<userPageProps> = ({ userData }) => {
+	const params = useParams();
+	const navigate = useNavigate();
+	const api = process.env.REACT_APP_API_URL;
 	const [tabIndex, setTabIndex] = useState(0);
 	const tabMenu = ["작성글", "댓글"];
 	const handleclickTabMenuButton = (tabIndex: number) => {
 		setTabIndex(tabIndex);
 	};
+	useEffect(() => {
+		let isToken = isAccessToken();
+		if (isToken === false) {
+			alert("로그인이 필요한 서비스입니다.");
+			navigate(`/login`);
+		}
+	}, []);
 
 	return (
 		<div className="user_page_wrap">
 			<div className="user_profile">
-				<div className="profile_img_wrap"></div>
+				{userData?.profileImage !== null ? null : (
+					<div className="profile_img_wrap">
+						<img src={iconUser} className="profile_img_default" />
+					</div>
+				)}
+
 				<div className="user_info_wrap">
-					<p className="title_h4">User 닉네임</p>
-					<p className="email">jbaccount@gmail.com</p>
+					<p className="title_h4">{userData?.nickname}</p>
+					<p className="email">{userData?.email}</p>
 				</div>
 				<div className="user_button_wrap">
 					<Button
@@ -45,11 +58,13 @@ const UserPage = () => {
 						buttonSize="big"
 						buttonLabel="사용자 정보 수정"
 					/>
-					<Button
-						buttonType="another"
-						buttonSize="big"
-						buttonLabel="관리자 페이지"
-					/>
+					{userData?.isAdmin ? (
+						<Button
+							buttonType="another"
+							buttonSize="big"
+							buttonLabel="관리자 페이지"
+						/>
+					) : null}
 				</div>
 			</div>
 			<div className="user_written_wrap">
@@ -70,14 +85,19 @@ const UserPage = () => {
 				</ul>
 				<div className="tab_content">
 					{/* 작성글인 경우 */}
-					{tabIndex === 0 ? (
-						<ul className="board">
-							<li>{/* <BoardItem data={dummyData} /> */}</li>
-							<li>{/* <BoardItem data={dummyData} /> */}</li>
-						</ul>
-					) : null}
+					<div
+						className={
+							tabIndex === 0 ? "tabContentItem show" : "tabContentItem"
+						}
+					>
+						<BoardListPagination />
+					</div>
 					{/* 댓글인 경우 */}
-					{tabIndex === 1 ? (
+					<div
+						className={
+							tabIndex === 1 ? "tabContentItem show" : "tabContentItem"
+						}
+					>
 						<ul className="comment">
 							<li>
 								<CommentItem />
@@ -86,7 +106,7 @@ const UserPage = () => {
 								<CommentItem />
 							</li>
 						</ul>
-					) : null}
+					</div>
 				</div>
 			</div>
 		</div>

@@ -57,16 +57,16 @@ const BoardWrite = () => {
 	const handleSelectboard = (board: string) => {
 		const matchedBoard = data.filter((el: any) => el.name === board)[0];
 		setNowBoardData(matchedBoard);
-		checkCategory(board);
+		checkCategory(matchedBoard);
 	};
 	//카테고리 유무 확인
-	const checkCategory = (board: string) => {
+	const checkCategory = (board: BoardDataType) => {
 		setCategoryItem([]);
-		if (nowBoardData !== undefined) {
-			if (nowBoardData.categories.length !== 0) {
-				const categorysArray = nowBoardData.categories.map(
-					(el: any) => el.categoryName
-				);
+		console.log(board);
+		if (board !== undefined) {
+			if (board.categories.length !== 0) {
+				const categorysArray = board.categories.map((el: any) => el.name);
+				console.log(board.categories);
 				setCategoryItem(categorysArray);
 			}
 		}
