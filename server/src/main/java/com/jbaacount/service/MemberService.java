@@ -84,8 +84,11 @@ public class MemberService
 
     public List<MemberScoreResponse> findTop3MembersByScore(LocalDateTime now)
     {
+        LocalDateTime startMonth = LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0);
+        LocalDateTime endMonth = startMonth.plusMonths(1);
+
         log.info("findTop3Members");
-        return memberRepository.memberResponseForReward(now);
+        return memberRepository.memberResponseForReward(startMonth, endMonth);
     }
 
     @Transactional
