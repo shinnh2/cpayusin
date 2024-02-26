@@ -11,6 +11,7 @@ import com.jbaacount.model.Post;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -29,6 +30,7 @@ public class FileService
     private final String bucket = "jbaccount";
     private final AmazonS3 amazonS3;
 
+    @Transactional
     public List<File> storeFiles(List<MultipartFile> files, Post post)
     {
         List<File> storedFiles = new ArrayList<>();
@@ -44,6 +46,7 @@ public class FileService
         return storedFiles;
     }
 
+    @Transactional
     public void deleteUploadedFile(Post post)
     {
         List<File> files = fileRepository.findByPostId(post.getId());
@@ -61,6 +64,7 @@ public class FileService
         fileRepository.deleteAll(files);
     }
 
+    @Transactional
     public void deleteProfilePhoto(Member member)
     {
         Optional<File> file = fileRepository.findByMemberId(member.getId());
@@ -72,6 +76,7 @@ public class FileService
         }
     }
 
+    @Transactional
     public File storeProfileImage(MultipartFile multipartFile, Member member)
     {
         String ext = multipartFile.getContentType();
