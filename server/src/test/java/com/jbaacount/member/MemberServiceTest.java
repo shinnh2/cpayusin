@@ -3,6 +3,7 @@ package com.jbaacount.member;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.request.MemberUpdateRequest;
+import com.jbaacount.payload.response.MemberDetailResponse;
 import com.jbaacount.service.AuthenticationService;
 import com.jbaacount.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,6 +62,8 @@ public class MemberServiceTest
     void getOneMemberTest()
     {
         Member member = memberService.findMemberByEmail("mike@ticonsys.com");
-    }
+        MemberDetailResponse memberDetailResponse = memberService.getMemberDetailResponse(member.getId());
 
+        assertThat(memberDetailResponse.getIsAdmin()).isTrue();
+    }
 }

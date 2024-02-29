@@ -34,6 +34,7 @@ public class AuthenticationService
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public MemberDetailResponse register(MemberRegisterRequest request)
     {
         Member member = MemberMapper.INSTANCE.toMemberEntity(request);
@@ -126,7 +127,6 @@ public class AuthenticationService
         response.set("Authorization", "Bearer " + newAccessToken);
         return response;
     }
-
 
 
 }

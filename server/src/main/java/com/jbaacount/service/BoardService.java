@@ -81,8 +81,6 @@ public class BoardService
                 if(!request.getCategory().isEmpty())
                     updateCategory(board, request.getCategory());
             }
-
-
         }
 
         log.info("업데이트 종료");
@@ -101,7 +99,6 @@ public class BoardService
                 BoardMapper.INSTANCE.updateBoard(request, category);
                 category.addParent(parent);
             }
-
         }
     }
 

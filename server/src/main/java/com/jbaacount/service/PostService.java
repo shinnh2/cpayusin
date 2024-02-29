@@ -55,7 +55,6 @@ public class PostService
 
         currentMember.getScoreByPost();
 
-
         return PostMapper.INSTANCE.toPostSingleResponse(savedPost, false);
     }
 
