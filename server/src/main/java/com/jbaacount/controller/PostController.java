@@ -37,12 +37,11 @@ public class PostController
     @PostMapping(value = "/post/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GlobalResponse<PostSingleResponse>> savePost(@RequestPart(value = "data") @Valid PostCreateRequest request,
                                                                        @RequestPart(value = "files", required = false) List<MultipartFile> files,
-                                                                       @AuthenticationPrincipal Member currentMember,
-                                                                       @RequestParam("board") Long boardId)
+                                                                       @AuthenticationPrincipal Member currentMember)
     {
         Member member = memberService.getMemberById(currentMember.getId());
 
-        var data = postService.createPost(request, files, boardId, member);
+        var data = postService.createPost(request, files, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

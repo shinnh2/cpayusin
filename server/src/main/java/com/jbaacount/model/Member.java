@@ -81,9 +81,9 @@ public class Member extends BaseEntity
         this.file = file;
     }
 
-    public void getScoreByVote()
+    public void getScoreByVote(int num)
     {
-        this.score += 2;
+        this.score += num;
     }
 
     public void getScoreByPost()

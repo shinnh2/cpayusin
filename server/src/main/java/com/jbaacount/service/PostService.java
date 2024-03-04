@@ -37,10 +37,10 @@ public class PostService
     private final FileService fileService;
 
     @Transactional
-    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Long boardId, Member currentMember)
+    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Member currentMember)
     {
         Post post = PostMapper.INSTANCE.toPostEntity(request);
-        Board board = boardService.getBoardById(boardId);
+        Board board = boardService.getBoardById(request.getBoardId());
         utilService.isUserAllowed(board.getIsAdminOnly(), currentMember);
 
         post.addMember(currentMember);

@@ -1,4 +1,4 @@
-package com.jbaacount.post;
+package com.jbaacount.post.service;
 
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.model.Member;
@@ -88,8 +88,9 @@ public class PostServiceTest
         PostCreateRequest request = new PostCreateRequest();
         request.setTitle("제목 테스트");
         request.setContent("내용 테스트");
+        request.setBoardId(board.getId());
 
-        PostSingleResponse savedPost = postService.createPost(request, null, board.getId(), admin);
+        PostSingleResponse savedPost = postService.createPost(request, null, admin);
 
         assertThat(savedPost.getContent()).isEqualTo("내용 테스트");
         assertThat(savedPost.getTitle()).isEqualTo("제목 테스트");
@@ -126,9 +127,10 @@ public class PostServiceTest
         PostCreateRequest request = new PostCreateRequest();
         request.setTitle("제목 테스트");
         request.setContent("내용 테스트");
+        request.setBoardId(boardForOnlyAdmin.getId());
 
         assertThrows(BusinessLogicException.class, () -> {
-            postService.createPost(request, null, boardForOnlyAdmin.getId(), user);
+            postService.createPost(request, null, user);
         });
     }
 
@@ -263,7 +265,8 @@ public class PostServiceTest
         PostCreateRequest request1 = new PostCreateRequest();
         request1.setTitle(title);
         request1.setContent(content);
-        return postService.createPost(request1, null, board.getId(), member);
+        request1.setBoardId(board.getId());
+        return postService.createPost(request1, null, member);
     }
 
 }

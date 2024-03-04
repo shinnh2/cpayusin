@@ -9,7 +9,10 @@ import com.jbaacount.model.Post;
 import com.jbaacount.model.type.CommentType;
 import com.jbaacount.payload.request.CommentCreateRequest;
 import com.jbaacount.payload.request.CommentUpdateRequest;
-import com.jbaacount.payload.response.*;
+import com.jbaacount.payload.response.CommentChildrenResponse;
+import com.jbaacount.payload.response.CommentParentResponse;
+import com.jbaacount.payload.response.CommentResponseForProfile;
+import com.jbaacount.payload.response.CommentSingleResponse;
 import com.jbaacount.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -84,7 +87,7 @@ public class CommentService
 
     public Comment getComment(Long commentId)
     {
-        return commentRepository.findById(commentId).orElseThrow();
+        return commentRepository.findById(commentId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.COMMENT_NOT_FOUND));
     }
 
 
@@ -149,7 +152,6 @@ public class CommentService
         else
             comment.deleteComment();
 
-        voteService.deleteVoteByCommentId(commentId);
     }
 
     private void checkIfPostHasExactComment(Post post, Comment comment)

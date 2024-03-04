@@ -1,4 +1,4 @@
-package com.jbaacount.member;
+package com.jbaacount.member.service;
 
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.MemberRegisterRequest;

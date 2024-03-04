@@ -35,13 +35,14 @@ public class VoteService
         {
             voteRepository.delete(optionalVote.get());
             post.downVote();
+            post.getMember().getScoreByVote(-2);
             return false;
         }
 
         else
         {
             Vote savedVote = voteRepository.save(new Vote(currentMember, post));
-            post.getMember().getScoreByVote();
+            post.getMember().getScoreByVote(2);
             post.upVote();
             log.info("voted post = {}", savedVote.getPost().getTitle());
             return true;
@@ -57,6 +58,7 @@ public class VoteService
         if(optionalVote.isPresent())
         {
             voteRepository.delete(optionalVote.get());
+            comment.getMember().getScoreByVote(-2);
 
             return false;
         }
@@ -64,7 +66,7 @@ public class VoteService
         else
         {
             voteRepository.save(new Vote(currentMember, comment));
-            comment.getMember().getScoreByVote();
+            comment.getMember().getScoreByVote(2);
 
             return true;
         }
