@@ -42,8 +42,11 @@ const BoardListPagination = () => {
 			});
 	}, []);
 	useEffect(() => {
+		const token = getAccessToken();
 		axios
-			.get(`${api}/api/v1/profile/my-posts?page=${nowPage}&size=8`) //url
+			.get(`${api}/api/v1/profile/my-posts?page=${nowPage}&size=8`, {
+				headers: { Authorization: token },
+			}) //url
 			.then((response) => {
 				setData(response.data.data);
 			})
