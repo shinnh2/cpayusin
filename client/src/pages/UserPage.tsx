@@ -53,11 +53,7 @@ const UserPage: React.FC<userPageProps> = ({ userData }) => {
 					<p className="email">{userData?.email}</p>
 				</div>
 				<div className="user_button_wrap">
-					<Button
-						buttonType="another"
-						buttonSize="big"
-						buttonLabel="사용자 정보 수정"
-					/>
+					<a href={`/user/${userData?.id}/edit`}>사용자 정보 수정</a>
 					{userData?.isAdmin ? (
 						<Button
 							buttonType="another"
