@@ -64,7 +64,10 @@ function App() {
 								path="/user/:userId"
 								element={<UserPage userData={userData} />}
 							/>
-							<Route path="/user/edit" element={<UserEdit />} />
+							<Route
+								path="/user/:userId/edit"
+								element={<UserEdit userData={userData} />}
+							/>
 						</Routes>
 					</main>
 				</div>
