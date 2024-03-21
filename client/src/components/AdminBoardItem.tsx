@@ -7,6 +7,8 @@ import { ReactComponent as IconArrowDown } from "./../assets/icon_arrow_down.svg
 import { Draggable } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "./StrictModeDroppable";
 import AdminCategoryItem from "./AdminCategoryItem";
+import axios from "axios";
+import { getAccessToken } from "../assets/tokenActions";
 
 const InnerList = React.memo(function InnerList({
 	board,
@@ -24,7 +26,14 @@ const InnerList = React.memo(function InnerList({
 	));
 });
 
-function AdminBoardItem({ board, categories, index, editData }: any) {
+function AdminBoardItem({
+	board,
+	categories,
+	index,
+	editData,
+	fetchData,
+}: any) {
+	const api = process.env.REACT_APP_API_URL;
 	const [newCategory, setNewCategory] = useState("");
 	const [isEdit, setIsEdit] = useState(false);
 	const [boardName, setBoardName] = useState(board.name);
@@ -34,8 +43,31 @@ function AdminBoardItem({ board, categories, index, editData }: any) {
 	const setInputValueNewCategory = (value: string) => {
 		setNewCategory(value);
 	};
+	//카테고리 생성
 	const handleClickCreateCategory = () => {
-		console.log(board.id, newCategory);
+		const newCategoryData = {
+			name: newCategory,
+			isAdminOnly: false,
+		};
+		const postAxiosConfig = {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `${getAccessToken()}`,
+			},
+		};
+		axios
+			.post(
+				`${api}/api/v1/admin/manage/category/create?board=${board.id}`,
+				newCategoryData,
+				postAxiosConfig
+			)
+			.then((response) => {
+				alert("카테고리가 추가되었습니다.");
+				fetchData();
+			})
+			.catch((error) => {
+				console.error("에러", error);
+			});
 	};
 	const clickHandler = (event: React.MouseEvent<HTMLElement>): void => {
 		event.currentTarget.parentElement!.parentElement!.classList.toggle("fold");
@@ -51,8 +83,15 @@ function AdminBoardItem({ board, categories, index, editData }: any) {
 	};
 	//삭제
 	const handleBoardDelete = () => {
-		board["isDeleted"] = true;
-		setIsDelete(true);
+		const isBoardDelete = window.confirm(
+			"게시판 안의 모든 카테고리와 게시글이 삭제됩니다. 그래도 진행하시겠습니까?"
+		);
+		if (isBoardDelete) {
+			board["isDeleted"] = true;
+			setIsDelete(true);
+		} else {
+			alert("게시판 삭제를 취소했습니다.");
+		}
 	};
 	return (
 		<Draggable draggableId={`board-${board.id}`} index={index}>
