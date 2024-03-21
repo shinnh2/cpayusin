@@ -1,22 +1,14 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Input from "../components/Input";
 import Button from "../components/Button";
 import IconAdd from "../assets/icon_add.svg";
-import boardData from "./../data/boardData.json";
 import React from "react";
 import { DragDropContext } from "react-beautiful-dnd";
 import { StrictModeDroppable as Droppable } from "../components/StrictModeDroppable";
 import AdminBoardItem from "../components/AdminBoardItem";
-
-// interface DragTarget {
-// 	dragOverHandler(event: DragEvent): void;
-// 	dropHandler(event: DragEvent): void;
-// 	dragLeaveHandler(event: DragEvent): void;
-// }
-// interface Draggable {
-// 	dragStartHandler(event: DragEvent, id: number): void;
-// 	dragEndHandler(event: DragEvent): void;
-// }
+import axios from "axios";
+import { getAccessToken } from "../assets/tokenActions";
 
 //보드 생성
 const InnerList = React.memo(function InnerList({
@@ -38,21 +30,59 @@ const InnerList = React.memo(function InnerList({
 });
 
 const Admin = () => {
-	//데이터 맵 생성
-	const boardMap: any = { boards: {} };
-	boardMap.boardsOrder = [];
-	boardData.forEach((el) => {
-		boardMap.boards[`board-${el.id}`] = el;
-		boardMap.boardsOrder.push(`board-${el.id}`);
-	});
-
-	const [boardListData, setBoardListData] = useState(boardMap);
+	const api = process.env.REACT_APP_API_URL;
+	const navigate = useNavigate();
+	const [boardListData, setBoardListData] = useState<any>(null);
 	const [newBoard, setNewBoard] = useState("");
 	const [isAdminOnlyBoard, setIsAdminOnlyBoard] = useState<boolean>(false);
 
+	const fetchDataMap = () => {
+		axios
+			.get(`${api}/api/v1/board-category`)
+			.then((response) => {
+				//데이터 맵 생성
+				const boardMap: any = { boards: {} };
+				boardMap.boardsOrder = [];
+				response.data.data.forEach((el: any) => {
+					boardMap.boards[`board-${el.id}`] = el;
+					boardMap.boardsOrder.push(`board-${el.id}`);
+				});
+				setBoardListData(boardMap);
+			})
+			.catch((error) => {
+				console.error("에러", error);
+			});
+	};
+
+	useEffect(() => {
+		fetchDataMap();
+	}, []);
+
 	//게시판 생성하기
 	const handleClickCreateBoard = () => {
-		console.log(newBoard, isAdminOnlyBoard);
+		const newBoardData = {
+			name: newBoard,
+			isAdminOnly: isAdminOnlyBoard,
+		};
+		const postAxiosConfig = {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `${getAccessToken()}`,
+			},
+		};
+		axios
+			.post(
+				`${api}/api/v1/admin/manage/board/create`,
+				newBoardData,
+				postAxiosConfig
+			)
+			.then((response) => {
+				alert("게시판이 추가되었습니다.");
+				fetchDataMap();
+			})
+			.catch((error) => {
+				console.error("에러", error);
+			});
 	};
 	const setInputValueNewBoard = (value: string) => {
 		setNewBoard(value);
@@ -62,27 +92,29 @@ const Admin = () => {
 		else setIsAdminOnlyBoard(false);
 	};
 
-	//보드명 및 카테고리명 수정하기
+	//게시판명 및 카테고리명 수정하기
 	const editData = (
 		dataType: "board" | "category",
 		boardId: any,
 		categoryIndex: any,
 		newName: string
 	) => {
-		const newBoard = boardListData.boards[`board-${boardId}`];
-		if (dataType === "board") {
-			newBoard.name = newName;
+		if (boardListData) {
+			const newBoard = boardListData.boards[`board-${boardId}`];
+			if (dataType === "board") {
+				newBoard.name = newName;
+			}
+			if (dataType === "category") {
+				newBoard.categories[categoryIndex].categoryName = newName;
+			}
+			setBoardListData({
+				...boardListData,
+				boards: {
+					...boardListData.boards,
+					[`board-${boardId}`]: newBoard,
+				},
+			});
 		}
-		if (dataType === "category") {
-			newBoard.categories[categoryIndex].categoryName = newName;
-		}
-		setBoardListData({
-			...boardListData,
-			boards: {
-				...boardListData.boards,
-				[`board-${boardId}`]: newBoard,
-			},
-		});
 	};
 
 	const handlerOnDragEnd = (result: any) => {
@@ -175,24 +207,15 @@ const Admin = () => {
 		});
 	};
 
-	//최종 데이터 변형
+	//게시판 및 카테고리 수정 완료
 	const handleClickSubmit = () => {
 		const boardDataArray: any[] = [];
 		let boardOrderIndex = 0;
-		/* 
-		1. boardDataArray=[], boardOrderIndex=0 생성
-		2. boardOrder의 각 아이템 boardId를 순회하며
-			2.1. isDeleted 확인 및 board의 orderIndex 수정
-			- nowBoard=boards[boardId]로 찾기
-			- nowBoard.isDeleted가 true가 아닌 경우: nowBoard.orderIndex=boardOrderIndex+=1
-			2.2. category의 orderIndex 수정
-			- categoryOrderIndex=0 생성
-			- nowBoard.categories의 각 아이템 category를 순회하며
-			category.isDeleted가 없거나 false인 경우: category.orderIndex=categoryOrderIndex+=1
-			2.3. boardDataArray에 nowBoard를 push
-		*/
+
 		for (let boardId of boardListData.boardsOrder) {
 			const nowBoard = boardListData.boards[boardId];
+			nowBoard.boardId = nowBoard.id; //API 이름이 달라서 키 명 변경: 확인 필요
+			delete nowBoard.id; //API 이름이 달라서 키 명 변경: 확인 필요
 			if (!nowBoard.isDeleted) {
 				boardOrderIndex = boardOrderIndex + 1;
 				nowBoard.orderIndex = boardOrderIndex;
@@ -200,6 +223,8 @@ const Admin = () => {
 			if (nowBoard.categories.length > 0) {
 				let categoryOrderIndex = 0;
 				for (let category of nowBoard.categories) {
+					category.categoryId = category.id;
+					delete category.id;
 					if (!category.isDeleted) {
 						categoryOrderIndex += 1;
 						category.orderIndex = categoryOrderIndex;
@@ -210,9 +235,27 @@ const Admin = () => {
 		}
 
 		console.log(boardDataArray);
+		const postAxiosConfig = {
+			headers: {
+				"Content-Type": "application/json",
+				Authorization: `${getAccessToken()}`,
+			},
+		};
+		axios
+			.patch(
+				`${api}/api/v1/admin/manage/board/update`,
+				boardDataArray,
+				postAxiosConfig
+			)
+			.then((response) => {
+				alert("게시판 수정이 완료되었습니다.");
+				fetchDataMap();
+			})
+			.catch((err) => {
+				console.log(err);
+				alert("게시판 수정에 실패했습니다.");
+			});
 	};
-
-	useEffect(() => {}, []);
 
 	return (
 		<div className="admin_wrap">
@@ -221,30 +264,35 @@ const Admin = () => {
 				드래그 앤 드롭으로 게시판 및 카테고리 순서를 변경할 수 있습니다.
 			</p>
 
-			<DragDropContext onDragEnd={handlerOnDragEnd}>
-				<Droppable droppableId="all-boards" direction="vertical" type="board">
-					{(provided) => (
-						<div
-							className="admin_board_list_wrap"
-							ref={provided.innerRef}
-							{...provided.droppableProps}
-						>
-							{boardListData.boardsOrder.map((boardId: any, index: any) => {
-								return (
-									<InnerList
-										key={boardId}
-										board={boardListData.boards[boardId]}
-										categories={boardListData.boards[boardId].categories}
-										index={index}
-										editData={editData}
-									/>
-								);
-							})}
-							{provided.placeholder}
-						</div>
-					)}
-				</Droppable>
-			</DragDropContext>
+			{boardListData ? (
+				<DragDropContext onDragEnd={handlerOnDragEnd}>
+					<Droppable droppableId="all-boards" direction="vertical" type="board">
+						{(provided) => (
+							<div
+								className="admin_board_list_wrap"
+								ref={provided.innerRef}
+								{...provided.droppableProps}
+							>
+								{boardListData.boardsOrder.map((boardId: any, index: any) => {
+									return (
+										<InnerList
+											key={boardId}
+											board={boardListData.boards[boardId]}
+											categories={boardListData.boards[boardId].categories}
+											index={index}
+											editData={editData}
+											fetchData={fetchDataMap}
+										/>
+									);
+								})}
+								{provided.placeholder}
+							</div>
+						)}
+					</Droppable>
+				</DragDropContext>
+			) : (
+				"로딩중"
+			)}
 
 			<div className="admin_board_create_wrap">
 				<h4 className="title">새 게시판 추가하기</h4>
@@ -279,7 +327,12 @@ const Admin = () => {
 					buttonLabel="게시글 수정 완료"
 					onClick={handleClickSubmit}
 				/>
-				<Button buttonType="no_em" buttonSize="big" buttonLabel="취소" />
+				<Button
+					buttonType="no_em"
+					buttonSize="big"
+					buttonLabel="취소"
+					onClick={() => navigate("./")}
+				/>
 			</div>
 		</div>
 	);
