@@ -68,6 +68,7 @@ function App() {
 								path="/user/:userId/edit"
 								element={<UserEdit userData={userData} />}
 							/>
+							<Route path="/admin" element={<Signup />} />
 						</Routes>
 					</main>
 				</div>
