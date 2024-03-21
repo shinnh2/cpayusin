@@ -4,6 +4,7 @@ import iconArrowDown from "./../assets/icon_arrow_down.svg";
 import { MouseEvent, useEffect, useState, Dispatch } from "react";
 import { NavLink } from "react-router-dom";
 import axios from "axios";
+import NavInfo from "./NavInfo";
 
 const createMenuNode = (data: any[]) => {
 	return data!.map((el: any, idx: number) => (
@@ -57,6 +58,7 @@ const Nav = () => {
 				</a>
 			</div>
 			<ul className="nav_menu depth1">{createMenuNode(data)}</ul>
+			<NavInfo />
 		</nav>
 	);
 };
