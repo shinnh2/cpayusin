@@ -6,7 +6,7 @@ import { useState } from "react";
 
 function AdminCategoryItem({ category, index, board, editData }: any) {
 	const [isEdit, setIsEdit] = useState(false);
-	const [categoryName, setCategoryName] = useState(category.categoryName);
+	const [categoryName, setCategoryName] = useState(category.name);
 	const [isDelete, setIsDelete] = useState(
 		"isDeleted" in category ? category["isDeleted"] : false
 	);
@@ -22,6 +22,16 @@ function AdminCategoryItem({ category, index, board, editData }: any) {
 	const handleCategoryDelete = () => {
 		category["isDeleted"] = true;
 		setIsDelete(true);
+
+		const isCategoryDelete = window.confirm(
+			"카테고리 안의 게시글이 모두 삭제됩니다. 그래도 진행하시겠습니까?"
+		);
+		if (isCategoryDelete) {
+			category["isDeleted"] = true;
+			setIsDelete(true);
+		} else {
+			alert("카테고리 삭제를 취소했습니다.");
+		}
 	};
 	return (
 		<Draggable draggableId={`category-${category.id}`} index={index}>
@@ -52,7 +62,7 @@ function AdminCategoryItem({ category, index, board, editData }: any) {
 								inputValue={categoryName}
 							/>
 						) : (
-							category.categoryName
+							category.name
 						)}
 					</div>
 					{isEdit ? (
