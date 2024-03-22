@@ -54,6 +54,8 @@ public enum ExceptionMessage
      */
     BOARD_TYPE_ERROR("하위 게시판은 한 개만 생성할 수 있습니다."),
 
+    BOARD_NOT_FOUND("존재하지 않는 게시판입니다."),
+
 
     /**
      * file

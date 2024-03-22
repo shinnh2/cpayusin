@@ -63,7 +63,7 @@ public class BoardService
 
 
     @Transactional
-    public void bulkUpdateBoards(List<BoardUpdateRequest> requests, Member currentMember)
+    public List<BoardMenuResponse> bulkUpdateBoards(List<BoardUpdateRequest> requests, Member currentMember)
     {
         utilService.isAdmin(currentMember);
 
@@ -84,6 +84,8 @@ public class BoardService
         }
 
         log.info("업데이트 종료");
+
+        return getMenuList();
     }
 
     public void updateCategory(Board parent, List<CategoryUpdateRequest> requests)
@@ -105,7 +107,7 @@ public class BoardService
     public Board getBoardById(Long boardId)
     {
         return boardRepository.findById(boardId)
-                .orElseThrow();
+                .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.BOARD_NOT_FOUND));
     }
 
     public BoardResponse findBoardById(Long boardId)
@@ -149,8 +151,8 @@ public class BoardService
         return boardList;
     }
 
-    @Transactional
-    public void deleteBoard(Board board)
+
+    private void deleteBoard(Board board)
     {
         if(!board.getPosts().isEmpty())
         {

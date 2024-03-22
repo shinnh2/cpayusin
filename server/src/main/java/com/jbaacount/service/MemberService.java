@@ -12,6 +12,7 @@ import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,7 +29,7 @@ import java.util.Optional;
 public class MemberService
 {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final FileService fileService;
 
 
@@ -56,7 +57,7 @@ public class MemberService
         if(request != null)
         {
             Optional.ofNullable(request.getNickname())
-                    .ifPresent(nickname -> findMember.updateNickname(nickname));
+                    .ifPresent(findMember::updateNickname);
             Optional.ofNullable(request.getPassword())
                     .ifPresent(password -> findMember.updatePassword(passwordEncoder.encode(password)));
         }

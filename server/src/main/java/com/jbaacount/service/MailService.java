@@ -28,9 +28,7 @@ public class MailService
         String verificationCode = generateVerificationCode();
         redisRepository.saveEmailAndVerificationCodeWith5Minutes(email, verificationCode);
 
-        String response = sendMail(email, verificationCode);
-
-        return response;
+        return sendMail(email, verificationCode);
     }
 
     private String sendMail(String email, String verificationCode)

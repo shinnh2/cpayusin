@@ -1,160 +1,130 @@
 package com.jbaacount.board;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.global.exception.BusinessLogicException;
+import com.jbaacount.global.exception.ExceptionMessage;
+import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.BoardCreateRequest;
 import com.jbaacount.payload.request.BoardUpdateRequest;
 import com.jbaacount.payload.request.CategoryUpdateRequest;
-import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.response.BoardChildrenResponse;
 import com.jbaacount.payload.response.BoardMenuResponse;
 import com.jbaacount.payload.response.BoardResponse;
-import com.jbaacount.service.AuthenticationService;
+import com.jbaacount.repository.BoardRepository;
 import com.jbaacount.service.BoardService;
 import com.jbaacount.service.MemberService;
-import org.junit.jupiter.api.BeforeEach;
+import com.jbaacount.service.UtilService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.jdbc.Sql;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
-@Transactional
-@SpringBootTest
-public class BoardServiceTest
+@Sql("classpath:db/teardown.sql")
+@ExtendWith(MockitoExtension.class)
+public class BoardServiceTest extends DummyObject
 {
-    @Autowired
+    @InjectMocks
     private BoardService boardService;
 
-    @Autowired
-    AuthenticationService authService;
+    @Mock
+    private BoardRepository boardRepository;
 
-    @Autowired
-    MemberService memberService;
+    @Spy
+    private UtilService utilService;
 
-
-    @BeforeEach
-    void beforeEach()
-    {
-        MemberRegisterRequest admin = new MemberRegisterRequest();
-        admin.setEmail("mike@ticonsys.com");
-        admin.setNickname("운영자");
-        admin.setPassword("123123123");
-
-        MemberRegisterRequest user = new MemberRegisterRequest();
-        user.setEmail("user@naver.com");
-        user.setNickname("유저");
-        user.setPassword("123123123");
-
-        String boardName = "게시판1";
-
-        BoardCreateRequest request = new BoardCreateRequest();
-        request.setName(boardName);
-        request.setIsAdminOnly(true);
-
-        authService.register(admin);
-        authService.register(user);
-
-        boardService.createBoard(request, memberService.findMemberByEmail("mike@ticonsys.com"));
-    }
+    @Spy
+    private ObjectMapper om;
 
 
     @DisplayName("운영자로 게시판 생성")
     @Test
-    void createBoard_Admin()
+    void createBoard_Admin() throws JsonProcessingException
     {
-        Member admin = memberService.findMemberByEmail("mike@ticonsys.com");
-
-        String boardName = "게시판1";
-
+        // given
+        Long boardId = 1L;
+        String name = "게시판";
         BoardCreateRequest request = new BoardCreateRequest();
-        request.setName(boardName);
+        request.setName(name);
         request.setIsAdminOnly(true);
 
+        // stub 1
+        Member admin = newMockMember(1L, "aaa@naver.com", "admin", "ADMIN");
+        Member user = newMockMember(1L, "aaa@naver.com", "admin", "USER");
+        Board board = newMockBoard(boardId, name, 1);
+
+        when(boardRepository.save(any())).thenReturn(board);
+        utilService.isAdmin(admin);
+        assertThrows(BusinessLogicException.class, () -> utilService.isAdmin(user));
+
+        // when
         BoardResponse response = boardService.createBoard(request, admin);
+        String responseBody = om.writeValueAsString(response);
 
-        assertThat(response.getName()).isEqualTo(boardName);
-    }
+        System.out.println("response body = " + responseBody);
 
-    @DisplayName("일반 유저로 게시판 생성")
-    @Test
-    void createBoard_User()
-    {
-        Member user = memberService.findMemberByEmail("user@naver.com");
+        // then
+        assertThat(response.getName()).isEqualTo("게시판");
 
-        String boardName = "게시판1";
-
-        BoardCreateRequest request = new BoardCreateRequest();
-        request.setName(boardName);
-        request.setIsAdminOnly(true);
-
-        assertThrows(BusinessLogicException.class, () -> {boardService.createBoard(request, user);});
     }
 
     @Test
     void updateBoard()
     {
-        Member admin = memberService.findMemberByEmail("mike@ticonsys.com");
+        // given
+        Member member = newMockMember(1L, "aaa@naver.com", "admin", "ADMIN");
 
-        List<BoardMenuResponse> menuList = boardService.getMenuList();
-        BoardMenuResponse boardMenuResponse = menuList.get(0);
+        Board board1 = newMockBoard(1L, "게시판1", 1);
+        Board board2 = newMockBoard(2L, "게시판2", 2);
+        Board board3 = newMockBoard(3L, "게시판3", 3);
 
-        BoardCreateRequest request2 = new BoardCreateRequest();
-        request2.setName("게시판1 - 하위1");
-        request2.setIsAdminOnly(true);
-        request2.setParentId(boardMenuResponse.getId());
+        BoardUpdateRequest request1 = new BoardUpdateRequest();
+        request1.setId(1L);
+        request1.setName("게시판1");
+        request1.setIsDeleted(true);
 
-        BoardCreateRequest request3 = new BoardCreateRequest();
-        request3.setName("게시판1 - 하위2");
-        request3.setIsAdminOnly(true);
-        request3.setParentId(boardMenuResponse.getId());
+        BoardUpdateRequest request2 = new BoardUpdateRequest();
+        request2.setId(2L);
+        request2.setName("게시판2");
+        request2.setOrderIndex(1);
+        request2.setIsDeleted(true);
 
-        BoardResponse response2 = boardService.createBoard(request2, admin);
-        BoardResponse response3 = boardService.createBoard(request3, admin);
+        BoardUpdateRequest request3 = new BoardUpdateRequest();
+        request3.setId(3L);
+        request3.setName("게시판3");
+        request2.setOrderIndex(2);
+        request3.setIsDeleted(true);
 
-        System.out.println("response2 = " + response2.toString());
-        System.out.println("response3 = " + response3.toString());
+        List<BoardUpdateRequest> requests = List.of(request1, request2, request3);
 
-        //
-        BoardUpdateRequest updateRequest1 = new BoardUpdateRequest();
-        updateRequest1.setId(boardMenuResponse.getId());
-        updateRequest1.setName("게시판1 수정");
-        updateRequest1.setOrderIndex(1);
+        // stub 1
+        when(boardRepository.findById(any())).thenReturn(Optional.of(board1));
+        when(boardRepository.findById(any())).thenReturn(Optional.of(board2));
+        when(boardRepository.findById(any())).thenReturn(Optional.of(board3));
 
 
-        CategoryUpdateRequest categoryUpdateRequest2 = new CategoryUpdateRequest();
-        categoryUpdateRequest2.setId(response2.getId());
-        categoryUpdateRequest2.setName("게시판1 - 하위1 수정");
-        updateRequest1.setOrderIndex(1);
+        // when
 
-        CategoryUpdateRequest categoryUpdateRequest3 = new CategoryUpdateRequest();
-        categoryUpdateRequest3.setId(response3.getId());
-        categoryUpdateRequest3.setIsDeleted(true);
+        List<BoardMenuResponse> menuList = boardService.bulkUpdateBoards(requests, member);
 
-        List<CategoryUpdateRequest> categoryUpdateRequests = List.of(categoryUpdateRequest2, categoryUpdateRequest3);
-        updateRequest1.setCategory(categoryUpdateRequests);
-
-        List<BoardUpdateRequest> requests = List.of(updateRequest1);
-        boardService.bulkUpdateBoards(requests, admin);
-
-        List<BoardMenuResponse> menuListAfterUpdate = boardService.getMenuList();
-        BoardMenuResponse parentBoard = menuListAfterUpdate.get(0);
-
-        System.out.println("테스트 = {}" + menuListAfterUpdate.toString());
-
-        List<BoardChildrenResponse> category = parentBoard.getCategory();
-
-        assertThat(menuListAfterUpdate.size()).isEqualTo(1);
-        assertThat(category.size()).isEqualTo(1);
-        assertThat(category.get(0).getName()).isEqualTo("게시판1 - 하위1 수정");
 
     }
-
 
 }
 

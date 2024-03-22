@@ -3,12 +3,16 @@ package com.jbaacount.model;
 import com.jbaacount.global.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Setter
+@ToString
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -44,16 +48,6 @@ public class Member extends BaseEntity
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
     private File file;
-
-    @Builder
-    public Member(String nickname, String email, String password)
-    {
-        this.nickname = nickname;
-        this.email = email;
-        this.password = password;
-        this.platform = Platform.HOME;
-        this.score = 0;
-    }
 
     public Member(String nickname, String email, List<String> roles, Platform platform)
     {

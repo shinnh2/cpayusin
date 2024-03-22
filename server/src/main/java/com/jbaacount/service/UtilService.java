@@ -24,7 +24,7 @@ public class UtilService
 
     public void isTheSameUser(Long memberId, Long loggedInMemberId)
     {
-        if(memberId != loggedInMemberId)
+        if(memberId.longValue() != loggedInMemberId.longValue())
             throw new BusinessLogicException(ExceptionMessage.MEMBER_UNAUTHORIZED);
     }
 
