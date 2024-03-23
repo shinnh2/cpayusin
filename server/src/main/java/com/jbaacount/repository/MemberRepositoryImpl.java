@@ -20,7 +20,6 @@ import static com.jbaacount.model.QFile.file;
 import static com.jbaacount.model.QMember.member;
 import static com.jbaacount.model.QPost.post;
 import static com.jbaacount.model.QVote.vote;
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,11 +42,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 .orderBy(member.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
-
-        for (MemberDetailResponse response : memberDto)
-        {
-            response.setTimeInfo(calculateTime(response.getCreatedAt()));
-        }
 
         log.info("list size = {}", memberDto.size());
 

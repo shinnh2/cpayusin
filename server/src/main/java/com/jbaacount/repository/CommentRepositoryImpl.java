@@ -14,7 +14,6 @@ import org.springframework.data.support.PageableExecutionUtils;
 import java.util.List;
 
 import static com.jbaacount.model.QComment.comment;
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @RequiredArgsConstructor
 public class CommentRepositoryImpl implements CommentRepositoryCustom
@@ -32,11 +31,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom
                 .offset(pageable.getOffset())
                 .orderBy(comment.id.desc())
                 .fetch();
-
-        for (CommentResponseForProfile response : content)
-        {
-            response.setTimeInfo(calculateTime(response.getCreatedAt()));
-        }
 
         JPAQuery<Long> count = query
                 .select(comment.count())

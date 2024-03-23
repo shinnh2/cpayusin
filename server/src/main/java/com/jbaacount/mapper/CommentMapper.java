@@ -12,7 +12,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface CommentMapper
@@ -36,7 +35,6 @@ public interface CommentMapper
                 .voteStatus(voteStatus)
                 .isRemoved(entity.isRemoved())
                 .createdAt(entity.getCreatedAt())
-                .timeInfo(calculateTime(entity.getCreatedAt()))
                 .build();
     }
 

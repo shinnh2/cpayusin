@@ -40,36 +40,4 @@ public class UtilService
             isAdmin(currentMember);
     }
 
-    public static String calculateTime(LocalDateTime time)
-    {
-        LocalDateTime currentTime = LocalDateTime.now();
-        Duration duration = Duration.between(time, currentTime);
-
-        long seconds = duration.getSeconds();
-
-        if(seconds < 60)
-            return "방금 전";
-
-        else if(seconds < 3600)
-            return seconds / 60 + "분 전";
-
-        else if(seconds < 86400)
-            return seconds / 3600 + "시간 전";
-
-        else
-        {
-            Period period = Period.between(time.toLocalDate(), currentTime.toLocalDate());
-
-            if(period.getYears() > 0)
-                return period.getYears() + "년 전";
-
-            else if(period.getMonths() > 0)
-                return period.getMonths() + "달 전";
-
-            else if(period.getDays() >= 7)
-                return period.getDays() / 7 + "주 전";
-
-            else return period.getDays() + "일 전";
-        }
-    }
 }

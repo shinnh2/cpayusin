@@ -25,7 +25,6 @@ public class CommentParentResponse
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
-    private String timeInfo;
 
     private List<CommentChildrenResponse> children = new ArrayList<>();
 }

@@ -16,7 +16,6 @@ public class PostResponseForProfile
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
-    private String timeInfo;
 
     @QueryProjection
     public PostResponseForProfile(Long id, String title, LocalDateTime createdAt)

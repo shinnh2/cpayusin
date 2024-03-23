@@ -69,6 +69,6 @@ public class DummyObject
     {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-        return passwordEncoder.encode("12345");
+        return passwordEncoder.encode("123456789");
     }
 }

@@ -82,14 +82,11 @@ public class AuthenticationService
     {
         jwtService.isValidToken(refreshToken);
 
-        if(redisRepository.hasKey(refreshToken))
-        {
-            redisRepository.deleteRefreshToken(refreshToken);
+        if(!redisRepository.hasKey(refreshToken))
+            throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
 
-            return "로그아웃에 성공했습니다";
-        }
-
-        throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
+        redisRepository.deleteRefreshToken(refreshToken);
+        return "로그아웃에 성공했습니다";
     }
 
     public AuthenticationResponse reissue(String accessToken, String refreshToken)

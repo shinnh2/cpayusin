@@ -27,7 +27,6 @@ public class PostMultiResponse
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
-    private String timeInfo;
 
     @QueryProjection
     public PostMultiResponse(Long memberId, String memberName, Long boardId, String boardName, Long id, String title, String content, Integer commentsCount, LocalDateTime createdAt)

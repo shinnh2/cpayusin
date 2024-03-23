@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.model.QPost.post;
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @RequiredArgsConstructor
 public class PostRepositoryImpl implements PostRepositoryCustom
@@ -67,11 +66,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .offset(pageable.getOffset())
                 .fetch();
 
-        for (PostResponseForProfile response : data)
-        {
-            response.setTimeInfo(calculateTime(response.getCreatedAt()));
-        }
-
         JPAQuery<Long> count = query
                 .select(post.count())
                 .from(post)
@@ -107,14 +101,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private BooleanExpression titleCondition(String keyword)
     {
         return keyword != null ? post.title.lower().contains(keyword.toLowerCase()) : null;
-    }
-
-    private static void calculateTimeInfo(List<PostMultiResponse> data)
-    {
-        for (PostMultiResponse datum : data)
-        {
-            datum.setTimeInfo(calculateTime(datum.getCreatedAt()));
-        }
     }
 
 }

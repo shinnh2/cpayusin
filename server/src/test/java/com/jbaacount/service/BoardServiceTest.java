@@ -1,4 +1,4 @@
-package com.jbaacount.board;
+package com.jbaacount.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

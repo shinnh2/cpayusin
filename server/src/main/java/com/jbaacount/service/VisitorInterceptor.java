@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -22,14 +23,16 @@ public class VisitorInterceptor implements HandlerInterceptor
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
     {
         String ipAddress = getIp(request);
-        String userAgent = request.getHeader("User-Agent");
+        String userAgent = request.getHeader("User-Agent") != null ? request.getHeader("User-Agent") : "";
         LocalDate date = LocalDate.now();
         String key = ipAddress + "_" + date;
 
-        ValueOperations valueOperations = redisTemplate.opsForValue();
+        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
 
         if(!redisTemplate.hasKey(key)) {
-            redisTemplate.opsForValue().set(key, userAgent);
+            log.info("ip = {}", ipAddress);
+
+            valueOperations.set(key, userAgent);
         }
 
         log.info("ip address = {}", ipAddress);

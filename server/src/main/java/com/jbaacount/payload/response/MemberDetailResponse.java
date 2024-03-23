@@ -25,7 +25,7 @@ public class MemberDetailResponse
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
-    private String timeInfo;
+
     private Boolean isAdmin;
 
 

@@ -1,4 +1,4 @@
-package com.jbaacount.member.service;
+package com.jbaacount.service;
 
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.MemberRegisterRequest;
@@ -8,25 +8,28 @@ import com.jbaacount.service.AuthenticationService;
 import com.jbaacount.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Transactional
-@SpringBootTest
+@Sql("classpath:db/teardown.sql")
+@ExtendWith(MockitoExtension.class)
 public class MemberServiceTest
 {
     @Autowired
-    MemberService memberService;
+    private MemberService memberService;
 
     @Autowired
-    AuthenticationService authService;
+    private AuthenticationService authService;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
 
     @BeforeEach

@@ -57,9 +57,6 @@ public class Member extends BaseEntity
         this.score = 0;
         this.roles = roles;
         this.platform = Platform.HOME;
-        this.posts = posts;
-        this.comments = comments;
-        this.file = file;
     }
 
     public Member(String nickname, String email, List<String> roles, Platform platform)

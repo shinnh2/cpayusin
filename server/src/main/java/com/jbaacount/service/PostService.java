@@ -22,8 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-import static com.jbaacount.service.UtilService.calculateTime;
-
 @Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -120,7 +118,7 @@ public class PostService
     {
         Page<Post> posts = postRepository.getPostsByBoardId(boardId, keyword, pageable);
 
-        var data = posts.map(post -> PostMapper.INSTANCE.toPostMultiResponse(post, calculateTime(post.getCreatedAt())));
+        var data = posts.map(post -> PostMapper.INSTANCE.toPostMultiResponse(post));
 
         return data;
     }

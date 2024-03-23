@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.jbaacount.service.UtilService.calculateTime;
-
 @Slf4j
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -109,12 +107,10 @@ public class CommentService
 
         for (CommentParentResponse parent : parentList)
         {
-            parent.setTimeInfo(calculateTime(parent.getCreatedAt()));
             parent.setVoteStatus(checkVoteStatus(member, parent.getId()));
 
             for (CommentChildrenResponse child : childrenList)
             {
-                child.setTimeInfo(calculateTime(child.getCreatedAt()));
                 child.setVoteStatus(checkVoteStatus(member, child.getId()));
 
                 if(child.getParentId().equals(parent.getId()))

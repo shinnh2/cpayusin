@@ -17,6 +17,5 @@ public class PostCreateRequest
     private String title;
     private String content;
 
-    @NotBlank
     private Long boardId;
 }

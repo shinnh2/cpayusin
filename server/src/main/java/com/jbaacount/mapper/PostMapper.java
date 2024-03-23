@@ -14,7 +14,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PostMapper
@@ -52,7 +51,6 @@ public interface PostMapper
                 .files(mapFiles(entity.getFiles()))
                 .voteCount(entity.getVotes().size())
                 .voteStatus(voteStatus)
-                .createdAt(calculateTime(entity.getCreatedAt()))
                 .build();
     }
 
@@ -70,7 +68,6 @@ public interface PostMapper
     @Mapping(target = "boardId", source = "post.board.id")
     @Mapping(target = "boardName", source = "post.board.name")
     @Mapping(target = "commentsCount", expression = "java(post.getComments().size())")
-    @Mapping(target = "timeInfo", source = "timeInfo")
-    PostMultiResponse toPostMultiResponse(Post post, String timeInfo);
+    PostMultiResponse toPostMultiResponse(Post post);
 
 }
