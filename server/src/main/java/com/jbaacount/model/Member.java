@@ -11,8 +11,6 @@ import java.util.UUID;
 
 @Setter
 @ToString
-@AllArgsConstructor
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -48,6 +46,21 @@ public class Member extends BaseEntity
 
     @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
     private File file;
+
+    @Builder
+    public Member(Long id, String nickname, String email, String password, int score, List<String> roles, Platform platform, List<Post> posts, List<Comment> comments, File file)
+    {
+        this.id = id;
+        this.nickname = nickname;
+        this.email = email;
+        this.password = password;
+        this.score = 0;
+        this.roles = roles;
+        this.platform = Platform.HOME;
+        this.posts = posts;
+        this.comments = comments;
+        this.file = file;
+    }
 
     public Member(String nickname, String email, List<String> roles, Platform platform)
     {

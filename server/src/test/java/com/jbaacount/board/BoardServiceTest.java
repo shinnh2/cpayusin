@@ -53,7 +53,7 @@ public class BoardServiceTest extends DummyObject
     private ObjectMapper om;
 
 
-    @DisplayName("운영자로 게시판 생성")
+    @DisplayName("게시판 생성")
     @Test
     void createBoard_Admin() throws JsonProcessingException
     {
