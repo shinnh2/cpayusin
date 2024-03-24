@@ -67,7 +67,7 @@ public class AuthenticationServiceTest extends DummyObject
     {
         // given
         String nickname = "test";
-        String email = "aa@naver.com";
+        String email = "aaa@naver.com";
         String password = "12345";
 
         MemberRegisterRequest request = new MemberRegisterRequest();

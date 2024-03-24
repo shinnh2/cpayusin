@@ -31,6 +31,7 @@ public interface MemberMapper
         memberDetailResponse.setNickname( member.getNickname() );
         memberDetailResponse.setEmail( member.getEmail() );
         memberDetailResponse.setScore( member.getScore() );
+        memberDetailResponse.setIsAdmin(member.getRoles().contains("ADMIN"));
         memberDetailResponse.setUrl(mapFiles(member.getFile()));
         memberDetailResponse.setCreatedAt( member.getCreatedAt() );
 
