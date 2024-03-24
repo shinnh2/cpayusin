@@ -13,7 +13,6 @@ import com.jbaacount.payload.request.CategoryUpdateRequest;
 import com.jbaacount.payload.response.BoardChildrenResponse;
 import com.jbaacount.payload.response.BoardMenuResponse;
 import com.jbaacount.payload.response.BoardResponse;
-import com.jbaacount.payload.response.BoardTypeResponse;
 import com.jbaacount.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -122,12 +121,6 @@ public class BoardService
         return BoardMapper.INSTANCE.toBoardResponseList(result);
     }
 
-    public List<BoardTypeResponse> getBoardType()
-    {
-        return boardRepository.findBoardType();
-    }
-
-
     public List<BoardMenuResponse> getMenuList()
     {
         List<Board> result = boardRepository.findAll();
@@ -149,6 +142,11 @@ public class BoardService
                         .collect(Collectors.toList())));
 
         return boardList;
+    }
+
+    public List<Long> getBoardIdListByParentId(Long boardId)
+    {
+        return boardRepository.findBoardIdListByParentId(boardId);
     }
 
 

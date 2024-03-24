@@ -44,7 +44,7 @@ public class AuthenticationService
         member.setRoles(roles);
         Member savedMember = memberService.save(member);
 
-        return MemberMapper.INSTANCE.toMemberDetailResponse(savedMember);
+        return memberService.getMemberDetailResponse(savedMember.getId());
 
     }
 

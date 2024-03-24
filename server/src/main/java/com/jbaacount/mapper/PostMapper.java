@@ -50,6 +50,7 @@ public interface PostMapper
                 .content(entity.getContent())
                 .files(mapFiles(entity.getFiles()))
                 .voteCount(entity.getVotes().size())
+                .createdAt(entity.getCreatedAt())
                 .voteStatus(voteStatus)
                 .build();
     }

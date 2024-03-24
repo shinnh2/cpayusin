@@ -25,7 +25,7 @@ public class Comment extends BaseEntity
     private String text;
 
     @Column(nullable = false)
-    private boolean isRemoved = false;
+    private Boolean isRemoved = false;
 
     private String type;
 
@@ -40,7 +40,7 @@ public class Comment extends BaseEntity
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<Comment> children = new ArrayList<>();
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
@@ -84,9 +84,9 @@ public class Comment extends BaseEntity
     {
         this.text = text;
     }
+
     public void deleteComment()
     {
-        this.text = "삭제된 댓글입니다.";
         this.isRemoved = true;
     }
 

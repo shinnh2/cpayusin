@@ -33,7 +33,7 @@ public interface CommentMapper
                 .text(entity.getText())
                 .voteCount(entity.getVotes().size())
                 .voteStatus(voteStatus)
-                .isRemoved(entity.isRemoved())
+                .isRemoved(entity.getIsRemoved())
                 .createdAt(entity.getCreatedAt())
                 .build();
     }

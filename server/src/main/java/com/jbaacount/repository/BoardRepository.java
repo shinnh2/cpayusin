@@ -1,7 +1,6 @@
 package com.jbaacount.repository;
 
 import com.jbaacount.model.Board;
-import com.jbaacount.payload.response.BoardTypeResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -22,10 +21,6 @@ public interface BoardRepository extends JpaRepository<Board, Long>, BoardReposi
     @Query("SELECT Count(b) FROM Board b WHERE b.parent IS NULL")
     Integer countParent();
 
-
-    @Query("SELECT new com.jbaacount.payload.response.BoardTypeResponse(b.id, b.name) FROM Board b " +
-            "WHERE b.type = 'Board' " +
-            "ORDER BY b.orderIndex")
-    List<BoardTypeResponse> findBoardType();
-
+    @Query("SELECT b.id FROM Board b WHERE b.parent.id = :boardId order by b.id desc")
+    List<Long> findBoardIdListByParentId(@Param("boardId") Long boardId);
 }

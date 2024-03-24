@@ -18,7 +18,7 @@ public class CommentParentResponse
     private String text;
     private Integer voteCount;
     private Boolean voteStatus;
-    private boolean isRemoved;
+    private Boolean isRemoved;
 
     private Long memberId;
     private String memberName;
@@ -27,4 +27,5 @@ public class CommentParentResponse
     private LocalDateTime createdAt;
 
     private List<CommentChildrenResponse> children = new ArrayList<>();
+
 }

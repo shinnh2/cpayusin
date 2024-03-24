@@ -24,32 +24,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private final JPAQueryFactory query;
 
     @Override
-    public Page<Post> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
+    public Page<Post> getPostsByBoardIds(List<Long> boardIds, String keyword, Pageable pageable)
     {
-        List<PostMultiResponse> data = new ArrayList<>();
-
         List<Post> result = query
                 .select(post)
                 .from(post)
-                .where(post.board.id.eq(boardId))
+                .where(post.board.id.in(boardIds))
                 .where(titleCondition(keyword))
                 .orderBy(post.createdAt.desc())
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .fetch();
-        /*for (Post post : result)
-        {
-            PostMultiResponse response = PostMapper.INSTANCE.toPostMultiResponse(post);
-            response.setCommentsCount(post.getComments().size());
-            response.setTimeInfo(calculateTime(post.getCreatedAt()));
-            data.add(response);
-        }*/
 
         JPAQuery<Long> count = query
                 .select(post.count())
                 .from(post)
                 .where(titleCondition(keyword))
-                .where(post.board.id.eq(boardId));
+                .where(post.board.id.in(boardIds));
 
         return PageableExecutionUtils.getPage(result, pageable, count::fetchOne);
     }

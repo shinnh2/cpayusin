@@ -92,29 +92,17 @@ public class CommentService
     public List<CommentParentResponse> getAllCommentByPostId(Long postId, Member member)
     {
         log.info("postid = {}", postId);
-        List<Comment> result = commentRepository.findAllByPostId(postId);
 
-        List<CommentParentResponse> parentList = CommentMapper.INSTANCE.toCommentParentResponseList(result.stream()
-                .filter(comment -> comment.getType().equals(CommentType.PARENT_COMMENT.getCode()))
-                .sorted(Comparator.comparing(Comment::getId))
-                .collect(Collectors.toList()));
-
-        List<CommentChildrenResponse> childrenList = CommentMapper.INSTANCE.toCommentChildrenResponseList(result.stream()
-                .filter(comment -> comment.getType().equals(CommentType.CHILD_COMMENT.getCode()))
-                .sorted(Comparator.comparing(Comment::getId))
-                .collect(Collectors.toList()));
-
+        List<Comment> parentCommentsByPostId = commentRepository.findParentCommentsByPostId(postId, CommentType.PARENT_COMMENT.getCode());
+        var parentList  = CommentMapper.INSTANCE.toCommentParentResponseList(parentCommentsByPostId);
 
         for (CommentParentResponse parent : parentList)
         {
             parent.setVoteStatus(checkVoteStatus(member, parent.getId()));
 
-            for (CommentChildrenResponse child : childrenList)
+            for (CommentChildrenResponse child : parent.getChildren())
             {
                 child.setVoteStatus(checkVoteStatus(member, child.getId()));
-
-                if(child.getParentId().equals(parent.getId()))
-                    parent.getChildren().add(child);
             }
         }
 
@@ -131,6 +119,7 @@ public class CommentService
         Comment comment = getComment(commentId);
 
         boolean voteStatus = checkVoteStatus(member, commentId);
+        log.info("comment 내용 {}", comment.getText() );
 
         return CommentMapper.INSTANCE.toCommentSingleResponse(comment, voteStatus);
     }
@@ -143,7 +132,6 @@ public class CommentService
 
         if(comment.getChildren().isEmpty())
             commentRepository.deleteById(commentId);
-
 
         else
             comment.deleteComment();

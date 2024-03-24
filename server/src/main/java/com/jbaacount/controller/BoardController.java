@@ -2,7 +2,6 @@ package com.jbaacount.controller;
 
 import com.jbaacount.payload.response.BoardMenuResponse;
 import com.jbaacount.payload.response.BoardResponse;
-import com.jbaacount.payload.response.BoardTypeResponse;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -43,14 +42,6 @@ public class BoardController
     public ResponseEntity<GlobalResponse<List<BoardResponse>>> getCategoryList(@PathVariable("board-id") Long boardId)
     {
         var data = boardService.findCategoryByBoardId(boardId);
-
-        return ResponseEntity.ok(new GlobalResponse<>(data));
-    }
-
-    @GetMapping("/list")
-    public ResponseEntity<GlobalResponse<List<BoardTypeResponse>>> getBoardList()
-    {
-        var data = boardService.getBoardType();
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

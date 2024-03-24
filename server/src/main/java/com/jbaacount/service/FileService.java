@@ -34,6 +34,7 @@ public class FileService
     public List<File> storeFiles(List<MultipartFile> files, Post post)
     {
         List<File> storedFiles = new ArrayList<>();
+        log.info("파일 갯수 = {}", files.size());
 
         for(MultipartFile file : files)
         {
@@ -42,6 +43,8 @@ public class FileService
 
             log.info("file saved successfully = {}", storedFile.getStoredFileName());
         }
+
+        log.info("저장 후 파일 개수 = {}", storedFiles.size());
 
         return storedFiles;
     }
@@ -124,8 +127,11 @@ public class FileService
                 .contentType(extractContentType(multipartFile))
                 .build();
 
-        file.addPost(post);
-        return fileRepository.save(file);
+
+        File filePS = fileRepository.save(file);
+        filePS.addPost(post);
+
+        return filePS;
     }
 
     private void saveUploadFile(String storeFileName, MultipartFile file, String location) throws IOException
@@ -159,7 +165,6 @@ public class FileService
             }
         }
 
-        log.info("content type = {}", contentType);
         return contentType;
     }
 

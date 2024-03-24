@@ -19,5 +19,4 @@ public class PostUpdateRequest
 
     private String content;
 
-    private Long categoryId;
 }

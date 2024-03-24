@@ -65,17 +65,11 @@ public class PostService
 
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
 
+        fileService.deleteUploadedFile(post);
 
         if(files != null && !files.isEmpty())
         {
-            fileService.deleteUploadedFile(post);
             fileService.storeFiles(files, post);
-        }
-
-        else
-        {
-            fileService.deleteUploadedFile(post);
-            log.info("file removed");
         }
 
         return PostMapper.INSTANCE.toPostSingleResponse(post, checkIfAlreadyVote(currentMember, post));
@@ -116,7 +110,10 @@ public class PostService
 
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
-        Page<Post> posts = postRepository.getPostsByBoardId(boardId, keyword, pageable);
+        var childrenList = boardService.getBoardIdListByParentId(boardId);
+        childrenList.add(boardId);
+
+        Page<Post> posts = postRepository.getPostsByBoardIds(childrenList, keyword, pageable);
 
         var data = posts.map(post -> PostMapper.INSTANCE.toPostMultiResponse(post));
 
