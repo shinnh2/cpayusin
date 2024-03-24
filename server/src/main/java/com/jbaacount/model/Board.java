@@ -32,7 +32,7 @@ public class Board extends BaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     private Board parent;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent")
     private List<Board> children = new ArrayList<>();
 
 

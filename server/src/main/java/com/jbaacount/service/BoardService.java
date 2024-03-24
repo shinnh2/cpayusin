@@ -19,8 +19,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -56,8 +58,7 @@ public class BoardService
             board.updateOrderIndex(orderIndex + 1);
         }
 
-        BoardResponse response = BoardMapper.INSTANCE.boardToResponse(boardRepository.save(board));
-        return response;
+        return BoardMapper.INSTANCE.boardToResponse(boardRepository.save(board));
     }
 
 
@@ -69,7 +70,7 @@ public class BoardService
         for(BoardUpdateRequest request : requests)
         {
             Board board = getBoardById(request.getId());
-            if(request.getIsDeleted() != null && request.getIsDeleted().equals(true))
+            if(request.getIsDeleted() != null && request.getIsDeleted())
                 deleteBoard(board);
 
             else{
@@ -83,21 +84,23 @@ public class BoardService
         }
 
         log.info("업데이트 종료");
-
         return getMenuList();
     }
 
     public void updateCategory(Board parent, List<CategoryUpdateRequest> requests)
     {
+
         for(CategoryUpdateRequest request : requests)
         {
             Board category = getBoardById(request.getId());
 
-            if(request.getIsDeleted() != null && request.getIsDeleted().equals(true))
+            if(request.getIsDeleted() != null && request.getIsDeleted())
                 deleteBoard(category);
 
             else{
                 BoardMapper.INSTANCE.updateBoard(request, category);
+                category.setType(BoardType.CATEGORY.getCode());
+
                 category.addParent(parent);
             }
         }
@@ -124,6 +127,9 @@ public class BoardService
     public List<BoardMenuResponse> getMenuList()
     {
         List<Board> result = boardRepository.findAll();
+
+        if(result.isEmpty())
+            return Collections.emptyList();
 
         List<BoardMenuResponse> boardList = BoardMapper.INSTANCE.toBoardMenuResponse(result.stream()
                 .filter(board -> board.getType().equals(BoardType.BOARD.getCode()))
