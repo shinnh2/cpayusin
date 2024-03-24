@@ -1,4 +1,5 @@
 import SelectBox from "../components/SelectBox";
+import Admin from "./Admin";
 
 const Home = () => {
 	return (

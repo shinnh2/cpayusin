@@ -52,7 +52,7 @@ const Login = (props: Props) => {
 		}));
 		if (isError.email || isError.password) return;
 		axios
-			.post(`${api}/members/login`, form, { withCredentials: true })
+			.post(`${api}/api/v1/login`, form, { withCredentials: true })
 			.then((response) => {
 				saveAccessToken(response.headers.authorization);
 				props.setIsLogin(true);

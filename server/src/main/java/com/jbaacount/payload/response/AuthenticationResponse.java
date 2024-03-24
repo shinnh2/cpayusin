@@ -16,10 +16,9 @@ import java.util.List;
 public class AuthenticationResponse
 {
     private Long memberId;
-    private String nickname;
+    private String email;
     private List<String> role;
 
     private String accessToken;
     private String refreshToken;
-
 }

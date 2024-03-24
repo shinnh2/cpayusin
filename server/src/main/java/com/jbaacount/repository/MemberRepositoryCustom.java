@@ -12,6 +12,5 @@ public interface MemberRepositoryCustom
 {
     SliceDto<MemberDetailResponse> findAllMembers(String keyword, Long memberId, Pageable pageable);
 
-    List<MemberScoreResponse> memberResponseForReward(LocalDateTime now);
-
+    List<MemberScoreResponse> memberResponseForReward(LocalDateTime startMonth, LocalDateTime endMonth);
 }

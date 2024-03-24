@@ -1,5 +1,6 @@
 package com.jbaacount.payload.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,7 +18,6 @@ public class PostSingleResponse
 {
     private Long memberId;
     private Long boardId;
-    private Long categoryId;
     private String nickname;
 
     @JsonProperty("postId")
@@ -28,5 +28,7 @@ public class PostSingleResponse
 
     private Integer voteCount;
     private boolean voteStatus;
+
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
 }

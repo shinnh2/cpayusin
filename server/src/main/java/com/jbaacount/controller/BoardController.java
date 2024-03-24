@@ -1,10 +1,9 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.payload.response.BoardAndCategoryResponse;
+import com.jbaacount.payload.response.BoardMenuResponse;
 import com.jbaacount.payload.response.BoardResponse;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.BoardService;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -16,33 +15,33 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @Slf4j
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/board")
 @RequiredArgsConstructor
 @RestController
 public class BoardController
 {
     private final BoardService boardService;
-    @GetMapping("/board/{board-id}")
-    public ResponseEntity<GlobalResponse<BoardResponse>> getBoard(@PathVariable("board-id") @Positive Long boardId)
+
+    @GetMapping("/menu")
+    public ResponseEntity<GlobalResponse<List<BoardMenuResponse>>> getMenu()
     {
-        log.info("board id = {}", boardId);
-        var data = boardService.getBoardResponse(boardId);
+        var data = boardService.getMenuList();
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/board")
-    public ResponseEntity<GlobalResponse<List<BoardResponse>>> getAllBoards()
+    @GetMapping("/single-info/{board-id}")
+    public ResponseEntity<GlobalResponse<BoardResponse>> getBoardById(@PathVariable("board-id") Long boardId)
     {
-        var data = boardService.getAllBoards();
+        var data = boardService.findBoardById(boardId);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/board-category")
-    public ResponseEntity<GlobalResponse<List<BoardAndCategoryResponse>>> getAllBoardAndCategory()
+    @GetMapping("/category/{board-id}")
+    public ResponseEntity<GlobalResponse<List<BoardResponse>>> getCategoryList(@PathVariable("board-id") Long boardId)
     {
-        var data = boardService.getAllBoardAndCategory();
+        var data = boardService.findCategoryByBoardId(boardId);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

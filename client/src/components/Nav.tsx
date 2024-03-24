@@ -1,21 +1,27 @@
 import boardData from "./../data/boardData.json";
 import { ReactComponent as IconHome } from "./../assets/icon_home.svg";
 import iconArrowDown from "./../assets/icon_arrow_down.svg";
-import { MouseEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useState, Dispatch } from "react";
+import { NavLink } from "react-router-dom";
 import axios from "axios";
+import NavInfo from "./NavInfo";
 
 const createMenuNode = (data: any[]) => {
-	return data.map((el: any, idx: number) => (
+	return data!.map((el: any, idx: number) => (
 		<li key={idx} className="nav_menu_item">
 			{el.name ? (
-				<a href="" onClick={clickHandler}>
+				<NavLink
+					to={`/board/${el.id}-${el.name}`}
+					onClick={clickHandler}
+					className={({ isActive }) => (isActive ? "active" : "")}
+				>
 					{el.name}
 					{el.categories && el.categories.length !== 0 ? (
 						<i className="toggle_updown">
 							<img src={iconArrowDown} alt="메뉴 펼치기 접기 토글 아이콘" />
 						</i>
 					) : null}
-				</a>
+				</NavLink>
 			) : (
 				<a href="">{el.categoryName}</a>
 			)}
@@ -27,7 +33,6 @@ const createMenuNode = (data: any[]) => {
 };
 
 const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>): void => {
-	event.preventDefault();
 	event.currentTarget.classList.toggle("unfold");
 };
 
@@ -36,9 +41,9 @@ const Nav = () => {
 	const [data, setData] = useState<any[]>([]);
 	useEffect(() => {
 		axios
-			.get(`${api}/board/all`)
+			.get(`${api}/api/v1/board-category`)
 			.then((response) => {
-				setData(response.data);
+				setData(response.data.data);
 			})
 			.catch((error) => {
 				console.error("에러", error);
@@ -47,12 +52,13 @@ const Nav = () => {
 	return (
 		<nav className="nav">
 			<div className="home_link">
-				<a href="./">
+				<a href="/">
 					<IconHome />
 					HOME
 				</a>
 			</div>
 			<ul className="nav_menu depth1">{createMenuNode(data)}</ul>
+			<NavInfo />
 		</nav>
 	);
 };

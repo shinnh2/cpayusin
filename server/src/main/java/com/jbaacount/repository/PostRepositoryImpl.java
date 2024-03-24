@@ -1,6 +1,8 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.payload.response.*;
+import com.jbaacount.model.Post;
+import com.jbaacount.payload.response.PostMultiResponse;
+import com.jbaacount.payload.response.PostResponseForProfile;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.model.QPost.post;
@@ -21,12 +24,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private final JPAQueryFactory query;
 
     @Override
-    public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
+    public Page<Post> getPostsByBoardIds(List<Long> boardIds, String keyword, Pageable pageable)
     {
-        List<PostMultiResponse> data = query
-                .select(extractPostResponse())
+        List<Post> result = query
+                .select(post)
                 .from(post)
-                .where(post.board.id.eq(boardId))
+                .where(post.board.id.in(boardIds))
                 .where(titleCondition(keyword))
                 .orderBy(post.createdAt.desc())
                 .limit(pageable.getPageSize())
@@ -37,37 +40,15 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .select(post.count())
                 .from(post)
                 .where(titleCondition(keyword))
-                .where(post.board.id.eq(boardId));
+                .where(post.board.id.in(boardIds));
 
-        return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
-    }
-
-    @Override
-    public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
-    {
-        List<PostMultiResponse> data = query
-                .select(extractPostResponse())
-                .from(post)
-                .where(post.category.id.eq(categoryId))
-                .where(titleCondition(keyword))
-                .orderBy(post.createdAt.desc())
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .fetch();
-
-        JPAQuery<Long> count = query
-                .select(post.count())
-                .from(post)
-                .where(titleCondition(keyword))
-                .where(post.category.id.eq(categoryId));
-
-        return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
+        return PageableExecutionUtils.getPage(result, pageable, count::fetchOne);
     }
 
     @Override
     public Page<PostResponseForProfile> getPostsByMemberId(Long memberId, Pageable pageable)
     {
-        List<PostResponseForProfile> content = query
+        List<PostResponseForProfile> data = query
                 .select(extractPostsForProfile())
                 .from(post)
                 .where(post.member.id.eq(memberId))
@@ -82,7 +63,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom
                 .where(post.member.id.eq(memberId));
 
 
-        return PageableExecutionUtils.getPage(content, pageable, count::fetchOne);
+        return PageableExecutionUtils.getPage(data, pageable, count::fetchOne);
     }
 
     private ConstructorExpression<PostResponseForProfile> extractPostsForProfile()
@@ -96,35 +77,15 @@ public class PostRepositoryImpl implements PostRepositoryCustom
     private ConstructorExpression<PostMultiResponse> extractPostResponse()
     {
         return Projections.constructor(PostMultiResponse.class,
-                getBoardInfo(),
-                getCategoryInfo(),
-                getMemberInfo(),
+                post.member.id,
+                post.member.nickname,
+                post.board.id,
+                post.board.name,
                 post.id,
                 post.title,
                 post.content,
                 post.comments.size(),
                 post.createdAt);
-    }
-
-    private ConstructorExpression<BoardSimpleResponse> getBoardInfo()
-    {
-        return Projections.constructor(BoardSimpleResponse.class,
-                post.board.id,
-                post.board.name);
-    }
-
-    private ConstructorExpression<CategorySimpleResponse> getCategoryInfo()
-    {
-        return Projections.constructor(CategorySimpleResponse.class,
-                post.category.id,
-                post.category.name);
-    }
-
-    private ConstructorExpression<MemberSimpleResponse> getMemberInfo()
-    {
-        return Projections.constructor(MemberSimpleResponse.class,
-                post.member.id,
-                post.member.nickname);
     }
 
 

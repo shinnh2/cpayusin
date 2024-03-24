@@ -15,6 +15,7 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,8 +33,9 @@ public class AuthenticationService
     private final CustomAuthorityUtils authorityUtils;
     private final RedisRepository redisRepository;
     private final JwtService jwtService;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
 
+    @Transactional
     public MemberDetailResponse register(MemberRegisterRequest request)
     {
         Member member = MemberMapper.INSTANCE.toMemberEntity(request);
@@ -76,34 +78,15 @@ public class AuthenticationService
         return MemberMapper.INSTANCE.toMemberDetailResponse(member);
     }
 
-    public AuthenticationResponse login(String email)
-    {
-        String refreshToken = jwtService.generateRefreshToken(email);
-        Member member = memberService.findMemberByEmail(email);
-        redisRepository.saveRefreshToken(refreshToken, email);
-
-        AuthenticationResponse response = AuthenticationResponse.builder()
-                .memberId(member.getId())
-                .nickname(member.getNickname())
-                .role(member.getRoles())
-                .refreshToken(refreshToken)
-                .build();
-
-        return response;
-    }
-
     public String logout(String refreshToken)
     {
         jwtService.isValidToken(refreshToken);
 
-        if(redisRepository.hasKey(refreshToken))
-        {
-            redisRepository.deleteRefreshToken(refreshToken);
+        if(!redisRepository.hasKey(refreshToken))
+            throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
 
-            return "로그아웃에 성공했습니다";
-        }
-
-        throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
+        redisRepository.deleteRefreshToken(refreshToken);
+        return "로그아웃에 성공했습니다";
     }
 
     public AuthenticationResponse reissue(String accessToken, String refreshToken)
@@ -126,7 +109,7 @@ public class AuthenticationService
 
             return AuthenticationResponse.builder()
                     .memberId(member.getId())
-                    .nickname(member.getNickname())
+                    .email(email)
                     .role(member.getRoles())
                     .accessToken(renewedAccessToken)
                     .refreshToken(refreshToken)
@@ -142,7 +125,6 @@ public class AuthenticationService
         response.set("Authorization", "Bearer " + newAccessToken);
         return response;
     }
-
 
 
 }

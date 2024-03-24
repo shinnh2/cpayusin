@@ -11,6 +11,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
+
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MemberMapper
 {
@@ -30,9 +31,9 @@ public interface MemberMapper
         memberDetailResponse.setNickname( member.getNickname() );
         memberDetailResponse.setEmail( member.getEmail() );
         memberDetailResponse.setScore( member.getScore() );
+        memberDetailResponse.setIsAdmin(member.getRoles().contains("ADMIN"));
         memberDetailResponse.setUrl(mapFiles(member.getFile()));
         memberDetailResponse.setCreatedAt( member.getCreatedAt() );
-        memberDetailResponse.setModifiedAt( member.getModifiedAt() );
 
         return memberDetailResponse;
     }

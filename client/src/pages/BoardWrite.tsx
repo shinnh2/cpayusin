@@ -5,34 +5,46 @@ import EditorUnit from "../components/EditorUnit";
 import boardData from "./../data/boardData.json";
 import Input from "../components/Input";
 import axios from "axios";
-import { useEffect, useState, useRef, ReactElement } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface FormType {
 	title: string;
 	content: string;
-	boardId: string;
-	[key: string]: string; // 인덱스 시그니처 추가
+	// boardId: string;
+	// [key: string]: string; // 인덱스 시그니처 추가
+}
+
+interface BoardDataType {
+	id: number;
+	name: string;
+	orderIndex: number;
+	categories: Array<any[]>;
 }
 
 const BoardWrite = () => {
 	const api = process.env.REACT_APP_API_URL;
 	const [accessToken, setAccessToken] = useState("");
-	const [data, setData] = useState<any[]>([]);
+	const navigate = useNavigate();
+	const [data, setData] = useState<any[]>([]); //전체 게시판 목록
 	// const [selectItemBoard, setSeletItemBoard] = useState<any[]>([]);
 	useEffect(() => {
 		const accessTokenInLS = localStorage.getItem("accessToken");
 		if (accessTokenInLS) setAccessToken(accessTokenInLS);
 		axios
-			.get(`${api}/board/all`)
+			.get(`${api}/api/v1/board-category`)
 			.then((response) => {
-				setData(response.data);
+				setData(response.data.data);
 			})
 			.catch((error) => {
 				console.error("에러", error);
 			});
 	}, []);
-	const [selectValueBoard, setSelectValueBoard] = useState(""); //현재 선택된 게시판
-	const [selectItemCategory, setSeletItemCategory] = useState<string[]>([]); //카테고리 목록
+	// const [selectValueBoard, setSelectValueBoard] = useState(""); //현재 선택된 게시판
+	const [categoryItem, setCategoryItem] = useState<string[]>([]); //카테고리 목록
+	const [nowBoardData, setNowBoardData] = useState<BoardDataType>(); //현재 선택된 게시판 정보
+	// const [nowBoardId, setNowBoardId] = useState(1); //현재 선택된 게시판 id
+	const [nowCategoryId, setNowCategoryId] = useState(0); //현재 선택된 카테고리 id
 	const [selectValueCategory, setSelectValueCategory] = useState(""); //현재 선택된 카테고리
 	const [titleValue, setTitleValue] = useState("");
 	// const [form, setForm] = useState({
@@ -43,34 +55,42 @@ const BoardWrite = () => {
 	const editorRef = useRef<any>(null); //작성된 내용
 	//게시판 선택
 	const handleSelectboard = (board: string) => {
-		setSelectValueBoard(board);
-		checkCategory(board);
+		const matchedBoard = data.filter((el: any) => el.name === board)[0];
+		setNowBoardData(matchedBoard);
+		checkCategory(matchedBoard);
 	};
 	//카테고리 유무 확인
-	const checkCategory = (board: string) => {
-		const matchedBoard = data.filter((el: any) => el.name === board)[0];
-		setSeletItemCategory([]);
-		if (matchedBoard !== undefined) {
-			if (matchedBoard.categories.length !== 0) {
-				const categorysArray = matchedBoard.categories.map(
-					(el: any) => el.categoryName
-				);
-				setSeletItemCategory(categorysArray);
+	const checkCategory = (board: BoardDataType) => {
+		setCategoryItem([]);
+		console.log(board);
+		if (board !== undefined) {
+			if (board.categories.length !== 0) {
+				const categorysArray = board.categories.map((el: any) => el.name);
+				console.log(board.categories);
+				setCategoryItem(categorysArray);
 			}
 		}
 	};
 	//카테고리 선택
 	const handleSelectCategory = (category: string) => {
+		const matchedCategory: any = nowBoardData!.categories.find(
+			(el: any) => el.name === category
+		);
+		setNowCategoryId(matchedCategory.id);
 		setSelectValueCategory(category);
+	};
+	//취소 클릭시 목록으로 이동
+	const cancelClickHandler = () => {
+		navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
 	};
 	//제출
 	const submitHandler = () => {
-		const boardId = data.filter((el) => el.name === selectValueBoard)[0].id; //게시판 id
+		const boardId = nowBoardData!.id.toString(); //게시판 id
+		const categoryId = nowCategoryId; //카테고리 id
 		const editorData: string = editorRef.current!.getInstance().getHTML(); //작성된 데이터
 		const form: FormType = {
 			title: titleValue,
 			content: editorData,
-			boardId: boardId,
 		};
 
 		const formData = new FormData();
@@ -86,11 +106,16 @@ const BoardWrite = () => {
 				Authorization: `${localStorage.getItem("accessToken")}`,
 			},
 		};
-		console.log(formData);
 		axios
-			.post(`${api}/`, formData, postAxiosConfig)
-			.then((response) => {
-				console.log("글 작성 성공 !!!!", response.data);
+			.post(
+				`${api}/api/v1/post/create?board=${boardId}${
+					nowCategoryId !== 0 ? `&category=${nowCategoryId}` : ""
+				}`,
+				formData,
+				postAxiosConfig
+			)
+			.then((_) => {
+				navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
 			})
 			.catch((error) => {
 				if (error.response) {
@@ -108,9 +133,6 @@ const BoardWrite = () => {
 				console.error("에러 구성:", error.config);
 			});
 	};
-	const handleWriteComplete = () => {
-		console.log(boardData);
-	};
 
 	return (
 		<div className="board_box board_write_box">
@@ -122,10 +144,10 @@ const BoardWrite = () => {
 						placeHolder="게시판 선택"
 						setHandleStatus={handleSelectboard}
 					/>
-					{selectItemCategory.length !== 0 ? (
+					{categoryItem.length !== 0 ? (
 						<SelectBox
 							isLabel={false}
-							selectItem={selectItemCategory}
+							selectItem={categoryItem}
 							placeHolder="카테고리 선택"
 							setHandleStatus={handleSelectCategory}
 						/>
@@ -153,7 +175,12 @@ const BoardWrite = () => {
 					buttonLabel="작성 완료"
 					onClick={submitHandler}
 				/>
-				<Button buttonType="no_em" buttonSize="big" buttonLabel="취소" />
+				<Button
+					buttonType="no_em"
+					buttonSize="big"
+					buttonLabel="취소"
+					onClick={cancelClickHandler}
+				/>
 			</div>
 		</div>
 	);

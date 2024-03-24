@@ -4,7 +4,6 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Board;
-import com.jbaacount.model.Category;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.PostCreateRequest;
@@ -22,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,27 +29,18 @@ import java.util.Optional;
 public class PostService
 {
     private final PostRepository postRepository;
-    private final AuthorizationService authorizationService;
-    private final CategoryService categoryService;
+    private final UtilService utilService;
     private final BoardService boardService;
     private final VoteService voteService;
     private final FileService fileService;
 
     @Transactional
-    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Long categoryId, Long boardId, Member currentMember)
+    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Member currentMember)
     {
         Post post = PostMapper.INSTANCE.toPostEntity(request);
-        Board board = boardService.getBoardById(boardId);
-        authorizationService.isUserAllowed(board.getIsAdminOnly(), currentMember);
+        Board board = boardService.getBoardById(request.getBoardId());
+        utilService.isUserAllowed(board.getIsAdminOnly(), currentMember);
 
-        if(categoryId != null)
-        {
-            Category category = categoryService.getCategory(categoryId);
-            checkBoardHasCategory(board, category);
-
-            authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
-            post.addCategory(category);
-        }
         post.addMember(currentMember);
         post.addBoard(board);
 
@@ -64,7 +53,6 @@ public class PostService
 
         currentMember.getScoreByPost();
 
-
         return PostMapper.INSTANCE.toPostSingleResponse(savedPost, false);
     }
 
@@ -73,32 +61,15 @@ public class PostService
     {
         Post post = getPostById(postId);
         //Only the owner of the post has the authority to update
-        authorizationService.isTheSameUser(post.getMember().getId(), currentMember.getId());
+        utilService.isTheSameUser(post.getMember().getId(), currentMember.getId());
 
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
 
-        Optional.ofNullable(request.getCategoryId())
-                .ifPresent(categoryId ->
-                {
-                    Category category = categoryService.getCategory(categoryId);
-                    authorizationService.isUserAllowed(category.getIsAdminOnly(), currentMember);
-                    Board board = category.getBoard();
-
-                    post.addCategory(category);
-                    post.addBoard(board);
-                });
-
+        fileService.deleteUploadedFile(post);
 
         if(files != null && !files.isEmpty())
         {
-            fileService.deleteUploadedFile(post);
             fileService.storeFiles(files, post);
-        }
-
-        else
-        {
-            fileService.deleteUploadedFile(post);
-            log.info("file removed");
         }
 
         return PostMapper.INSTANCE.toPostSingleResponse(post, checkIfAlreadyVote(currentMember, post));
@@ -123,25 +94,30 @@ public class PostService
     {
         return postRepository.getPostsByMemberId(member.getId(), pageable);
     }
+
+    @Transactional
     public void deletePostById(Long postId, Member currentMember)
     {
         Post post = getPostById(postId);
-        authorizationService.checkPermission(post.getMember().getId(), currentMember);
+        utilService.checkPermission(post.getMember().getId(), currentMember);
 
-        voteService.deleteVoteByPostId(postId);
+        /*voteService.deleteVoteByPostId(postId);
         fileService.deleteUploadedFile(post);
-
+*/
         postRepository.deleteById(postId);
+        log.info("게시글이 삭제되었습니다");
     }
 
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
-        return postRepository.getPostsByBoardId(boardId, keyword, pageable);
-    }
+        var childrenList = boardService.getBoardIdListByParentId(boardId);
+        childrenList.add(boardId);
 
-    public Page<PostMultiResponse> getPostsByCategoryId(Long categoryId, String keyword, Pageable pageable)
-    {
-        return postRepository.getPostsByCategoryId(categoryId, keyword, pageable);
+        Page<Post> posts = postRepository.getPostsByBoardIds(childrenList, keyword, pageable);
+
+        var data = posts.map(post -> PostMapper.INSTANCE.toPostMultiResponse(post));
+
+        return data;
     }
 
     private boolean checkIfAlreadyVote(Member member, Post post)
@@ -154,9 +130,4 @@ public class PostService
         return voteStatus;
     }
 
-    private void checkBoardHasCategory(Board board, Category category)
-    {
-        if(!board.getCategories().contains(category))
-            throw new BusinessLogicException(ExceptionMessage.CATEGORY_NOT_FOUND);
-    }
 }

@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CommentUpdateRequest
 {
+    private Long commentId;
+
     @NotSpace
     private String text;
 }
