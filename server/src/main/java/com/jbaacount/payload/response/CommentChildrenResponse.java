@@ -16,11 +16,10 @@ public class CommentChildrenResponse
     private String text;
     private Integer voteCount;
     private Boolean voteStatus;
-    private boolean isRemoved;
+    private Boolean isRemoved;
 
     private Long memberId;
     private String memberName;
-
 
     private Long parentId;
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
