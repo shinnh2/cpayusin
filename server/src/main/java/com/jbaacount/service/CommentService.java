@@ -6,9 +6,11 @@ import com.jbaacount.mapper.CommentMapper;
 import com.jbaacount.model.Comment;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
+import com.jbaacount.model.type.CommentType;
 import com.jbaacount.payload.request.CommentCreateRequest;
 import com.jbaacount.payload.request.CommentUpdateRequest;
-import com.jbaacount.payload.response.CommentMultiResponse;
+import com.jbaacount.payload.response.CommentChildrenResponse;
+import com.jbaacount.payload.response.CommentParentResponse;
 import com.jbaacount.payload.response.CommentResponseForProfile;
 import com.jbaacount.payload.response.CommentSingleResponse;
 import com.jbaacount.repository.CommentRepository;
@@ -19,8 +21,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -35,18 +39,18 @@ public class CommentService
     private final VoteService voteService;
 
     @Transactional
-    public CommentSingleResponse saveComment(CommentCreateRequest request, Long postId, Long parentId, Member member)
+    public CommentSingleResponse saveComment(CommentCreateRequest request, Member member)
     {
-        Post post = postService.getPostById(postId);
+        Post post = postService.getPostById(request.getPostId());
         Comment comment = CommentMapper.INSTANCE.toCommentEntity(request);
         Member currentMember = memberService.getMemberById(member.getId());
 
 
         comment.addPost(post);
         comment.addMember(currentMember);
-        if(parentId != null)
+        if(request.getParentCommentId() != null)
         {
-            Comment parent = getComment(parentId);
+            Comment parent = getComment(request.getParentCommentId());
             checkIfPostHasExactComment(post, parent);
             if(parent.getParent() != null)
             {
@@ -54,6 +58,7 @@ public class CommentService
             }
 
             comment.addParent(parent);
+            comment.setType(CommentType.CHILD_COMMENT.getCode());
         }
 
         if(post.getMember() != currentMember)
@@ -80,35 +85,29 @@ public class CommentService
 
     public Comment getComment(Long commentId)
     {
-        return commentRepository.findById(commentId).orElseThrow();
+        return commentRepository.findById(commentId).orElseThrow(() -> new BusinessLogicException(ExceptionMessage.COMMENT_NOT_FOUND));
     }
 
 
-    @Transactional(readOnly = true)
-    public List<CommentMultiResponse> getAllComments(Long postId, Member member)
+    public List<CommentParentResponse> getAllCommentByPostId(Long postId, Member member)
     {
-        var list = commentRepository.getAllComments(postId);
+        log.info("postid = {}", postId);
 
-        if(member != null)
+        List<Comment> parentCommentsByPostId = commentRepository.findParentCommentsByPostId(postId, CommentType.PARENT_COMMENT.getCode());
+        var parentList  = CommentMapper.INSTANCE.toCommentParentResponseList(parentCommentsByPostId);
+
+        for (CommentParentResponse parent : parentList)
         {
-            for (CommentMultiResponse response : list)
-            {
-                response.setVoteStatus(checkVoteStatus(member, response.getId()));
+            parent.setVoteStatus(checkVoteStatus(member, parent.getId()));
 
-                if(!response.getChildren().isEmpty())
-                {
-                    List<CommentMultiResponse> children = response.getChildren();
-                    for (CommentMultiResponse child : children)
-                    {
-                        child.setVoteStatus(checkVoteStatus(member, child.getId()));
-                    }
-                }
+            for (CommentChildrenResponse child : parent.getChildren())
+            {
+                child.setVoteStatus(checkVoteStatus(member, child.getId()));
             }
         }
 
-        return list;
+        return parentList;
     }
-
 
     public Page<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
     {
@@ -120,6 +119,7 @@ public class CommentService
         Comment comment = getComment(commentId);
 
         boolean voteStatus = checkVoteStatus(member, commentId);
+        log.info("comment 내용 {}", comment.getText() );
 
         return CommentMapper.INSTANCE.toCommentSingleResponse(comment, voteStatus);
     }
@@ -135,6 +135,7 @@ public class CommentService
 
         else
             comment.deleteComment();
+
     }
 
     private void checkIfPostHasExactComment(Post post, Comment comment)

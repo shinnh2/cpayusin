@@ -14,7 +14,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PostMapper
@@ -42,22 +41,17 @@ public interface PostMapper
             return null;
         }
 
-        Long categoryId = null;
-        if(entity.getCategory() != null)
-            categoryId = entity.getCategory().getId();
-
         return PostSingleResponse.builder()
                 .memberId(entity.getMember().getId())
                 .boardId(entity.getBoard().getId())
-                .categoryId(categoryId)
                 .nickname(entity.getMember().getNickname())
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
                 .files(mapFiles(entity.getFiles()))
-                .voteCount(entity.getVoteCount())
+                .voteCount(entity.getVotes().size())
+                .createdAt(entity.getCreatedAt())
                 .voteStatus(voteStatus)
-                .createdAt(calculateTime(entity.getCreatedAt()))
                 .build();
     }
 
@@ -70,12 +64,11 @@ public interface PostMapper
     }
 
 
-    @Mapping(target = "memberId", source = "member.id")
-    @Mapping(target = "memberName", source = "member.nickname")
-    @Mapping(target = "boardId", source = "board.id")
-    @Mapping(target = "boardName", source = "board.name")
-    @Mapping(target = "categoryId", source = "category.id")
-    @Mapping(target = "categoryName", source = "category.name")
+    @Mapping(target = "memberId", source = "post.member.id")
+    @Mapping(target = "memberName", source = "post.member.nickname")
+    @Mapping(target = "boardId", source = "post.board.id")
+    @Mapping(target = "boardName", source = "post.board.name")
+    @Mapping(target = "commentsCount", expression = "java(post.getComments().size())")
     PostMultiResponse toPostMultiResponse(Post post);
 
 }

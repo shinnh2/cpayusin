@@ -23,6 +23,7 @@ public class Post extends BaseEntity
     private String title;
 
     @Lob
+    //@Column(columnDefinition = "CLOB")
     private String content;
 
     @Column(nullable = false)
@@ -31,10 +32,6 @@ public class Post extends BaseEntity
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", nullable = false)
@@ -48,6 +45,7 @@ public class Post extends BaseEntity
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Vote> votes = new ArrayList<>();
+
     @Builder
     public Post(String title, String content)
     {
@@ -63,15 +61,6 @@ public class Post extends BaseEntity
 
         this.member = member;
         member.getPosts().add(this);
-    }
-
-    public void addCategory(Category category)
-    {
-        if(this.category != null)
-            this.category.getPosts().remove(this);
-
-        this.category = category;
-        category.getPosts().add(this);
     }
 
     public void addBoard(Board board)

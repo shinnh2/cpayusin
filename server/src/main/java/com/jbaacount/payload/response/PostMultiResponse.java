@@ -1,7 +1,6 @@
 package com.jbaacount.payload.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,10 +18,8 @@ public class PostMultiResponse
 
     private Long boardId;
     private String boardName;
-    private Long categoryId;
-    private String categoryName;
 
-    @JsonProperty("postId")
+
     private Long id;
     private String title;
     private String content;
@@ -30,17 +27,15 @@ public class PostMultiResponse
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
-    private String timeInfo;
 
     @QueryProjection
-    public PostMultiResponse(Long memberId, String memberName, Long boardId, String boardName, Long categoryId, String categoryName, Long id, String title, String content, Integer commentsCount, LocalDateTime createdAt)
+    public PostMultiResponse(Long memberId, String memberName, Long boardId, String boardName, Long id, String title, String content, Integer commentsCount, LocalDateTime createdAt)
     {
         this.memberId = memberId;
         this.memberName = memberName;
         this.boardId = boardId;
         this.boardName = boardName;
-        this.categoryId = categoryId;
-        this.categoryName = categoryName;
+
         this.id = id;
         this.title = title;
         this.content = content;

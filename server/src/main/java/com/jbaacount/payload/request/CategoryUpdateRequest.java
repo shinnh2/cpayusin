@@ -1,26 +1,25 @@
 package com.jbaacount.payload.request;
 
 import com.jbaacount.global.validation.notspace.NotSpace;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
 @Data
+@NoArgsConstructor
 @AllArgsConstructor
 public class CategoryUpdateRequest
 {
-    @NotNull
-    private Long categoryId;
+    @NotBlank
+    private Long id;
 
     @NotSpace
-    @Size(max = 15, message = "카테고리 제목은 최대 15자까지 입력 가능합니다.")
+    @Size(max = 15, message = "게시판 제목은 최대 15자까지 입력 가능합니다.")
     private String name;
+    private Integer orderIndex;
 
     private Boolean isAdminOnly;
-
-    private Long orderIndex;
     private Boolean isDeleted;
 }

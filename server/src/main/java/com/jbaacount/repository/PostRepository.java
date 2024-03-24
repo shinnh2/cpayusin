@@ -19,5 +19,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
             "WHERE p.board.id = :boardId " +
             "AND (:keyword IS NOT NULL OR p.board.name LIKE %:keyword%) " +
             "ORDER BY p.board.createdAt DESC")
-    Page<Post> findAllByBoardId(@Param("boardId") Long boardId, String keyword, Pageable pageable);
+    Page<Post> findAllByBoardId(@Param("boardId") Long boardId, @Param("keyword") String keyword, Pageable pageable);
 }

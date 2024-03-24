@@ -12,6 +12,7 @@ import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +29,7 @@ import java.util.Optional;
 public class MemberService
 {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final UtilService utilService;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final FileService fileService;
 
 
@@ -40,9 +40,9 @@ public class MemberService
     }
 
     @Transactional
-    public MemberDetailResponse updateMember(Long memberId, MemberUpdateRequest request, MultipartFile multipartFile, Member currentMember)
+    public MemberDetailResponse updateMember(MemberUpdateRequest request, MultipartFile multipartFile, Member currentMember)
     {
-        Member findMember = getMemberById(memberId);
+        Member findMember = getMemberById(currentMember.getId());
 
         log.info("===updateMember===");
         log.info("findMember email = {}", findMember.getEmail());
@@ -57,7 +57,7 @@ public class MemberService
         if(request != null)
         {
             Optional.ofNullable(request.getNickname())
-                    .ifPresent(nickname -> findMember.updateNickname(nickname));
+                    .ifPresent(findMember::updateNickname);
             Optional.ofNullable(request.getPassword())
                     .ifPresent(password -> findMember.updatePassword(passwordEncoder.encode(password)));
         }
@@ -75,7 +75,10 @@ public class MemberService
     {
         Member member = getMemberById(memberId);
 
-        return MemberMapper.INSTANCE.toMemberDetailResponse(member);
+        var response = MemberMapper.INSTANCE.toMemberDetailResponse(member);
+
+        response.setIsAdmin(member.getRoles().contains("ADMIN"));
+        return response;
     }
 
     public SliceDto<MemberDetailResponse> getAllMembers(String keyword, Long memberId, Pageable pageable)
@@ -85,8 +88,11 @@ public class MemberService
 
     public List<MemberScoreResponse> findTop3MembersByScore(LocalDateTime now)
     {
+        LocalDateTime startMonth = LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0);
+        LocalDateTime endMonth = startMonth.plusMonths(1);
+
         log.info("findTop3Members");
-        return memberRepository.memberResponseForReward(now);
+        return memberRepository.memberResponseForReward(startMonth, endMonth);
     }
 
     @Transactional

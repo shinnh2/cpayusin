@@ -14,4 +14,8 @@ public class CommentCreateRequest
 {
     @NotSpace
     private String text;
+
+    private Long postId;
+
+    private Long parentCommentId;
 }

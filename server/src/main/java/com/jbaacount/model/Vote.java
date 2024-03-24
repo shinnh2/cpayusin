@@ -1,8 +1,5 @@
 package com.jbaacount.model;
 
-import com.jbaacount.model.Comment;
-import com.jbaacount.model.Member;
-import com.jbaacount.model.Post;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -19,8 +16,6 @@ public class Vote
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version
-    private Integer version;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)

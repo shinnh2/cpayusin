@@ -16,4 +16,6 @@ public class BoardCreateRequest
     private String name;
 
     private Boolean isAdminOnly;
+
+    private Long parentId;
 }

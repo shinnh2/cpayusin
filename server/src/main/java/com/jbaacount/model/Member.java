@@ -3,12 +3,14 @@ package com.jbaacount.model;
 import com.jbaacount.global.audit.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Setter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -46,13 +48,15 @@ public class Member extends BaseEntity
     private File file;
 
     @Builder
-    public Member(String nickname, String email, String password)
+    public Member(Long id, String nickname, String email, String password, int score, List<String> roles, Platform platform, List<Post> posts, List<Comment> comments, File file)
     {
+        this.id = id;
         this.nickname = nickname;
         this.email = email;
         this.password = password;
-        this.platform = Platform.HOME;
         this.score = 0;
+        this.roles = roles;
+        this.platform = Platform.HOME;
     }
 
     public Member(String nickname, String email, List<String> roles, Platform platform)
@@ -81,9 +85,9 @@ public class Member extends BaseEntity
         this.file = file;
     }
 
-    public void getScoreByVote()
+    public void getScoreByVote(int num)
     {
-        this.score += 2;
+        this.score += num;
     }
 
     public void getScoreByPost()

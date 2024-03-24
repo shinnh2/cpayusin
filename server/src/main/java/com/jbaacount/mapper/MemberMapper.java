@@ -11,7 +11,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface MemberMapper
@@ -32,9 +31,9 @@ public interface MemberMapper
         memberDetailResponse.setNickname( member.getNickname() );
         memberDetailResponse.setEmail( member.getEmail() );
         memberDetailResponse.setScore( member.getScore() );
+        memberDetailResponse.setIsAdmin(member.getRoles().contains("ADMIN"));
         memberDetailResponse.setUrl(mapFiles(member.getFile()));
         memberDetailResponse.setCreatedAt( member.getCreatedAt() );
-        memberDetailResponse.setTimeInfo(calculateTime(member.getCreatedAt()));
 
         return memberDetailResponse;
     }

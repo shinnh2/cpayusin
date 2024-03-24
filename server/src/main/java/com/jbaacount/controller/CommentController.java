@@ -4,10 +4,7 @@ import com.jbaacount.global.dto.PageInfo;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.CommentCreateRequest;
 import com.jbaacount.payload.request.CommentUpdateRequest;
-import com.jbaacount.payload.response.CommentMultiResponse;
-import com.jbaacount.payload.response.CommentResponseForProfile;
-import com.jbaacount.payload.response.CommentSingleResponse;
-import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.*;
 import com.jbaacount.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,19 +26,17 @@ public class CommentController
     private final CommentService commentService;
 
     @PostMapping("/comment/create")
-    public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@RequestParam("post") Long postId,
-                                                                             @RequestBody @Valid CommentCreateRequest request,
-                                                                             @RequestParam(required = false, name = "parent") Long parentId,
+    public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@RequestBody @Valid CommentCreateRequest request,
                                                                              @AuthenticationPrincipal Member member)
     {
-        var data = commentService.saveComment(request, postId, parentId, member);
+        var data = commentService.saveComment(request, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @PatchMapping("/comment/update")
+    @PatchMapping("/comment/update/{commentId}")
     public ResponseEntity<GlobalResponse<CommentSingleResponse>> updateComment(@RequestBody @Valid CommentUpdateRequest request,
-                                                                               @RequestParam("comment") Long commentId,
+                                                                               @PathVariable("commentId") Long commentId,
                                                                                @AuthenticationPrincipal Member currentMember)
     {
         var data = commentService.updateComment(request, commentId, currentMember);
@@ -59,10 +54,10 @@ public class CommentController
     }
 
     @GetMapping("/comment")
-    public ResponseEntity<GlobalResponse<List<CommentMultiResponse>>> getAllComments(@RequestParam("post") Long postId,
-                                                                                     @AuthenticationPrincipal Member currentMember)
+    public ResponseEntity<GlobalResponse<List<CommentParentResponse>>> getAllComments(@RequestParam("post") Long postId,
+                                                                                      @AuthenticationPrincipal Member currentMember)
     {
-        var data = commentService.getAllComments(postId, currentMember);
+        var data = commentService.getAllCommentByPostId(postId, currentMember);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

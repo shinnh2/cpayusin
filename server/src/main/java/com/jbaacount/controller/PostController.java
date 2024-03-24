@@ -5,6 +5,7 @@ import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.PostCreateRequest;
 import com.jbaacount.payload.request.PostUpdateRequest;
 import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.PostMultiResponse;
 import com.jbaacount.payload.response.PostResponseForProfile;
 import com.jbaacount.payload.response.PostSingleResponse;
 import com.jbaacount.service.MemberService;
@@ -36,13 +37,11 @@ public class PostController
     @PostMapping(value = "/post/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<GlobalResponse<PostSingleResponse>> savePost(@RequestPart(value = "data") @Valid PostCreateRequest request,
                                                                        @RequestPart(value = "files", required = false) List<MultipartFile> files,
-                                                                       @AuthenticationPrincipal Member currentMember,
-                                                                       @RequestParam("board") Long boardId,
-                                                                       @RequestParam(value = "category", required = false) Long categoryId)
+                                                                       @AuthenticationPrincipal Member currentMember)
     {
         Member member = memberService.getMemberById(currentMember.getId());
 
-        var data = postService.createPost(request, files, categoryId, boardId, member);
+        var data = postService.createPost(request, files, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
@@ -78,21 +77,11 @@ public class PostController
     }
 
     @GetMapping("/post/board")
-    public ResponseEntity getAllByBoardId(@PageableDefault Pageable pageable,
-                                          @RequestParam(required = false) String keyword,
-                                          @RequestParam("id") Long boardId)
+    public ResponseEntity<GlobalResponse<List<PostMultiResponse>>> getAllByBoardId(@PageableDefault Pageable pageable,
+                                                                                   @RequestParam(required = false) String keyword,
+                                                                                   @RequestParam("id") Long boardId)
     {
         var data = postService.getPostsByBoardId(boardId, keyword, pageable.previousOrFirst());
-
-        return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
-    }
-
-    @GetMapping("/post/category")
-    public ResponseEntity getPostsByCategoryId(@PageableDefault Pageable pageable,
-                                               @RequestParam(required = false) String keyword,
-                                               @RequestParam("id") Long categoryId)
-    {
-        var data = postService.getPostsByCategoryId(categoryId, keyword, pageable.previousOrFirst());
 
         return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }

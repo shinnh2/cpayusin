@@ -4,7 +4,6 @@ import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
 import com.jbaacount.payload.response.MemberDetailResponse;
 import com.jbaacount.payload.response.MemberScoreResponse;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -16,13 +15,11 @@ import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.jbaacount.model.QFile.file;
 import static com.jbaacount.model.QMember.member;
 import static com.jbaacount.model.QPost.post;
 import static com.jbaacount.model.QVote.vote;
-import static com.jbaacount.service.UtilService.calculateTime;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,11 +43,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
 
-        for (MemberDetailResponse response : memberDto)
-        {
-            response.setTimeInfo(calculateTime(response.getCreatedAt()));
-        }
-
         log.info("list size = {}", memberDto.size());
 
         Slice<MemberDetailResponse> slice = paginationUtils.toSlice(pageable, memberDto);
@@ -59,13 +51,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
     }
 
     @Override
-    public List<MemberScoreResponse> memberResponseForReward(LocalDateTime now)
+    public List<MemberScoreResponse> memberResponseForReward(LocalDateTime startMonth, LocalDateTime endMonth)
     {
-        LocalDateTime startMonth = LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0);
-        LocalDateTime endMonth = startMonth.plusMonths(1);
-
-        List<Tuple> memberListTuple = query
-                .select(member.id, member.nickname, member.score)
+        return query
+                .select(extractMemberScoreResponse())
                 .from(member)
                 .leftJoin(member.posts, post)
                 .leftJoin(post.votes, vote)
@@ -82,11 +71,11 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 .limit(3)
                 .fetch();
 
-        List<MemberScoreResponse> responses = memberListTuple.stream()
+        /*List<MemberScoreResponse> responses = memberListTuple.stream()
                 .map(tuple -> new MemberScoreResponse(tuple.get(member.id), tuple.get(member.nickname), tuple.get(member.score)))
                 .collect(Collectors.toList());
 
-        return responses;
+        return responses;*/
     }
 
     private ConstructorExpression<MemberDetailResponse> getMemberList()
@@ -99,6 +88,14 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 member.file != null ? member.file.url : null,
                 member.score,
                 member.createdAt);
+    }
+
+    private ConstructorExpression<MemberScoreResponse> extractMemberScoreResponse()
+    {
+        return Projections.constructor(MemberScoreResponse.class,
+                member.id,
+                member.nickname,
+                member.score);
     }
 
 

@@ -1,6 +1,5 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.global.security.dto.LoginDto;
 import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.request.PasswordResetRequest;
 import com.jbaacount.payload.response.AuthenticationResponse;
@@ -20,16 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController
 {
     private final AuthenticationService authenticationService;
-
-    @PostMapping("/login")
-    public ResponseEntity<GlobalResponse<AuthenticationResponse>> login(@RequestBody LoginDto loginDto)
-    {
-        String email = loginDto.getEmail();
-
-        var data = authenticationService.login(email);
-
-        return ResponseEntity.ok(new GlobalResponse<>(data));
-    }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader(value = "Refresh") String refreshToken)

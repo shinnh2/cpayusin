@@ -1,16 +1,19 @@
 package com.jbaacount.model;
 
 import com.jbaacount.global.audit.BaseEntity;
+import com.jbaacount.model.type.CommentType;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
 @Getter
+@Setter
 @Entity
 public class Comment extends BaseEntity
 {
@@ -22,30 +25,32 @@ public class Comment extends BaseEntity
     private String text;
 
     @Column(nullable = false)
-    private int voteCount;
+    private Boolean isRemoved = false;
 
-    @Column(nullable = false)
-    private boolean isRemoved = false;
+    private String type;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private Comment parent;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
     private Member member;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", fetch = FetchType.LAZY)
     private List<Comment> children = new ArrayList<>();
+
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Vote> votes = new ArrayList<>();
 
     @Builder
     public Comment(String text)
     {
         this.text = text;
-        this.voteCount = 0;
+        this.type = CommentType.PARENT_COMMENT.getCode();
     }
 
     public void addPost(Post post)
@@ -79,19 +84,10 @@ public class Comment extends BaseEntity
     {
         this.text = text;
     }
+
     public void deleteComment()
     {
-        this.text = "삭제된 댓글입니다.";
         this.isRemoved = true;
     }
 
-    public void upVote()
-    {
-        this.voteCount++;
-    }
-
-    public void downVote()
-    {
-        this.voteCount--;
-    }
 }
