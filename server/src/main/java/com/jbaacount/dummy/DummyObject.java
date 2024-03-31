@@ -2,6 +2,7 @@ package com.jbaacount.dummy;
 
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
+import com.jbaacount.model.Post;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -62,6 +63,32 @@ public class DummyObject
         board.setModifiedAt(LocalDateTime.now());
 
         return board;
+    }
+
+    protected Post newPost(String title, String content, Board board, Member member)
+    {
+        Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .build();
+
+        post.addBoard(board);
+        post.addMember(member);
+
+        return post;
+    }
+
+    protected Post newMockPost(Long id, String title, String content, Board board, Member member)
+    {
+        Post post = Post.builder()
+                .title(title)
+                .content(content)
+                .build();
+        post.setId(id);
+        post.addBoard(board);
+        post.addMember(member);
+
+        return post;
     }
 
 

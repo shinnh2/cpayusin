@@ -53,6 +53,8 @@ public class Board extends BaseEntity
 
         this.parent = board;
         board.getChildren().add(this);
+
+        this.setType(BoardType.CATEGORY.getCode());
     }
 
     public void updateBoardType(String boardType)
