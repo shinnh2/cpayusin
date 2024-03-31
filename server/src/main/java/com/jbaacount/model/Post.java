@@ -2,16 +2,14 @@ package com.jbaacount.model;
 
 import com.jbaacount.global.audit.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "POST")
+@Setter
 @Getter
 @Entity
 public class Post extends BaseEntity
@@ -22,8 +20,7 @@ public class Post extends BaseEntity
     @Column(nullable = false)
     private String title;
 
-    @Lob
-    //@Column(columnDefinition = "CLOB")
+    @Column(columnDefinition = "LONGTEXT")
     private String content;
 
     @Column(nullable = false)
