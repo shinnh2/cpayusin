@@ -14,6 +14,7 @@ import BoardWrite from "./pages/BoardWrite";
 import UserPage from "./pages/UserPage";
 import UserEdit from "./pages/UserEdit";
 import BoardDetailEdit from "./pages/BoardDetailEdit";
+import Admin from "./pages/Admin";
 
 export interface userDataType {
 	createdAt: string;
@@ -68,7 +69,7 @@ function App() {
 								path="/user/:userId/edit"
 								element={<UserEdit userData={userData} />}
 							/>
-							<Route path="/admin" element={<Signup />} />
+							<Route path="/admin" element={<Admin />} />
 						</Routes>
 					</main>
 				</div>
