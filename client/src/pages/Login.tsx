@@ -60,6 +60,7 @@ const Login = (props: Props) => {
 			})
 			.catch((error) => {
 				console.error("에러", error);
+				alert("로그인에 실패했습니다."); //수정 필요
 			});
 	};
 

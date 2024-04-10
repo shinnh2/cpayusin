@@ -61,7 +61,7 @@ const BoardWrite = () => {
 			});
 		//카테고리 목록 받아오기
 		axios
-			.get(`${api}/api/v1/category?board=${boardId}`)
+			.get(`${api}/api/v1/category/${boardId}`)
 			.then((response) => {
 				setCategoryItem(response.data.data);
 			})

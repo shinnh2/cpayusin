@@ -48,6 +48,7 @@ function AdminBoardItem({
 		const newCategoryData = {
 			name: newCategory,
 			isAdminOnly: false,
+			parentId: board.id,
 		};
 		const postAxiosConfig = {
 			headers: {

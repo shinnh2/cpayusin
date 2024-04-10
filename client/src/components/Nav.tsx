@@ -41,7 +41,7 @@ const Nav = () => {
 	const [data, setData] = useState<any[]>([]);
 	useEffect(() => {
 		axios
-			.get(`${api}/api/v1/board-category`)
+			.get(`${api}/api/v1/board/menu`)
 			.then((response) => {
 				setData(response.data.data);
 			})

@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 interface FormType {
 	title: string;
 	content: string;
-	// boardId: string;
+	boardId: string;
 	// [key: string]: string; // 인덱스 시그니처 추가
 }
 
@@ -32,7 +32,7 @@ const BoardWrite = () => {
 		const accessTokenInLS = localStorage.getItem("accessToken");
 		if (accessTokenInLS) setAccessToken(accessTokenInLS);
 		axios
-			.get(`${api}/api/v1/board-category`)
+			.get(`${api}/api/v1/board/menu`)
 			.then((response) => {
 				setData(response.data.data);
 			})
@@ -91,6 +91,7 @@ const BoardWrite = () => {
 		const form: FormType = {
 			title: titleValue,
 			content: editorData,
+			boardId: boardId,
 		};
 
 		const formData = new FormData();
@@ -107,13 +108,14 @@ const BoardWrite = () => {
 			},
 		};
 		axios
-			.post(
-				`${api}/api/v1/post/create?board=${boardId}${
-					nowCategoryId !== 0 ? `&category=${nowCategoryId}` : ""
-				}`,
-				formData,
-				postAxiosConfig
-			)
+			// .post(
+			// 	`${api}/api/v1/post/create?board=${boardId}${
+			// 		nowCategoryId !== 0 ? `&category=${nowCategoryId}` : ""
+			// 	}`,
+			// 	formData,
+			// 	postAxiosConfig
+			// )
+			.post(`${api}/api/v1/post/create`, formData, postAxiosConfig)
 			.then((_) => {
 				navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
 			})

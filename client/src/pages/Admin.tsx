@@ -38,7 +38,7 @@ const Admin = () => {
 
 	const fetchDataMap = () => {
 		axios
-			.get(`${api}/api/v1/board-category`)
+			.get(`${api}/api/v1/menu`)
 			.then((response) => {
 				//데이터 맵 생성
 				const boardMap: any = { boards: {} };

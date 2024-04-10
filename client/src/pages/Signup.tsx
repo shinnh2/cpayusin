@@ -2,10 +2,12 @@ import { useState } from "react";
 import Input from "./../components/Input";
 import Button from "./../components/Button";
 import { validator, ValidatorStatus } from "../assets/validater";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Signup = () => {
 	const api = process.env.REACT_APP_API_URL;
+	const navigate = useNavigate();
 	const [form, setForm] = useState({
 		email: "",
 		password: "",
@@ -66,6 +68,7 @@ const Signup = () => {
 			.post(`${api}/api/v1/sign-up`, form, { withCredentials: true })
 			.then((response) => {
 				console.log("회원가입 성공 !!!!", response.data);
+				navigate("/login");
 			})
 			.catch((error) => {
 				if (error.response) {
