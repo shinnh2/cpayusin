@@ -595,6 +595,44 @@ header .header_button_wrap .header_links.active {
 	top: 50%;
 	transform: translate3d(-50%, -50%, 0);
 }
+.sns_login_wrap {
+	margin-top: 32px;
+}
+.sns_login_title {
+	margin-bottom: 8px;
+	text-align: center;
+	font-size: var(--fs-normal);
+}
+.sns_login_description {
+	margin-bottom: 8px;
+	text-align: center;
+	font-size: var(--fs-caption);
+	color: var(--on-background-secondary-color);
+}
+.sns_login_btns {
+	display: flex;
+	justify-content: center;
+	margin-top: 24px;
+}
+.sns_login_btns .sns_btn {
+	display: block;
+	width: 50px;
+	height: 48px;
+	margin-left: 16px;
+	margin-top: 0;
+	background-image: url("./assets/sns_login_btns.png");
+	background-repeat: no-repeat;
+	font-size: 0;
+}
+.sns_login_btns .sns_btn.kakao {
+	background-position: 0 0;
+}
+.sns_login_btns .sns_btn.naver {
+	background-position: -51px 0;
+}
+.sns_login_btns .sns_btn.google {
+	background-position: -103px 0;
+}
 /* signup */
 .sign_box .validate_email_wrap {
 	margin-bottom: 16px;
