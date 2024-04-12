@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.UUID;
 
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -122,6 +123,7 @@ public class AuthenticationService
 
         ResponseEntity<JsonNode> exchange = restTemplate.exchange(tokenUri, HttpMethod.POST, httpEntity, JsonNode.class);
 
+
         return exchange.getBody().get("access_token").asText();
     }
 
@@ -133,6 +135,7 @@ public class AuthenticationService
         headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
 
         HttpEntity entity = new HttpEntity(headers);
+        log.info("entity = {}", entity);
 
         return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
     }
@@ -151,6 +154,8 @@ public class AuthenticationService
         String email = resource.get("email").asText();
         String picture = resource.get("picture").asText();
 
+        log.info("resource = {}", resource);
+
         String accessToken = jwtService.generateAccessToken(email, List.of("USER"));
         String refreshToken = jwtService.generateRefreshToken(email);
 
@@ -162,11 +167,9 @@ public class AuthenticationService
     private OAuth2Response saveOrUpdate(String name, String email, String picture, String registrationId) {
         Member member = memberService.findOptionalMemberByEmail(email)
                 .orElseGet(() -> {
-                    Member newMember = new Member(name, email, Platform.valueOf(registrationId));
-                    Member savedMember = memberService.save(newMember);
-                    File file = fileService.save(File.builder().url(picture).build());
-                    file.addMember(savedMember);
-                    return newMember;
+                    Member newMember = new Member(name, email, Platform.GOOGLE);
+                    newMember.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
+                    return memberService.save(newMember);
                 });
 
         member.setNickname(name);
