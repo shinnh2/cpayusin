@@ -59,12 +59,11 @@ public class Member extends BaseEntity
         this.platform = Platform.HOME;
     }
 
-    public Member(String nickname, String email, List<String> roles, Platform platform)
+    public Member(String nickname, String email, Platform platform)
     {
         this.nickname = nickname;
-        this.password = UUID.randomUUID().toString();
         this.email = email;
-        this.roles = roles;
+        this.roles = List.of("USER");
         this.platform = platform;
         this.score = 0;
     }

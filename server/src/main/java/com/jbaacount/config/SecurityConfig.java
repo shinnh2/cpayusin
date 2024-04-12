@@ -64,9 +64,9 @@ public class SecurityConfig
                         .requestMatchers(HttpMethod.GET).permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/reset-password").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/login", "/api/v1/sign-up").permitAll()
-                        .requestMatchers(HttpMethod.POST).hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PATCH).hasAnyRole("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.DELETE).hasAnyRole("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.POST).authenticated()
+                        .requestMatchers(HttpMethod.PATCH).authenticated()
+                        .requestMatchers(HttpMethod.DELETE).authenticated()
                         .anyRequest().permitAll())
                 .apply(new CustomFilterConfigurer());
 
@@ -85,10 +85,9 @@ public class SecurityConfig
     CorsConfigurationSource corsConfigurationSource()
     {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowedMethods(List.of("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"));
-        configuration.setExposedHeaders(List.of("Authorization", "Refresh"));
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedOriginPattern("*");
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
