@@ -21,6 +21,7 @@ public class BoardMenuResponse
     private String type;
 
     private Integer orderIndex;
+    private Boolean isAdminOnly;
 
     private List<BoardChildrenResponse> category = new ArrayList<>();
 }

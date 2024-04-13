@@ -141,4 +141,9 @@ public class MemberService
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
     }
 
+    public Optional<Member> findOptionalMemberByEmail(String email)
+    {
+        return memberRepository.findByEmail(email);
+    }
+
 }

@@ -81,6 +81,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.4.0'
 
+    // https://mvnrepository.com/artifact/com.google.api-client/google-api-client
+    implementation group: 'com.google.api-client', name: 'google-api-client', version: '2.4.0'
+
 
 }
 

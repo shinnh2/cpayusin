@@ -31,6 +31,12 @@ public class FileService
     private final AmazonS3 amazonS3;
 
     @Transactional
+    public File save(File file)
+    {
+        return fileRepository.save(file);
+    }
+
+    @Transactional
     public List<File> storeFiles(List<MultipartFile> files, Post post)
     {
         List<File> storedFiles = new ArrayList<>();
