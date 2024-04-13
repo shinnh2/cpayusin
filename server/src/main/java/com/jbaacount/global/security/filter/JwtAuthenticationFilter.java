@@ -11,6 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,7 +72,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         redisRepository.saveRefreshToken(refreshToken, email);
 
-        response.setHeader("Authorization", "Bearer " + accessToken);
+        log.info("accesstoken = {}", accessToken);
+
+        response.setHeader(AUTHORIZATION, "Bearer " + accessToken);
         response.setHeader("Refresh", refreshToken);
 
         this.getSuccessHandler().onAuthenticationSuccess(request, response, authResult);
