@@ -16,7 +16,7 @@ const createMenuNode = (data: any[]) => {
 					className={({ isActive }) => (isActive ? "active" : "")}
 				>
 					{el.name}
-					{el.categories && el.categories.length !== 0 ? (
+					{el.category && el.category.length !== 0 ? (
 						<i className="toggle_updown">
 							<img src={iconArrowDown} alt="메뉴 펼치기 접기 토글 아이콘" />
 						</i>
@@ -25,8 +25,8 @@ const createMenuNode = (data: any[]) => {
 			) : (
 				<a href="">{el.categoryName}</a>
 			)}
-			{el.categories && el.categories.length !== 0 ? (
-				<ul className="nav_menu depth2">{createMenuNode(el.categories)}</ul>
+			{el.category && el.category.length !== 0 ? (
+				<ul className="nav_menu depth2">{createMenuNode(el.category)}</ul>
 			) : null}
 		</li>
 	));

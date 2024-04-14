@@ -54,6 +54,7 @@ const Login = (props: Props) => {
 		axios
 			.post(`${api}/api/v1/login`, form, { withCredentials: true })
 			.then((response) => {
+				console.log(response.headers.authorization);
 				saveAccessToken(response.headers.authorization);
 				props.setIsLogin(true);
 				navigate("/");
