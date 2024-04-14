@@ -10,21 +10,32 @@ import AdminBoardItem from "../components/AdminBoardItem";
 import axios from "axios";
 import { getAccessToken } from "../assets/tokenActions";
 
+interface BoradCatgoryItem {
+	id: number;
+	name: string;
+	type: "Board" | "Category";
+	orderIndex: number;
+	category: any[];
+	parentId?: number;
+}
+
 //보드 생성
 const InnerList = React.memo(function InnerList({
 	board,
-	categories,
+	category,
 	index,
 	editCategory,
 	editData,
+	fetchData,
 }: any) {
 	return (
 		<AdminBoardItem
 			board={board}
-			categories={categories}
+			category={category}
 			index={index}
 			editCategory={editCategory}
 			editData={editData}
+			fetchData={fetchData}
 		/>
 	);
 });
@@ -38,7 +49,7 @@ const Admin = () => {
 
 	const fetchDataMap = () => {
 		axios
-			.get(`${api}/api/v1/menu`)
+			.get(`${api}/api/v1/board/menu`)
 			.then((response) => {
 				//데이터 맵 생성
 				const boardMap: any = { boards: {} };
@@ -105,7 +116,7 @@ const Admin = () => {
 				newBoard.name = newName;
 			}
 			if (dataType === "category") {
-				newBoard.categories[categoryIndex].categoryName = newName;
+				newBoard.category[categoryIndex].categoryName = newName;
 			}
 			setBoardListData({
 				...boardListData,
@@ -157,7 +168,7 @@ const Admin = () => {
 
 		//시작지점에서 카테고리 정보 추출
 		const draggedCategoryId = draggableId.split("-")[1]; //드래그된 카테고리 아이디 "1"
-		const startCategorys = Array.from(start.categories); //시작지점의 카테고리
+		const startCategorys = Array.from(start.category); //시작지점의 카테고리
 		//(시작지점에서 추출한) 드래그된 카테고리의 정보
 		const draggedCategory = startCategorys.filter(
 			(el: any) => el.id === +draggedCategoryId
@@ -170,7 +181,7 @@ const Admin = () => {
 
 			const newStartBoard = {
 				...start,
-				categories: startCategorys,
+				category: startCategorys,
 			};
 
 			setBoardListData({
@@ -187,14 +198,14 @@ const Admin = () => {
 		startCategorys.splice(source.index, 1);
 		const newStartBoard = {
 			...start,
-			categories: startCategorys,
+			category: startCategorys,
 		};
 
-		const finishCategorys = Array.from(finish.categories);
+		const finishCategorys = Array.from(finish.category);
 		finishCategorys.splice(destination.index, 0, draggedCategory);
 		const newFinishBoard = {
 			...finish,
-			categories: finishCategorys,
+			category: finishCategorys,
 		};
 
 		setBoardListData({
@@ -211,23 +222,23 @@ const Admin = () => {
 	const handleClickSubmit = () => {
 		const boardDataArray: any[] = [];
 		let boardOrderIndex = 0;
-
+		//데이터 변경 작업
 		for (let boardId of boardListData.boardsOrder) {
 			const nowBoard = boardListData.boards[boardId];
-			nowBoard.boardId = nowBoard.id; //API 이름이 달라서 키 명 변경: 확인 필요
-			delete nowBoard.id; //API 이름이 달라서 키 명 변경: 확인 필요
+			// nowBoard.boardId = nowBoard.id; //API 이름이 달라서 키 명 변경: 확인 필요
+			// delete nowBoard.id; //API 이름이 달라서 키 명 변경: 확인 필요
 			if (!nowBoard.isDeleted) {
 				boardOrderIndex = boardOrderIndex + 1;
 				nowBoard.orderIndex = boardOrderIndex;
 			}
-			if (nowBoard.categories.length > 0) {
+			if (nowBoard.category.length > 0) {
 				let categoryOrderIndex = 0;
-				for (let category of nowBoard.categories) {
-					category.categoryId = category.id;
-					delete category.id;
-					if (!category.isDeleted) {
+				for (let categoryItem of nowBoard.category) {
+					// categoryItem.categoryId = categoryItem.id;
+					// delete categoryItem.id;
+					if (!categoryItem.isDeleted) {
 						categoryOrderIndex += 1;
-						category.orderIndex = categoryOrderIndex;
+						categoryItem.orderIndex = categoryOrderIndex;
 					}
 				}
 			}
@@ -243,7 +254,7 @@ const Admin = () => {
 		};
 		axios
 			.patch(
-				`${api}/api/v1/admin/manage/board/update`,
+				`${api}/api/v1/admin/manage/update`,
 				boardDataArray,
 				postAxiosConfig
 			)
@@ -278,7 +289,7 @@ const Admin = () => {
 										<InnerList
 											key={boardId}
 											board={boardListData.boards[boardId]}
-											categories={boardListData.boards[boardId].categories}
+											category={boardListData.boards[boardId].category}
 											index={index}
 											editData={editData}
 											fetchData={fetchDataMap}
