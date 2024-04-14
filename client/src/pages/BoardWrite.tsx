@@ -19,7 +19,7 @@ interface BoardDataType {
 	id: number;
 	name: string;
 	orderIndex: number;
-	categories: Array<any[]>;
+	category: Array<any[]>;
 }
 
 const BoardWrite = () => {
@@ -62,22 +62,20 @@ const BoardWrite = () => {
 	//카테고리 유무 확인
 	const checkCategory = (board: BoardDataType) => {
 		setCategoryItem([]);
-		console.log(board);
 		if (board !== undefined) {
-			if (board.categories.length !== 0) {
-				const categorysArray = board.categories.map((el: any) => el.name);
-				console.log(board.categories);
+			if (board.category.length !== 0) {
+				const categorysArray = board.category.map((el: any) => el.name);
 				setCategoryItem(categorysArray);
 			}
 		}
 	};
 	//카테고리 선택
-	const handleSelectCategory = (category: string) => {
-		const matchedCategory: any = nowBoardData!.categories.find(
-			(el: any) => el.name === category
+	const handleSelectCategory = (categoryItem: string) => {
+		const matchedCategory: any = nowBoardData!.category.find(
+			(el: any) => el.name === categoryItem
 		);
 		setNowCategoryId(matchedCategory.id);
-		setSelectValueCategory(category);
+		setSelectValueCategory(categoryItem);
 	};
 	//취소 클릭시 목록으로 이동
 	const cancelClickHandler = () => {
@@ -85,13 +83,14 @@ const BoardWrite = () => {
 	};
 	//제출
 	const submitHandler = () => {
-		const boardId = nowBoardData!.id.toString(); //게시판 id
-		const categoryId = nowCategoryId; //카테고리 id
+		const id = nowCategoryId
+			? nowCategoryId.toString()
+			: nowBoardData!.id.toString(); //게시판 id
 		const editorData: string = editorRef.current!.getInstance().getHTML(); //작성된 데이터
 		const form: FormType = {
 			title: titleValue,
 			content: editorData,
-			boardId: boardId,
+			boardId: id,
 		};
 
 		const formData = new FormData();
