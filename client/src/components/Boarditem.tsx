@@ -16,7 +16,8 @@
 
 //서버 응답 기준
 interface BoardItemData {
-	postId: number;
+	postId?: number;
+	id?: number;
 	boardId: number;
 	boardName: string;
 	categoryId?: number;
@@ -34,12 +35,12 @@ const BoardItem = ({ data }: { data: BoardItemData }) => {
 	return (
 		<div className="board_item">
 			<a
-				href={`/board/${data.boardId}-${data.boardName}/${data.postId}`}
+				href={`/board/${data.boardId}-${data.boardName}/${data.id}`}
 				title={data.title}
 			>
 				<div className="board_item_element_wrap">
-					{data.categoryId ? (
-						<p className="category_tag">{data.categoryName}</p>
+					{data.boardId ? (
+						<p className="category_tag">{data.boardName}</p>
 					) : (
 						<p className="category_tag no_category">카테고리없음</p>
 					)}
