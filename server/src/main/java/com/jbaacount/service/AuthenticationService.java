@@ -1,16 +1,13 @@
 package com.jbaacount.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.exception.InvalidTokenException;
-import com.jbaacount.global.oauth2.OAuth2Response;
 import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.mapper.MemberMapper;
-import com.jbaacount.model.File;
 import com.jbaacount.model.Member;
-import com.jbaacount.model.Platform;
+import com.jbaacount.model.type.Platform;
 import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.response.AuthenticationResponse;
 import com.jbaacount.payload.response.MemberDetailResponse;
@@ -18,21 +15,16 @@ import com.jbaacount.repository.RedisRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.env.Environment;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
-import java.util.UUID;
 
-@RequestMapping("/api/v1/auth")
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -43,11 +35,6 @@ public class AuthenticationService
     private final RedisRepository redisRepository;
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final FileService fileService;
-    private final Environment env;
-    private final RestTemplate restTemplate = new RestTemplate();
-    public final String BASIC_URL = "oauth2.";
-    public final String GOOGLE_GRANT_TYPE = "authorization_code";
 
 
     @Transactional
@@ -55,6 +42,7 @@ public class AuthenticationService
     {
         Member member = MemberMapper.INSTANCE.toMemberEntity(request);
         member.updatePassword(passwordEncoder.encode(request.getPassword()));
+        member.setPlatform(Platform.HOME);
         List<String> roles = authorityUtils.createRoles(request.getEmail());
         member.setRoles(roles);
         Member savedMember = memberService.save(member);
@@ -93,90 +81,6 @@ public class AuthenticationService
         return MemberMapper.INSTANCE.toMemberDetailResponse(member);
     }
 
-    public OAuth2Response oauth2Login(String code, String registrationId)
-    {
-        String accessToken = getAccessToken(code, registrationId);
-        JsonNode userResource = getUserInfoFromToken(accessToken, registrationId);
-
-        return userLoginProcess(userResource, registrationId);
-    }
-
-
-    private String getAccessToken(String code, String registrationId)
-    {
-        String clientId = env.getProperty(BASIC_URL + registrationId + ".client-id");
-        String clientSecret = env.getProperty(BASIC_URL + registrationId + ".client-secret");
-        String redirectUri = env.getProperty(BASIC_URL + registrationId + ".redirect-uri");
-        String tokenUri = env.getProperty(BASIC_URL + registrationId + ".token-uri");
-
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("code", code);
-        params.add("grant_type", GOOGLE_GRANT_TYPE);
-        params.add("redirect_uri", redirectUri);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-
-        HttpEntity httpEntity = new HttpEntity<>(params, headers);
-
-        ResponseEntity<JsonNode> exchange = restTemplate.exchange(tokenUri, HttpMethod.POST, httpEntity, JsonNode.class);
-
-
-        return exchange.getBody().get("access_token").asText();
-    }
-
-    public JsonNode getUserInfoFromToken(String accessToken, String registrationId)
-    {
-        String resourceUri = env.getProperty(BASIC_URL + registrationId + ".resource-uri");
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
-
-        HttpEntity entity = new HttpEntity(headers);
-        log.info("entity = {}", entity);
-
-        return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
-    }
-
-    public OAuth2Response userLoginProcess(JsonNode resource, String registrationId) {
-        switch (registrationId) {
-            case "google":
-                return processGoogleLogin(resource);
-            default:
-                throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
-        }
-    }
-
-    private OAuth2Response processGoogleLogin(JsonNode resource) {
-        String name = resource.get("name").asText();
-        String email = resource.get("email").asText();
-        String picture = resource.get("picture").asText();
-
-        log.info("resource = {}", resource);
-
-        String accessToken = jwtService.generateAccessToken(email, List.of("USER"));
-        String refreshToken = jwtService.generateRefreshToken(email);
-
-        setHeadersWithNewAccessToken(accessToken);
-
-        return saveOrUpdate(name, email, picture, "google");
-    }
-
-    private OAuth2Response saveOrUpdate(String name, String email, String picture, String registrationId) {
-        Member member = memberService.findOptionalMemberByEmail(email)
-                .orElseGet(() -> {
-                    Member newMember = new Member(name, email, Platform.GOOGLE);
-                    newMember.setPassword(passwordEncoder.encode(UUID.randomUUID().toString()));
-                    return memberService.save(newMember);
-                });
-
-        member.setNickname(name);
-
-        return OAuth2Response.builder().build();
-    }
-
 
     public String logout(String refreshToken)
     {
@@ -186,6 +90,7 @@ public class AuthenticationService
             throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
 
         redisRepository.deleteRefreshToken(refreshToken);
+        SecurityContextHolder.clearContext();
         return "로그아웃에 성공했습니다";
     }
 
@@ -222,9 +127,7 @@ public class AuthenticationService
     public HttpHeaders setHeadersWithNewAccessToken(String newAccessToken)
     {
         HttpHeaders response = new HttpHeaders();
-        response.set("Authorization", "Bearer " + newAccessToken);
+        response.set(AUTHORIZATION, "Bearer " + newAccessToken);
         return response;
     }
-
-
 }

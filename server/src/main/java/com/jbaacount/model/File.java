@@ -4,12 +4,10 @@ import com.jbaacount.global.audit.BaseEntity;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
 @Getter
 @Entity
 public class File extends BaseEntity

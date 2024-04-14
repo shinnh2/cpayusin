@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @Data
 public class OAuth2Response
 {
-    private Long id;
-    private String name;
-    private String email;
 
+    private String email;
+    private String name;
+    private String picture;
+    private String role;
 }
