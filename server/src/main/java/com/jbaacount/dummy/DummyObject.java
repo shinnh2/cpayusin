@@ -3,6 +3,7 @@ package com.jbaacount.dummy;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
+import com.jbaacount.model.type.Platform;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class DummyObject
         return Member.builder()
                 .email(email)
                 .nickname(nickname)
+                .platform(Platform.HOME)
                 .password(getEncodedPassword())
                 .build();
     }
@@ -25,6 +27,7 @@ public class DummyObject
         Member member = Member.builder()
                 .id(id)
                 .email(email)
+                .platform(Platform.HOME)
                 .nickname(nickname)
                 .password(getEncodedPassword())
                 .build();

@@ -7,6 +7,7 @@ import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
+import com.jbaacount.model.type.Platform;
 import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.response.AuthenticationResponse;
 import com.jbaacount.payload.response.MemberDetailResponse;
@@ -41,6 +42,7 @@ public class AuthenticationService
     {
         Member member = MemberMapper.INSTANCE.toMemberEntity(request);
         member.updatePassword(passwordEncoder.encode(request.getPassword()));
+        member.setPlatform(Platform.HOME);
         List<String> roles = authorityUtils.createRoles(request.getEmail());
         member.setRoles(roles);
         Member savedMember = memberService.save(member);

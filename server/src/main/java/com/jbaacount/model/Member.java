@@ -37,7 +37,7 @@ public class Member extends BaseEntity
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
-    private Platform platform;
+    private Platform platform = Platform.HOME;
 
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
@@ -57,12 +57,6 @@ public class Member extends BaseEntity
     public void updateNickname(String nickname)
     {
         this.nickname = nickname;
-    }
-
-
-    public void setFile(File file)
-    {
-        this.file = file;
     }
 
     public void getScoreByVote(int num)
