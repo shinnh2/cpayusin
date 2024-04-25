@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import Nav from "./components/Nav";
+import NavDrawer from "./components/NavDrawer";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -30,6 +31,7 @@ export interface userDataType {
 function App() {
 	const [isLogin, setIsLogin] = useState(false);
 	const [userData, setUserData] = useState<userDataType>();
+	const [isNavDrawerOn, setIsNavDrawerOn] = useState(false);
 	return (
 		<div className="App">
 			<Router>
@@ -38,6 +40,7 @@ function App() {
 					setIsLogin={setIsLogin}
 					setUserData={setUserData}
 					userData={userData}
+					setIsNavDrawerOn={setIsNavDrawerOn}
 				/>
 				<div className="page_wrap">
 					<Nav />
@@ -73,6 +76,13 @@ function App() {
 						</Routes>
 					</main>
 				</div>
+				<NavDrawer
+					isLogin={isLogin}
+					setIsLogin={setIsLogin}
+					userData={userData}
+					setIsNavDrawerOn={setIsNavDrawerOn}
+					isNavDrawerOn={isNavDrawerOn}
+				/>
 			</Router>
 		</div>
 	);
