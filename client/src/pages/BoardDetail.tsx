@@ -79,7 +79,7 @@ const BoardDetail = () => {
 					{" "}
 					<div className="board_header">
 						<p className="board_date">{postData.createdAt}</p>
-						<h4 className="title_h1">{postData.title}</h4>
+						<h4 className="board_detail_title">{postData.title}</h4>
 						<div className="board_detail_info">
 							<p className="board_info">{params.boardInfo?.split("-")[1]}</p>
 							{postData!.categoryId ? (
