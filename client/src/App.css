@@ -479,8 +479,6 @@ input.error {
 	font-size: var(--fs-caption);
 	color: var(--on-background-secondary-color);
 }
-.nav_info_wrap .user_rank {
-}
 .nav_info_wrap .user_rank .title {
 	font-weight: var(--fw-bold);
 	margin-bottom: 14px;
@@ -601,6 +599,7 @@ input.error {
 	left: 50%;
 	top: 50%;
 	transform: translate3d(-50%, -50%, 0);
+	width: var(--col-4);
 }
 .sns_login_wrap {
 	margin-top: 32px;
@@ -613,6 +612,7 @@ input.error {
 .sns_login_description {
 	margin-bottom: 8px;
 	text-align: center;
+	line-height: var(--lh-caption);
 	font-size: var(--fs-caption);
 	color: var(--on-background-secondary-color);
 }
@@ -641,6 +641,9 @@ input.error {
 	background-position: -103px 0;
 }
 /* signup */
+.sign_box {
+	width: var(--col-4);
+}
 .sign_box .validate_email_wrap {
 	margin-bottom: 16px;
 }
@@ -781,7 +784,7 @@ input.error {
 .board_detail_box .board_date {
 	margin-bottom: 12px;
 }
-.board_detail_box .title_h1 {
+.board_detail_box .board_detail_title {
 	padding-bottom: 16px;
 	border-bottom: 1px solid var(--border-color);
 }
@@ -1123,6 +1126,7 @@ input.error {
 }
 .admin_board_desc {
 	margin-bottom: 32px;
+	line-height: var(--lh-normal);
 }
 .admin_board_list_item {
 	/* max-height: 52px; */
@@ -1255,7 +1259,6 @@ input.error {
 
 /* responsive: mobile */
 @media screen and (max-width: 768px) {
-	/* 컴포넌트에서 회원가입, 로그인 쪽에 있는 모든 col_4 없애기 */
 	:root {
 		/* font size */
 		--fs-h1: 36px;
@@ -1407,7 +1410,6 @@ input.error {
 		width: 100%;
 	}
 	.sns_login_description {
-		line-height: var(--lh-caption); /* 원본에 추가하기 */
 		word-break: keep-all;
 	}
 	/* sign up */
@@ -1419,8 +1421,7 @@ input.error {
 	.board_detail_box {
 		padding: 20px;
 	}
-	.board_detail_box .title_h1 {
-		/* 이것도 컴포넌트명 바꾸기... */
+	.board_detail_box .board_detail_title {
 		line-height: var(--lh-h4);
 		font-size: var(--fs-h4);
 	}
@@ -1478,7 +1479,6 @@ input.error {
 	}
 	/* admin: 로딩중 기본 스타일 수정할 것 */
 	.admin_board_desc {
-		/* 이것도 기본 line-height 추가하기 */
 		word-break: keep-all;
 	}
 }
