@@ -298,6 +298,44 @@ input.error {
 	border-bottom: 1px solid var(--primary-color);
 	color: var(--primary-color);
 }
+/* login info */
+.login_info_wrap {
+	display: flex;
+	margin-left: auto;
+}
+.login_info_wrap .login_info_links {
+	display: block;
+	padding: 10px 24px;
+	border-radius: var(--br-md);
+	font-size: var(--fs-normal);
+	font-weight: var(--fw-normal);
+	color: var(--white);
+}
+.login_info_wrap .login_info_links.active {
+	background: var(--white);
+	font-weight: var(--fw-bold);
+	color: var(--primary-color);
+}
+.login_info_wrap .login_info_btns {
+	display: block;
+	width: 36px;
+	height: 36px;
+	margin-left: 16px;
+	overflow: hidden;
+	box-sizing: border-box;
+	border-radius: 100%;
+	text-align: center;
+	font-size: 0;
+}
+.login_info_icon_wrap {
+	width: 36px;
+	height: 36px;
+	padding: 6px 0;
+	background-color: var(--primary-container-color);
+}
+.login_info_wrap .login_info_btns_name {
+	display: none;
+}
 
 /* header */
 .header {
@@ -313,56 +351,22 @@ input.error {
 	background: var(--primary-color);
 	z-index: 2;
 }
-.header .button_navi {
-	width: 24px;
-	height: 24px;
-	margin-right: 16px;
-}
 .header .logo {
 	font-size: var(--fs-h4);
 	font-weight: var(--fw-bold);
 	color: var(--white);
 }
-.header .header_button_wrap {
-	display: flex;
-	margin-left: auto;
+/* 모바일 전용 버튼 */
+.header .button_navi {
+	display: none;
+	width: 24px;
+	height: 24px;
+	margin: 0 8px;
 }
-.header .header_button_wrap .header_links {
-	display: block;
-	padding: 10px 24px;
-	border-radius: var(--br-md);
-	font-size: var(--fs-normal);
-	font-weight: var(--fw-normal);
-	color: var(--white);
-}
-header .header_button_wrap .header_links.active {
-	background: var(--white);
-	font-weight: var(--fw-bold);
-	color: var(--primary-color);
-}
-.header .header_button_wrap .header_btns {
-	display: block;
-	width: 36px;
-	height: 36px;
-	padding: 6px 0;
-	margin-left: 16px;
-	overflow: hidden;
-	box-sizing: border-box;
-	border-radius: 100%;
-	text-align: center;
-	font-size: 0;
-}
-.link_profile {
-	background-color: var(--primary-container-color);
-}
-.link_write {
-	background-color: var(--primary-container-color);
-}
-.button_logout {
-	background-color: var(--primary-container-color);
-}
-
 /* nav */
+.nav_drawer_wrap {
+	display: none;
+}
 .nav {
 	/* flex: 0 0 auto; */
 	position: fixed;
@@ -379,6 +383,7 @@ header .header_button_wrap .header_links.active {
 .nav_menu {
 	flex: 1;
 	padding: 0 16px;
+	overflow-y: auto;
 }
 .nav a {
 	display: flex;
@@ -449,7 +454,9 @@ header .header_button_wrap .header_links.active {
 	padding: 12px 0;
 }
 .nav_info_wrap {
+	margin-top: auto;
 	padding: 24px 16px;
+	border-top: 1px solid var(--border-color);
 }
 .nav_info_wrap .statistics {
 	display: flex;
@@ -1244,4 +1251,234 @@ header .header_button_wrap .header_links.active {
 }
 .admin_board_list_item.fold .admin_board_create_wrap {
 	display: none;
+}
+
+/* responsive: mobile */
+@media screen and (max-width: 768px) {
+	/* 컴포넌트에서 회원가입, 로그인 쪽에 있는 모든 col_4 없애기 */
+	:root {
+		/* font size */
+		--fs-h1: 36px;
+		--fs-h2: 32px;
+		--fs-h3: 28px;
+		--fs-h4: 24px;
+		--fs-h5: 22px;
+		--fs-h6: 20px;
+		--fs-caption: 14px;
+		--fs-caption-sm: 12px;
+	}
+	/* common */
+	.page_wrap {
+		padding-left: 0;
+	}
+	.page_wrap .container {
+		width: 90%;
+		padding: 102px 0 72px 0;
+	}
+	/* header */
+	.header .logo {
+		margin-right: auto;
+		font-size: var(--fs-h6);
+	}
+	.header .button_navi {
+		display: block;
+	}
+	.header .login_info_wrap {
+		display: none;
+	}
+	/* nav, nav_drawer */
+	.nav {
+		display: none;
+	}
+	.nav_drawer_wrap {
+		display: block;
+		position: fixed;
+		right: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		/* background: linear-gradient(
+			0deg,
+			rgba(0, 0, 0, 0.88) 0%,
+			rgba(0, 0, 0, 0.35) 100%
+		); */
+		opacity: 1;
+		z-index: 500;
+		overflow: hidden;
+		transition: all 0.55s;
+		opacity: 1;
+		pointer-events: auto;
+	}
+	.drawer_dim {
+		position: absolute;
+		right: 0;
+		top: 0;
+		width: 100%;
+		height: 100%;
+		background: linear-gradient(
+			0deg,
+			rgba(0, 0, 0, 0.88) 0%,
+			rgba(0, 0, 0, 0.35) 100%
+		);
+		transition: all 0.45s;
+		opacity: 1;
+	}
+	.drawer {
+		position: relative;
+		width: 300px;
+		height: 100%;
+		margin-left: auto;
+		display: flex;
+		flex-direction: column;
+		background: var(--white);
+		transition: transform 0.45s ease-in-out;
+	}
+	.drawer_head {
+		margin-bottom: 24px;
+		background: var(--primary-container-color);
+	}
+	.nav_drawer_close {
+		display: block;
+		width: 56px;
+		height: 56px;
+		font-size: 0;
+		overflow: hidden;
+	}
+	.drawer_title_wrap {
+		padding: 8px 16px 24px 16px;
+	}
+	.drawer_title {
+		font-size: var(--fs-h6);
+		color: var(--on-background-color);
+	}
+	.drawer_sub_title {
+		color: var(--on-background-secondary-color);
+	}
+	.drawer .login_info_wrap {
+		display: flex;
+		align-items: center;
+		justify-content: space-around;
+		background: var(--primary-color);
+		min-height: 56px;
+	}
+	.drawer .login_info_wrap .login_info_btns {
+		width: 100%;
+		height: 100%;
+		padding: 14px 0;
+		margin: 0;
+		line-height: 0;
+	}
+	.drawer .login_info_icon_wrap {
+		border-radius: 100%;
+		margin: 0 auto;
+		background-color: var(--white);
+	}
+	.drawer .login_info_wrap .login_info_btns_name {
+		display: block;
+		margin-top: 4px;
+		line-height: var(--lh-caption);
+		font-size: var(--fs-caption);
+		font-weight: var(--fw-normal);
+		color: var(--white);
+	}
+	.drawer .nav {
+		display: flex;
+		position: static;
+		width: 100%;
+		padding: 0;
+		box-shadow: none;
+		flex: 1;
+		overflow: auto;
+	}
+	.nav_drawer_wrap.off {
+		/* transition: transform 0.55s;
+		transform: translateX(100%); */
+		pointer-events: none;
+		opacity: 0;
+	}
+	.nav_drawer_wrap.off .drawer_dim {
+		opacity: 0;
+	}
+	.nav_drawer_wrap.off .drawer {
+		transform: translateX(300px);
+	}
+	/* login */
+	.login_box {
+		width: 100%;
+	}
+	.sns_login_description {
+		line-height: var(--lh-caption); /* 원본에 추가하기 */
+		word-break: keep-all;
+	}
+	/* sign up */
+	.sign_box {
+		width: 100%;
+	}
+	/* boardList: 건드릴 것 없음 */
+	/* boardDetail */
+	.board_detail_box {
+		padding: 20px;
+	}
+	.board_detail_box .title_h1 {
+		/* 이것도 컴포넌트명 바꾸기... */
+		line-height: var(--lh-h4);
+		font-size: var(--fs-h4);
+	}
+	.comment_write {
+		padding: 16px;
+	}
+	/* board write */
+	.board_write_box {
+		padding: 16px;
+	}
+	.board_write_box .toastui-editor-dropdown-toolbar {
+		height: auto;
+		flex-wrap: wrap;
+	}
+	.board_write_box .toastui-editor-contents {
+		font-size: 16px;
+	}
+	.board_editor_button_wrap {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.board_editor_button_wrap > button:first-child {
+		margin-right: 0;
+		margin-bottom: 16px;
+	}
+	/* userPage: css는 수정할 것 없음. 컴포넌트 이미지 경로 부분 수정 필요 */
+	/* userEdit */
+	.user_edit_wrap {
+		padding: 24px;
+	}
+	.user_edit_wrap .user_profile {
+		margin-bottom: 40px;
+	}
+	.user_input_content_wrap .input_wrap {
+		margin-bottom: 24px;
+	}
+	.user_input_content_wrap .input_wrap .input_area {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.user_input_content_wrap .input_wrap .input_area input {
+		flex: none;
+		margin-bottom: 12px;
+	}
+	.user_input_content_wrap .input_wrap .input_area button {
+		margin: 0;
+	}
+	.user_edit_button_wrap {
+		flex-direction: column;
+		align-items: stretch;
+	}
+	.user_edit_button_wrap button:first-child {
+		margin-right: 0;
+		margin-bottom: 16px;
+	}
+	/* admin: 로딩중 기본 스타일 수정할 것 */
+	.admin_board_desc {
+		/* 이것도 기본 line-height 추가하기 */
+		word-break: keep-all;
+	}
 }
