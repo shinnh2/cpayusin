@@ -87,7 +87,7 @@ const Signup = () => {
 			});
 	};
 	return (
-		<div className="input_box sign_box col_4">
+		<div className="input_box sign_box">
 			<h3 className="title_h3">회원가입</h3>
 			<div className="validate_email_wrap">
 				<Input
