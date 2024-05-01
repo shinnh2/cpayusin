@@ -1,7 +1,8 @@
-package com.jbaacount.payload.response;
+package com.jbaacount.payload.response.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.jbaacount.payload.response.FileResponse;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
