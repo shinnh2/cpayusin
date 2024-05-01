@@ -16,7 +16,7 @@ import org.hibernate.validator.constraints.Length;
 public class MemberRegisterRequest
 {
     @Length(min = 2, max = 10, message = "닉네임은 2자 이상 10자 이하여야 합니다.")
-    @Pattern(regexp = "^[A-z가-힣0-9 ]{3,10}", message = "닉네임에는 특수문자 및 공백이 올 수 없습니다.")
+    @Pattern(regexp = "^[A-z가-힣0-9 ]{2,10}", message = "닉네임에는 특수문자 및 공백이 올 수 없습니다.")
     @NicknameValidation
     @NotSpace
     private String nickname;

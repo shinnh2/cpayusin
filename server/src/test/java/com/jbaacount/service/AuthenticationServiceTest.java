@@ -9,24 +9,16 @@ import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.response.MemberDetailResponse;
-import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.repository.RedisRepository;
-import com.jbaacount.service.AuthenticationService;
-import com.jbaacount.service.MemberService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 

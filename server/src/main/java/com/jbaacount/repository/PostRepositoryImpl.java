@@ -1,8 +1,8 @@
 package com.jbaacount.repository;
 
 import com.jbaacount.model.Post;
-import com.jbaacount.payload.response.PostMultiResponse;
-import com.jbaacount.payload.response.PostResponseForProfile;
+import com.jbaacount.payload.response.post.PostMultiResponse;
+import com.jbaacount.payload.response.post.PostResponseForProfile;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.model.QPost.post;
