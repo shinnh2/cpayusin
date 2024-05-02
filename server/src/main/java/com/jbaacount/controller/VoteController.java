@@ -1,5 +1,6 @@
 package com.jbaacount.controller;
 
+import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.VoteService;
@@ -21,10 +22,10 @@ public class VoteController
     private final VoteService voteService;
 
     @PostMapping("/post")
-    public ResponseEntity<?> votePost(@AuthenticationPrincipal Member currentMember,
+    public ResponseEntity<?> votePost(@AuthenticationPrincipal MemberDetails currentMember,
                                       @RequestParam(name = "id") Long postId) throws InterruptedException
     {
-        boolean response = voteService.votePost(currentMember, postId);
+        boolean response = voteService.votePost(currentMember.getMember(), postId);
         if(response)
             return ResponseEntity.ok(new GlobalResponse<>("좋아요 성공"));
 
@@ -33,10 +34,10 @@ public class VoteController
     }
 
     @PostMapping("/comment")
-    public ResponseEntity<?> voteComment(@AuthenticationPrincipal Member currentMember,
+    public ResponseEntity<?> voteComment(@AuthenticationPrincipal MemberDetails currentMember,
                                          @RequestParam(name = "id") Long commentId) throws InterruptedException
     {
-        boolean response = voteService.voteComment(currentMember, commentId);
+        boolean response = voteService.voteComment(currentMember.getMember(), commentId);
 
         if(response)
             return ResponseEntity.ok(new GlobalResponse<>("좋아요 성공"));

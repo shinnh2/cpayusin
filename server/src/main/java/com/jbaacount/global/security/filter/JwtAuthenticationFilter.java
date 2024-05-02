@@ -3,6 +3,8 @@ package com.jbaacount.global.security.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.global.security.dto.LoginDto;
 import com.jbaacount.global.security.jwt.JwtService;
+import com.jbaacount.global.security.userdetails.MemberDetails;
+import com.jbaacount.global.security.userdetails.MemberDetailsService;
 import com.jbaacount.repository.RedisRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -31,6 +33,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
     private final RedisRepository redisRepository;
+    private final MemberDetailsService memberDetailsService;
 
     @SneakyThrows
     @Override
@@ -60,6 +63,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                                             Authentication authResult) throws ServletException, IOException
     {
         String email = authResult.getName();
+        MemberDetails memberDetails = memberDetailsService.loadUserByUsername(email);
+
+        authResult.getAuthorities();
 
         List<String> roles = authResult.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -67,7 +73,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         log.info("===successfulAuthentication===");
         log.info("authorities = {}", authResult.getAuthorities());
-        String accessToken = jwtService.generateAccessToken(email, roles);
+        String accessToken = jwtService.generateAccessToken(email);
         String refreshToken = jwtService.generateRefreshToken(email);
 
         redisRepository.saveRefreshToken(refreshToken, email);

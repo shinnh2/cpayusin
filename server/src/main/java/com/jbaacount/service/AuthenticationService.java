@@ -4,13 +4,14 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.global.exception.InvalidTokenException;
 import com.jbaacount.global.security.jwt.JwtService;
-import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.type.Platform;
-import com.jbaacount.payload.request.MemberRegisterRequest;
+import com.jbaacount.model.type.Role;
+import com.jbaacount.payload.request.member.MemberRegisterRequest;
 import com.jbaacount.payload.response.AuthenticationResponse;
-import com.jbaacount.payload.response.MemberDetailResponse;
+import com.jbaacount.payload.response.member.MemberCreateResponse;
+import com.jbaacount.payload.response.member.MemberDetailResponse;
 import com.jbaacount.repository.RedisRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
@@ -31,23 +30,21 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class AuthenticationService
 {
     private final MemberService memberService;
-    private final CustomAuthorityUtils authorityUtils;
     private final RedisRepository redisRepository;
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
 
 
     @Transactional
-    public MemberDetailResponse register(MemberRegisterRequest request)
+    public MemberCreateResponse register(MemberRegisterRequest request)
     {
         Member member = MemberMapper.INSTANCE.toMemberEntity(request);
         member.updatePassword(passwordEncoder.encode(request.getPassword()));
         member.setPlatform(Platform.HOME);
-        List<String> roles = authorityUtils.createRoles(request.getEmail());
-        member.setRoles(roles);
+        member.setRole(Role.USER.getValue());
         Member savedMember = memberService.save(member);
 
-        return MemberMapper.INSTANCE.toMemberDetailResponse(savedMember);
+        return MemberMapper.INSTANCE.toMemberCreateResponse(savedMember);
 
     }
 
@@ -107,7 +104,7 @@ public class AuthenticationService
 
             Member member = memberService.findMemberByEmail(email);
 
-            String renewedAccessToken = jwtService.generateAccessToken(email, member.getRoles());
+            String renewedAccessToken = jwtService.generateAccessToken(email);
 
 
             redisRepository.saveRefreshToken(refreshToken, email);
@@ -115,7 +112,7 @@ public class AuthenticationService
             return AuthenticationResponse.builder()
                     .memberId(member.getId())
                     .email(email)
-                    .role(member.getRoles())
+                    .role(member.getRole())
                     .accessToken(renewedAccessToken)
                     .refreshToken(refreshToken)
                     .build();

@@ -48,6 +48,7 @@ public enum ExceptionMessage
      */
 
     COMMENT_NOT_FOUND("해당 댓글을 찾을 수 없습니다."),
+    COMMENT_ALREADY_NESTED("댓글을 2단계 이상 저장할 수 없습니다."),
 
     /**
      * board

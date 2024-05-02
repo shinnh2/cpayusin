@@ -2,8 +2,8 @@ package com.jbaacount.repository;
 
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
-import com.jbaacount.payload.response.MemberDetailResponse;
-import com.jbaacount.payload.response.MemberScoreResponse;
+import com.jbaacount.payload.response.member.MemberMultiResponse;
+import com.jbaacount.payload.response.member.MemberScoreResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -29,10 +29,10 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
     private final PaginationUtils paginationUtils;
 
     @Override
-    public SliceDto<MemberDetailResponse> findAllMembers(String keyword, Long memberId, Pageable pageable)
+    public SliceDto<MemberMultiResponse> findAllMembers(String keyword, Long memberId, Pageable pageable)
     {
         log.info("===findAllMembers in repository===");
-        List<MemberDetailResponse> memberDto = query
+        List<MemberMultiResponse> memberDto = query
                 .select(getMemberList())
                 .from(member)
                 .leftJoin(member.file, file)
@@ -45,7 +45,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
 
         log.info("list size = {}", memberDto.size());
 
-        Slice<MemberDetailResponse> slice = paginationUtils.toSlice(pageable, memberDto);
+        Slice<MemberMultiResponse> slice = paginationUtils.toSlice(pageable, memberDto);
 
         return new SliceDto<>(memberDto, slice);
     }
@@ -78,16 +78,16 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         return responses;*/
     }
 
-    private ConstructorExpression<MemberDetailResponse> getMemberList()
+    private ConstructorExpression<MemberMultiResponse> getMemberList()
     {
         log.info("===memberToResponse===");
-        return Projections.constructor(MemberDetailResponse.class,
+        return Projections.constructor(MemberMultiResponse.class,
                 member.id,
                 member.nickname,
                 member.email,
                 member.file != null ? member.file.url : null,
                 member.score,
-                member.createdAt);
+                member.role);
     }
 
     private ConstructorExpression<MemberScoreResponse> extractMemberScoreResponse()

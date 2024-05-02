@@ -1,4 +1,4 @@
-package com.jbaacount.payload.request;
+package com.jbaacount.payload.request.member;
 
 import com.jbaacount.global.validation.NicknameValidation;
 import lombok.AllArgsConstructor;

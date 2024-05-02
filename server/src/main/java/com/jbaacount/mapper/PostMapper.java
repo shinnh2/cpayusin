@@ -2,11 +2,13 @@ package com.jbaacount.mapper;
 
 import com.jbaacount.model.File;
 import com.jbaacount.model.Post;
-import com.jbaacount.payload.request.PostCreateRequest;
-import com.jbaacount.payload.request.PostUpdateRequest;
+import com.jbaacount.payload.request.post.PostCreateRequest;
+import com.jbaacount.payload.request.post.PostUpdateRequest;
 import com.jbaacount.payload.response.FileResponse;
+import com.jbaacount.payload.response.post.PostCreateResponse;
 import com.jbaacount.payload.response.post.PostMultiResponse;
 import com.jbaacount.payload.response.post.PostSingleResponse;
+import com.jbaacount.payload.response.post.PostUpdateResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -71,4 +73,8 @@ public interface PostMapper
     @Mapping(target = "commentsCount", expression = "java(post.getComments().size())")
     PostMultiResponse toPostMultiResponse(Post post);
 
+
+    PostUpdateResponse toPostUpdateResponse(Post post);
+
+    PostCreateResponse toPostCreateResponse(Post post);
 }

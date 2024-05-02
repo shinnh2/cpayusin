@@ -1,10 +1,11 @@
 package com.jbaacount.controller;
 
+import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.BoardCreateRequest;
-import com.jbaacount.payload.request.BoardUpdateRequest;
-import com.jbaacount.payload.response.BoardMenuResponse;
-import com.jbaacount.payload.response.BoardResponse;
+import com.jbaacount.payload.request.board.BoardCreateRequest;
+import com.jbaacount.payload.request.board.BoardUpdateRequest;
+import com.jbaacount.payload.response.board.BoardMenuResponse;
+import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.BoardService;
 import jakarta.validation.Valid;
@@ -30,9 +31,9 @@ public class AdminController
     @PostMapping("/board/create")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<GlobalResponse<BoardResponse>> saveBoard(@Valid @RequestBody BoardCreateRequest request,
-                                                                   @AuthenticationPrincipal Member currentMember)
+                                                                   @AuthenticationPrincipal MemberDetails currentMember)
     {
-        var data = boardService.createBoard(request, currentMember);
+        var data = boardService.createBoard(request, currentMember.getMember());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
@@ -40,9 +41,9 @@ public class AdminController
     @PutMapping("/update")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<GlobalResponse<List<BoardMenuResponse>>> updateBoard(@Valid @RequestBody List<BoardUpdateRequest> request,
-                                                                               @AuthenticationPrincipal Member member)
+                                                                               @AuthenticationPrincipal MemberDetails currentMember)
     {
-        var data = boardService.bulkUpdateBoards(request, member);
+        var data = boardService.bulkUpdateBoards(request, currentMember.getMember());
         //var data = boardService.getMenuList();
 
         return ResponseEntity.ok(new GlobalResponse<>(data));

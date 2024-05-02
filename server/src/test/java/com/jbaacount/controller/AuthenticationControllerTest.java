@@ -1,16 +1,13 @@
 package com.jbaacount.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.MemberRegisterRequest;
+import com.jbaacount.payload.request.member.MemberRegisterRequest;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.repository.RedisRepository;
 import com.jbaacount.service.AuthenticationService;
-import com.jbaacount.service.AuthenticationServiceTest;
-import com.jbaacount.service.VisitorInterceptor;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,19 +16,15 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;

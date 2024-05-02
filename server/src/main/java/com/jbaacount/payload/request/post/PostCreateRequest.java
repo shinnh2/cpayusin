@@ -1,4 +1,4 @@
-package com.jbaacount.payload.request;
+package com.jbaacount.payload.request.post;
 
 import com.jbaacount.global.validation.notspace.NotSpace;
 import jakarta.validation.constraints.Size;
@@ -9,13 +9,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-public class BoardCreateRequest
+public class PostCreateRequest
 {
     @NotSpace
-    @Size(max = 15, message = "게시판 제목은 최대 15자까지 입력 가능합니다.")
-    private String name;
+    @Size(max = 50, message = "게시글 제목은 최대 50자까지 입력 가능합니다.")
+    private String title;
+    private String content;
 
-    private Boolean isAdminOnly;
-
-    private Long parentId;
+    private Long boardId;
 }

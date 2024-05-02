@@ -1,12 +1,12 @@
 package com.jbaacount.mapper;
 
 import com.jbaacount.model.Board;
-import com.jbaacount.payload.request.BoardCreateRequest;
-import com.jbaacount.payload.request.BoardUpdateRequest;
-import com.jbaacount.payload.request.CategoryUpdateRequest;
-import com.jbaacount.payload.response.BoardChildrenResponse;
-import com.jbaacount.payload.response.BoardMenuResponse;
-import com.jbaacount.payload.response.BoardResponse;
+import com.jbaacount.payload.request.board.BoardCreateRequest;
+import com.jbaacount.payload.request.board.BoardUpdateRequest;
+import com.jbaacount.payload.request.board.CategoryUpdateRequest;
+import com.jbaacount.payload.response.board.BoardChildrenResponse;
+import com.jbaacount.payload.response.board.BoardMenuResponse;
+import com.jbaacount.payload.response.board.BoardResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

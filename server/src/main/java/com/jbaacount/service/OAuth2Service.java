@@ -6,6 +6,7 @@ import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.model.File;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.type.Platform;
+import com.jbaacount.model.type.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -175,7 +176,7 @@ public class OAuth2Service
                             .nickname(name)
                             .email(email)
                             .password(UUID.randomUUID().toString())
-                            .roles(List.of("USER"))
+                            .role(Role.USER.getValue())
                             .platform(Platform.platformValue(registrationId))
                             .build());
 
@@ -193,7 +194,7 @@ public class OAuth2Service
 
     private void setToken(String email)
     {
-        String accessToken = jwtService.generateAccessToken(email, List.of("USER"));
+        String accessToken = jwtService.generateAccessToken(email);
         String refreshToken = jwtService.generateRefreshToken(email);
 
         log.info("accessToken = {}", accessToken);

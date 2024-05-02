@@ -7,12 +7,12 @@ import com.jbaacount.model.Comment;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.model.type.CommentType;
-import com.jbaacount.payload.request.CommentCreateRequest;
-import com.jbaacount.payload.request.CommentUpdateRequest;
-import com.jbaacount.payload.response.CommentChildrenResponse;
-import com.jbaacount.payload.response.CommentParentResponse;
-import com.jbaacount.payload.response.CommentResponseForProfile;
-import com.jbaacount.payload.response.CommentSingleResponse;
+import com.jbaacount.payload.request.comment.CommentCreateRequest;
+import com.jbaacount.payload.request.comment.CommentUpdateRequest;
+import com.jbaacount.payload.response.comment.CommentChildrenResponse;
+import com.jbaacount.payload.response.comment.CommentParentResponse;
+import com.jbaacount.payload.response.comment.CommentResponseForProfile;
+import com.jbaacount.payload.response.comment.CommentSingleResponse;
 import com.jbaacount.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Transactional(readOnly = true)
@@ -39,11 +37,10 @@ public class CommentService
     private final VoteService voteService;
 
     @Transactional
-    public CommentSingleResponse saveComment(CommentCreateRequest request, Member member)
+    public CommentSingleResponse saveComment(CommentCreateRequest request, Member currentMember)
     {
         Post post = postService.getPostById(request.getPostId());
         Comment comment = CommentMapper.INSTANCE.toCommentEntity(request);
-        Member currentMember = memberService.getMemberById(member.getId());
 
 
         comment.addPost(post);
@@ -54,7 +51,7 @@ public class CommentService
             checkIfPostHasExactComment(post, parent);
             if(parent.getParent() != null)
             {
-                throw new RuntimeException();
+                throw new BusinessLogicException(ExceptionMessage.COMMENT_ALREADY_NESTED);
             }
 
             comment.addParent(parent);
@@ -68,7 +65,7 @@ public class CommentService
 
         Comment savedComment = commentRepository.save(comment);
 
-        return getCommentSingleResponse(savedComment.getId(), member);
+        return getCommentSingleResponse(savedComment.getId(), currentMember);
     }
 
     @Transactional

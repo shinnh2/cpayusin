@@ -1,22 +1,20 @@
-package com.jbaacount.payload.response;
+package com.jbaacount.payload.response.board;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class BoardChildrenResponse
+@AllArgsConstructor
+public class BoardResponse
 {
     private Long id;
 
     private String name;
 
-    private String type;
-
     private Integer orderIndex;
-    private Boolean isAdminOnly;
 
     private Long parentId;
+    private Boolean isAdminOnly;
 }

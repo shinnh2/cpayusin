@@ -19,8 +19,10 @@ public interface VoteRepository extends JpaRepository<Vote, Long>
     @Query("select v from Vote v where v.member = :member and v.comment = :comment")
     Optional<Vote> findByMemberAndComment(@Param("member") Member member, @Param("comment") Comment comment);
 
+    @Query("SELECT v FROM Vote v WHERE v.member.id = :memberId AND v.post.id = :postId")
     Optional<Vote> findByMemberIdAndPostId(@Param("memberId") Long memberId, @Param("postId") Long postId);
 
+    @Query("SELECT v FROM Vote v WHERE v.member.id = :memberId AND v.comment.id = :commentId")
     Optional<Vote> findByMemberIdAndCommentId(@Param("memberId") Long memberId, @Param("commentId") Long commentId);
 
     void deleteVoteByPostId(@Param("postId") Long postId);
@@ -30,5 +32,7 @@ public interface VoteRepository extends JpaRepository<Vote, Long>
     boolean existsVoteByMemberAndPost(Member member, Post post);
 
     boolean existsVoteByMemberIdAndCommentId(@Param("memberId") Long memberId, @Param("commentId") Long commentId);
+
+    boolean existsVoteByMemberIdAndPostId(@Param("memberId") Long memberId, @Param("postId") Long postId);
 
 }

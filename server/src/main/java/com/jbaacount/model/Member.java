@@ -32,8 +32,7 @@ public class Member extends BaseEntity
     @Column(nullable = false, name = "score")
     private int score;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    private List<String> roles = new ArrayList<>();
+    private String role;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)

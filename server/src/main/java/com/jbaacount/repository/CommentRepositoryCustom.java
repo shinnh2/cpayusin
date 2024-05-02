@@ -1,6 +1,6 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.payload.response.CommentResponseForProfile;
+import com.jbaacount.payload.response.comment.CommentResponseForProfile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

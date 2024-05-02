@@ -34,14 +34,9 @@ public class JwtService
         this.refreshTokenExpirationMinutes = refreshTokenExpirationMinutes;
     }
 
-    public String generateAccessToken(String email, List<String> roles)
+    public String generateAccessToken(String email)
     {
-        Map<String, Object> claims = new HashMap<>();
-
-        claims.put("roles", roles);
-
         return Jwts.builder()
-                .setClaims(claims)
                 .setSubject(email)
                 .setIssuedAt(Calendar.getInstance().getTime())
                 .setExpiration(getTokenExpiration(accessTokenExpirationMinutes))

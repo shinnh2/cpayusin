@@ -94,6 +94,16 @@ public class VoteService
         return voteRepository.existsVoteByMemberIdAndCommentId(memberId, commentId);
     }
 
+    public boolean checkIfMemberVotedPost(Long memberId, Long postId)
+    {
+        return voteRepository.existsVoteByMemberIdAndPostId(memberId, postId);
+    }
+
+    public boolean checkIfMemberVotedComment(Long memberId, Long commentId)
+    {
+        return voteRepository.existsVoteByMemberIdAndCommentId(memberId, commentId);
+    }
+
     private Post findByPostId(Long postId)
     {
         return postRepository.findById(postId)

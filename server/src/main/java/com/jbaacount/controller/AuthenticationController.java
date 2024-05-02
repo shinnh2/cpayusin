@@ -1,10 +1,11 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.payload.request.MemberRegisterRequest;
-import com.jbaacount.payload.request.PasswordResetRequest;
+import com.jbaacount.payload.request.member.MemberRegisterRequest;
+import com.jbaacount.payload.request.member.PasswordResetRequest;
 import com.jbaacount.payload.response.AuthenticationResponse;
 import com.jbaacount.payload.response.GlobalResponse;
-import com.jbaacount.payload.response.MemberDetailResponse;
+import com.jbaacount.payload.response.member.MemberCreateResponse;
+import com.jbaacount.payload.response.member.MemberDetailResponse;
 import com.jbaacount.service.AuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class AuthenticationController
     }
 
     @PostMapping("/sign-up")
-    public ResponseEntity<GlobalResponse<MemberDetailResponse>> enrollMember(@RequestBody @Valid MemberRegisterRequest request)
+    public ResponseEntity<GlobalResponse<MemberCreateResponse>> enrollMember(@RequestBody @Valid MemberRegisterRequest request)
     {
         var data = authenticationService.register(request);
 

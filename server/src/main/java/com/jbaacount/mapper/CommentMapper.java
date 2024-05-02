@@ -1,10 +1,10 @@
 package com.jbaacount.mapper;
 
 import com.jbaacount.model.Comment;
-import com.jbaacount.payload.request.CommentCreateRequest;
-import com.jbaacount.payload.response.CommentChildrenResponse;
-import com.jbaacount.payload.response.CommentParentResponse;
-import com.jbaacount.payload.response.CommentSingleResponse;
+import com.jbaacount.payload.request.comment.CommentCreateRequest;
+import com.jbaacount.payload.response.comment.CommentChildrenResponse;
+import com.jbaacount.payload.response.comment.CommentParentResponse;
+import com.jbaacount.payload.response.comment.CommentSingleResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;

@@ -5,15 +5,16 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.MemberUpdateRequest;
-import com.jbaacount.payload.response.MemberDetailResponse;
-import com.jbaacount.payload.response.MemberScoreResponse;
+import com.jbaacount.payload.request.member.MemberUpdateRequest;
+import com.jbaacount.payload.response.member.MemberDetailResponse;
+import com.jbaacount.payload.response.member.MemberMultiResponse;
+import com.jbaacount.payload.response.member.MemberScoreResponse;
+import com.jbaacount.payload.response.member.MemberUpdateResponse;
 import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -40,7 +41,7 @@ public class MemberService
     }
 
     @Transactional
-    public MemberDetailResponse updateMember(MemberUpdateRequest request, MultipartFile multipartFile, Member currentMember)
+    public MemberUpdateResponse updateMember(MemberUpdateRequest request, MultipartFile multipartFile, Member currentMember)
     {
         Member findMember = getMemberById(currentMember.getId());
 
@@ -62,7 +63,7 @@ public class MemberService
                     .ifPresent(password -> findMember.updatePassword(passwordEncoder.encode(password)));
         }
 
-        return MemberMapper.INSTANCE.toMemberDetailResponse(findMember);
+        return MemberMapper.INSTANCE.toMemberUpdateResponse(findMember);
     }
 
     public Member getMemberById(long id)
@@ -77,11 +78,11 @@ public class MemberService
 
         var response = MemberMapper.INSTANCE.toMemberDetailResponse(member);
 
-        response.setIsAdmin(member.getRoles().contains("ADMIN"));
+
         return response;
     }
 
-    public SliceDto<MemberDetailResponse> getAllMembers(String keyword, Long memberId, Pageable pageable)
+    public SliceDto<MemberMultiResponse> getAllMembers(String keyword, Long memberId, Pageable pageable)
     {
         return memberRepository.findAllMembers(keyword, memberId, pageable);
     }

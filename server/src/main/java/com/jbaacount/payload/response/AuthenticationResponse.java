@@ -17,7 +17,7 @@ public class AuthenticationResponse
 {
     private Long memberId;
     private String email;
-    private List<String> role;
+    private String role;
 
     private String accessToken;
     private String refreshToken;

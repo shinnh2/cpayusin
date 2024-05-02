@@ -1,14 +1,13 @@
 package com.jbaacount.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.global.security.jwt.JwtService;
-import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.MemberRegisterRequest;
-import com.jbaacount.payload.response.MemberDetailResponse;
+import com.jbaacount.payload.request.member.MemberRegisterRequest;
+import com.jbaacount.payload.response.member.MemberCreateResponse;
+import com.jbaacount.payload.response.member.MemberDetailResponse;
 import com.jbaacount.repository.RedisRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,15 +46,12 @@ public class AuthenticationServiceTest extends DummyObject
     @Mock
     private JwtService jwtService;
 
-    @Mock
-    private CustomAuthorityUtils authorityUtils;
-
     @Spy // 진짜 객체를 InjectMocks 에 주입
     private ObjectMapper om;
 
 
     @Test
-    void memberCreateTest() throws JsonProcessingException
+    void memberCreateTest()
     {
         // given
         String nickname = "test";
@@ -83,7 +79,7 @@ public class AuthenticationServiceTest extends DummyObject
 
 
         // when
-        MemberDetailResponse response = authenticationService.register(request);
+        MemberCreateResponse response = authenticationService.register(request);
 
         System.out.println("response = " + response.toString());
         // then

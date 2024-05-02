@@ -1,13 +1,16 @@
 package com.jbaacount.controller;
 
 import com.jbaacount.global.dto.SliceDto;
+import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.EmailRequest;
-import com.jbaacount.payload.request.MemberUpdateRequest;
-import com.jbaacount.payload.request.NicknameRequest;
+import com.jbaacount.payload.request.member.EmailRequest;
+import com.jbaacount.payload.request.member.MemberUpdateRequest;
+import com.jbaacount.payload.request.member.NicknameRequest;
 import com.jbaacount.payload.response.GlobalResponse;
-import com.jbaacount.payload.response.MemberDetailResponse;
-import com.jbaacount.payload.response.MemberScoreResponse;
+import com.jbaacount.payload.response.member.MemberDetailResponse;
+import com.jbaacount.payload.response.member.MemberMultiResponse;
+import com.jbaacount.payload.response.member.MemberScoreResponse;
+import com.jbaacount.payload.response.member.MemberUpdateResponse;
 import com.jbaacount.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +37,11 @@ public class MemberController
     private final MemberService memberService;
 
     @PatchMapping("/update")
-    public ResponseEntity<GlobalResponse<MemberDetailResponse>> updateMember(@RequestPart(value = "data", required = false) @Valid MemberUpdateRequest patchDto,
-                                       @RequestPart(value = "image", required = false)MultipartFile multipartFile,
-                                       @AuthenticationPrincipal Member currentUser)
+    public ResponseEntity<GlobalResponse<MemberUpdateResponse>> updateMember(@RequestPart(value = "data", required = false) @Valid MemberUpdateRequest patchDto,
+                                                                             @RequestPart(value = "image", required = false)MultipartFile multipartFile,
+                                                                             @AuthenticationPrincipal MemberDetails currentUser)
     {
-        var data = memberService.updateMember(patchDto, multipartFile, currentUser);
+        var data = memberService.updateMember(patchDto, multipartFile, currentUser.getMember());
 
         log.info("===updateMember===");
         log.info("user updated successfully");
@@ -47,9 +50,9 @@ public class MemberController
 
 
     @GetMapping("/single-info")
-    public ResponseEntity<GlobalResponse<MemberDetailResponse>> getMember(@AuthenticationPrincipal Member member)
+    public ResponseEntity<GlobalResponse<MemberDetailResponse>> getMember(@AuthenticationPrincipal MemberDetails member)
     {
-        var data = memberService.getMemberDetailResponse(member.getId());
+        var data = memberService.getMemberDetailResponse(member.getMember().getId());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
@@ -61,7 +64,7 @@ public class MemberController
 
     {
         log.info("===getAllMembers===");
-        SliceDto<MemberDetailResponse> response = memberService.getAllMembers(keyword, member, pageable);
+        SliceDto<MemberMultiResponse> response = memberService.getAllMembers(keyword, member, pageable);
 
         return new ResponseEntity(response, HttpStatus.OK);
     }

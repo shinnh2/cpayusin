@@ -1,7 +1,7 @@
 package com.jbaacount.controller;
 
-import com.jbaacount.payload.response.BoardMenuResponse;
-import com.jbaacount.payload.response.BoardResponse;
+import com.jbaacount.payload.response.board.BoardMenuResponse;
+import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.service.BoardService;
 import lombok.RequiredArgsConstructor;

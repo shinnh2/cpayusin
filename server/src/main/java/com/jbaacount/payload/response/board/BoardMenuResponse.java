@@ -1,4 +1,4 @@
-package com.jbaacount.payload.response;
+package com.jbaacount.payload.response.board;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

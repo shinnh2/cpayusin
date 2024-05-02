@@ -6,9 +6,10 @@ import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
-import com.jbaacount.payload.request.PostCreateRequest;
-import com.jbaacount.payload.request.PostUpdateRequest;
-import com.jbaacount.payload.response.post.PostSingleResponse;
+import com.jbaacount.payload.request.post.PostCreateRequest;
+import com.jbaacount.payload.request.post.PostUpdateRequest;
+import com.jbaacount.payload.response.post.PostCreateResponse;
+import com.jbaacount.payload.response.post.PostUpdateResponse;
 import com.jbaacount.repository.BoardRepository;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.repository.PostRepository;
@@ -100,9 +101,8 @@ class PostServiceTest extends DummyObject
         // stub 5
         postEntity.addBoard(mockBoard);
 
-
         // when
-        PostSingleResponse response = postService.createPost(request, null, mockMember);
+        PostCreateResponse response = postService.createPost(request, null, mockMember);
         String responseBody = om.writeValueAsString(response);
 
         // then
@@ -125,10 +125,9 @@ class PostServiceTest extends DummyObject
         //given(postService.getPostById(anyLong())).willReturn(mockPost);
 
         utilService.isUserAllowed(mockBoard.getIsAdminOnly(), mockMember);
-        given(voteService.existByMemberAndPost(mockMember, mockPost)).willReturn(false);
 
         // when
-        PostSingleResponse response = postService.updatePost(1L, request, null, mockMember);
+        PostUpdateResponse response = postService.updatePost(1L, request, null, mockMember);
 
         // then
         assertEquals(updateContent, response.getContent());

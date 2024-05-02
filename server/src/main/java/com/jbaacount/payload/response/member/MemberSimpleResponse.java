@@ -1,4 +1,4 @@
-package com.jbaacount.payload.response;
+package com.jbaacount.payload.response.member;
 
 
 import com.querydsl.core.annotations.QueryProjection;

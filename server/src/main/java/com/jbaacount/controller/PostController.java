@@ -1,13 +1,12 @@
 package com.jbaacount.controller;
 
 import com.jbaacount.global.dto.PageInfo;
+import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.PostCreateRequest;
-import com.jbaacount.payload.request.PostUpdateRequest;
+import com.jbaacount.payload.request.post.PostCreateRequest;
+import com.jbaacount.payload.request.post.PostUpdateRequest;
 import com.jbaacount.payload.response.GlobalResponse;
-import com.jbaacount.payload.response.post.PostMultiResponse;
-import com.jbaacount.payload.response.post.PostResponseForProfile;
-import com.jbaacount.payload.response.post.PostSingleResponse;
+import com.jbaacount.payload.response.post.*;
 import com.jbaacount.service.MemberService;
 import com.jbaacount.service.PostService;
 import jakarta.validation.Valid;
@@ -32,25 +31,23 @@ import java.util.List;
 public class PostController
 {
     private final PostService postService;
-    private final MemberService memberService;
 
     @PostMapping(value = "/post/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<GlobalResponse<PostSingleResponse>> savePost(@RequestPart(value = "data") @Valid PostCreateRequest request,
+    public ResponseEntity<GlobalResponse<PostCreateResponse>> savePost(@RequestPart(value = "data") @Valid PostCreateRequest request,
                                                                        @RequestPart(value = "files", required = false) List<MultipartFile> files,
-                                                                       @AuthenticationPrincipal Member currentMember)
+                                                                       @AuthenticationPrincipal MemberDetails currentMember)
     {
-        Member member = memberService.getMemberById(currentMember.getId());
 
-        var data = postService.createPost(request, files, member);
+        var data = postService.createPost(request, files, currentMember.getMember());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @PatchMapping("/post/update/{post-id}")
-    public ResponseEntity<GlobalResponse<PostSingleResponse>> updatePost(@RequestPart(value = "data") @Valid PostUpdateRequest request,
-                                     @PathVariable("post-id") @Positive Long postId,
-                                     @RequestPart(value = "files", required = false) List<MultipartFile> files,
-                                     @AuthenticationPrincipal Member currentMember)
+    public ResponseEntity<GlobalResponse<PostUpdateResponse>> updatePost(@RequestPart(value = "data") @Valid PostUpdateRequest request,
+                                                                         @PathVariable("post-id") @Positive Long postId,
+                                                                         @RequestPart(value = "files", required = false) List<MultipartFile> files,
+                                                                         @AuthenticationPrincipal Member currentMember)
     {
         var data = postService.updatePost(postId, request, files, currentMember);
 
@@ -59,19 +56,19 @@ public class PostController
 
     @GetMapping("/post/{post-id}")
     public ResponseEntity<GlobalResponse<PostSingleResponse>> getPost(@PathVariable("post-id") @Positive Long postId,
-                                  @AuthenticationPrincipal Member currentMember)
+                                  @AuthenticationPrincipal MemberDetails currentMember)
     {
-        var data = postService.getPostSingleResponse(postId, currentMember);
+        var data = postService.getPostSingleResponse(postId, currentMember.getMember());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
     @GetMapping("/profile/my-posts")
     @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_ADMIN')")
-    public ResponseEntity<GlobalResponse<List<PostResponseForProfile>>> getMyPosts(@AuthenticationPrincipal Member member,
+    public ResponseEntity<GlobalResponse<List<PostResponseForProfile>>> getMyPosts(@AuthenticationPrincipal MemberDetails currentMember,
                                                                                    @PageableDefault Pageable pageable)
     {
-        var data = postService.getMyPosts(member, pageable.previousOrFirst());
+        var data = postService.getMyPosts(currentMember.getMember(), pageable.previousOrFirst());
 
         return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }
@@ -89,9 +86,9 @@ public class PostController
 
     @DeleteMapping("/post/{post-id}")
     public ResponseEntity<GlobalResponse<String>> deletePost(@PathVariable("post-id") @Positive Long postId,
-                                     @AuthenticationPrincipal Member currentMember)
+                                     @AuthenticationPrincipal MemberDetails currentMember)
     {
-        postService.deletePostById(postId, currentMember);
+        postService.deletePostById(postId, currentMember.getMember());
 
         return ResponseEntity.ok(new GlobalResponse<>("삭제가 완료되었습니다."));
     }

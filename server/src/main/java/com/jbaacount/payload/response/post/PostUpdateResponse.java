@@ -1,4 +1,4 @@
-package com.jbaacount.payload.response;
+package com.jbaacount.payload.response.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -10,18 +10,15 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentChildrenResponse
+public class PostUpdateResponse
 {
     private Long id;
-    private String text;
-    private Integer voteCount;
-    private Boolean voteStatus;
-    private Boolean isRemoved;
+    private String title;
+    private String content;
 
-    private Long memberId;
-    private String memberName;
-
-    private Long parentId;
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
+    private LocalDateTime updatedAt;
 }

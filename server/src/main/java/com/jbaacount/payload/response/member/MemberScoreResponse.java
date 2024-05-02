@@ -1,4 +1,4 @@
-package com.jbaacount.payload.response;
+package com.jbaacount.payload.response.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

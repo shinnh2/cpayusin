@@ -2,17 +2,18 @@ package com.jbaacount.service;
 
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
+import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.mapper.BoardMapper;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.model.type.BoardType;
-import com.jbaacount.payload.request.BoardCreateRequest;
-import com.jbaacount.payload.request.BoardUpdateRequest;
-import com.jbaacount.payload.request.CategoryUpdateRequest;
-import com.jbaacount.payload.response.BoardChildrenResponse;
-import com.jbaacount.payload.response.BoardMenuResponse;
-import com.jbaacount.payload.response.BoardResponse;
+import com.jbaacount.payload.request.board.BoardCreateRequest;
+import com.jbaacount.payload.request.board.BoardUpdateRequest;
+import com.jbaacount.payload.request.board.CategoryUpdateRequest;
+import com.jbaacount.payload.response.board.BoardChildrenResponse;
+import com.jbaacount.payload.response.board.BoardMenuResponse;
+import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor

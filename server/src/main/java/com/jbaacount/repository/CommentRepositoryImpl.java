@@ -1,7 +1,7 @@
 package com.jbaacount.repository;
 
-import com.jbaacount.payload.response.CommentResponseForProfile;
-import com.jbaacount.payload.response.MemberSimpleResponse;
+import com.jbaacount.payload.response.comment.CommentResponseForProfile;
+import com.jbaacount.payload.response.member.MemberSimpleResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQuery;

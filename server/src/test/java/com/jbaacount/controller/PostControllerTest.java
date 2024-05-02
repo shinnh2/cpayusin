@@ -2,9 +2,10 @@ package com.jbaacount.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.dummy.DummyObject;
+import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
-import com.jbaacount.payload.request.PostCreateRequest;
+import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.repository.BoardRepository;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.repository.PostRepository;
@@ -22,9 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
-import java.nio.charset.StandardCharsets;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -49,15 +48,19 @@ class PostControllerTest extends DummyObject
     @Autowired
     private PostRepository postRepository;
 
+    private Member member;
+    private Board board1;
+    private Board board2;
+
     @BeforeEach
     void setUp()
     {
-        Member member = newMockMember(1L, "aa@naver.com", "mockUser", "ADMIN");
+        member = newMockMember(1L, "aa@naver.com", "mockUser", "ADMIN");
         memberRepository.save(member);
 
-        Board board1 = boardRepository.save(newMockBoard(1L, "board1", 1));
+        board1 = boardRepository.save(newMockBoard(1L, "board1", 1));
 
-        Board board2 = boardRepository.save(newMockBoard(2L, "board2", 2));
+        board2 = boardRepository.save(newMockBoard(2L, "board2", 2));
 
         postRepository.save(newMockPost(1L, "title", "content", board1, member));
 
@@ -110,13 +113,12 @@ class PostControllerTest extends DummyObject
                 MediaType.APPLICATION_JSON_VALUE,
                 objectMapper.writeValueAsString(request).getBytes());
 
-
-
+        MemberDetails memberDetails = new MemberDetails(member);
         // when
-
         ResultActions resultActions =
                 mvc.perform(MockMvcRequestBuilders.multipart("/api/v1/post/create")
                 .file(jsonData)
+                        .with(user(memberDetails))
                 .characterEncoding("UTF-8"));
 
 
@@ -124,8 +126,7 @@ class PostControllerTest extends DummyObject
         resultActions
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.title").value(title))
-                .andExpect(jsonPath("$.data.content").value(content))
-                .andExpect(jsonPath("$.data.voteCount").value(0));
+                .andExpect(jsonPath("$.data.content").value(content));
 
         System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
     }

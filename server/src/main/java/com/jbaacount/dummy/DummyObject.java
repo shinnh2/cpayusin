@@ -30,11 +30,11 @@ public class DummyObject
                 .platform(Platform.HOME)
                 .nickname(nickname)
                 .password(getEncodedPassword())
+                .role(role)
                 .build();
 
         member.setCreatedAt(LocalDateTime.now());
         member.setModifiedAt(LocalDateTime.now());
-        member.setRoles(List.of(role));
 
         return member;
     }

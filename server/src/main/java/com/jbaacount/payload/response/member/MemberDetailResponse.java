@@ -1,4 +1,4 @@
-package com.jbaacount.payload.response;
+package com.jbaacount.payload.response.member;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -26,11 +26,11 @@ public class MemberDetailResponse
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
 
-    private Boolean isAdmin;
+    private String role;
 
 
     @QueryProjection
-    public MemberDetailResponse(Long id, String nickname, String email, String url, int score, LocalDateTime createdAt)
+    public MemberDetailResponse(Long id, String nickname, String email, String url, int score, LocalDateTime createdAt, String role)
     {
         this.id = id;
         this.nickname = nickname;
@@ -38,5 +38,6 @@ public class MemberDetailResponse
         this.url = url;
         this.score = score;
         this.createdAt = createdAt;
+        this.role = role;
     }
 }

@@ -6,11 +6,9 @@ import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
-import com.jbaacount.payload.request.PostCreateRequest;
-import com.jbaacount.payload.request.PostUpdateRequest;
-import com.jbaacount.payload.response.post.PostMultiResponse;
-import com.jbaacount.payload.response.post.PostResponseForProfile;
-import com.jbaacount.payload.response.post.PostSingleResponse;
+import com.jbaacount.payload.request.post.PostCreateRequest;
+import com.jbaacount.payload.request.post.PostUpdateRequest;
+import com.jbaacount.payload.response.post.*;
 import com.jbaacount.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +34,7 @@ public class PostService
     private final FileService fileService;
 
     @Transactional
-    public PostSingleResponse createPost(PostCreateRequest request, List<MultipartFile> files, Member currentMember)
+    public PostCreateResponse createPost(PostCreateRequest request, List<MultipartFile> files, Member currentMember)
     {
         Post post = PostMapper.INSTANCE.toPostEntity(request);
         Board board = boardService.getBoardById(request.getBoardId());
@@ -54,11 +52,11 @@ public class PostService
 
         currentMember.getScoreByPost();
 
-        return PostMapper.INSTANCE.toPostSingleResponse(savedPost, false);
+        return PostMapper.INSTANCE.toPostCreateResponse(savedPost);
     }
 
     @Transactional
-    public PostSingleResponse updatePost(Long postId, PostUpdateRequest request, List<MultipartFile> files, Member currentMember)
+    public PostUpdateResponse updatePost(Long postId, PostUpdateRequest request, List<MultipartFile> files, Member currentMember)
     {
         Post post = getPostById(postId);
         //Only the owner of the post has the authority to update
@@ -73,7 +71,6 @@ public class PostService
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
 
 
-
         fileService.deleteUploadedFile(post);
 
         if(files != null && !files.isEmpty())
@@ -81,7 +78,7 @@ public class PostService
             fileService.storeFiles(files, post);
         }
 
-        return PostMapper.INSTANCE.toPostSingleResponse(post, checkIfAlreadyVote(currentMember, post));
+        return PostMapper.INSTANCE.toPostUpdateResponse(post);
     }
 
 
@@ -94,7 +91,7 @@ public class PostService
     public PostSingleResponse getPostSingleResponse(Long id, Member member)
     {
         Post post = getPostById(id);
-        boolean voteStatus = checkIfAlreadyVote(member, post);
+        boolean voteStatus = voteService.checkIfMemberVotedPost(member.getId(), id);
 
         return PostMapper.INSTANCE.toPostSingleResponse(post, voteStatus);
     }
@@ -124,9 +121,7 @@ public class PostService
 
         Page<Post> posts = postRepository.getPostsByBoardIds(childrenList, keyword, pageable);
 
-        var data = posts.map(post -> PostMapper.INSTANCE.toPostMultiResponse(post));
-
-        return data;
+        return posts.map(PostMapper.INSTANCE::toPostMultiResponse);
     }
 
     private boolean checkIfAlreadyVote(Member member, Post post)

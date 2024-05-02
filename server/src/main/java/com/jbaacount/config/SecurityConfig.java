@@ -8,7 +8,6 @@ import com.jbaacount.global.security.filter.JwtAuthenticationFilter;
 import com.jbaacount.global.security.filter.JwtVerificationFilter;
 import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.global.security.userdetails.MemberDetailsService;
-import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.repository.RedisRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +38,6 @@ public class SecurityConfig
 {
     private final JwtService jwtService;
     private final RedisRepository redisRepository;
-    private final CustomAuthorityUtils authorityUtils;
     private final MemberDetailsService memberDetailsService;
 
     @Bean
@@ -122,12 +120,13 @@ public class SecurityConfig
         {
             AuthenticationManager authenticationManager = builder.getSharedObject(AuthenticationManager.class);
 
-            JwtAuthenticationFilter jwtAuthenticationFilter = new JwtAuthenticationFilter(authenticationManager, jwtService, redisRepository);
+            JwtAuthenticationFilter jwtAuthenticationFilter =
+                    new JwtAuthenticationFilter(authenticationManager, jwtService, redisRepository, memberDetailsService);
             jwtAuthenticationFilter.setFilterProcessesUrl("/api/v1/login");
-            jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler());
+            jwtAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessfulHandler(memberDetailsService));
             jwtAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler());
 
-            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService, authorityUtils, memberDetailsService);
+            JwtVerificationFilter jwtVerificationFilter = new JwtVerificationFilter(jwtService, memberDetailsService);
 
             builder
                     .addFilter(jwtAuthenticationFilter)

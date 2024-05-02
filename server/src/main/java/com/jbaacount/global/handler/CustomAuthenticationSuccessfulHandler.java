@@ -1,11 +1,15 @@
 package com.jbaacount.global.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jbaacount.global.security.userdetails.MemberDetails;
+import com.jbaacount.global.security.userdetails.MemberDetailsService;
+import com.jbaacount.model.Member;
 import com.jbaacount.payload.response.AuthenticationResponse;
 import com.jbaacount.payload.response.GlobalResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -17,19 +21,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
+@RequiredArgsConstructor
 public class CustomAuthenticationSuccessfulHandler implements AuthenticationSuccessHandler
 {
+    private final MemberDetailsService memberDetailsService;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException
     {
         String email = authentication.getName();
-        List<String> roles = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
+        Member member = memberDetailsService.loadUserByUsername(email).getMember();
         AuthenticationResponse data = AuthenticationResponse.builder()
                 .email(email)
-                .role(roles)
+                .role(member.getRole())
                 .build();
 
         ObjectMapper objectMapper = new ObjectMapper();
