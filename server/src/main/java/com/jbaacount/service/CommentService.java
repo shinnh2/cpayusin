@@ -9,10 +9,7 @@ import com.jbaacount.model.Post;
 import com.jbaacount.model.type.CommentType;
 import com.jbaacount.payload.request.comment.CommentCreateRequest;
 import com.jbaacount.payload.request.comment.CommentUpdateRequest;
-import com.jbaacount.payload.response.comment.CommentChildrenResponse;
-import com.jbaacount.payload.response.comment.CommentParentResponse;
-import com.jbaacount.payload.response.comment.CommentResponseForProfile;
-import com.jbaacount.payload.response.comment.CommentSingleResponse;
+import com.jbaacount.payload.response.comment.*;
 import com.jbaacount.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +34,7 @@ public class CommentService
     private final VoteService voteService;
 
     @Transactional
-    public CommentSingleResponse saveComment(CommentCreateRequest request, Member currentMember)
+    public CommentCreatedResponse saveComment(CommentCreateRequest request, Member currentMember)
     {
         Post post = postService.getPostById(request.getPostId());
         Comment comment = CommentMapper.INSTANCE.toCommentEntity(request);
@@ -63,21 +60,19 @@ public class CommentService
             currentMember.getScoreByComment();
         }
 
-        Comment savedComment = commentRepository.save(comment);
-
-        return getCommentSingleResponse(savedComment.getId(), currentMember);
+        return CommentMapper.INSTANCE.toCommentCreatedResponse(commentRepository.save(comment));
     }
 
     @Transactional
-    public CommentSingleResponse updateComment(CommentUpdateRequest request, Long commentId, Member currentMember)
+    public CommentUpdateResponse updateComment(CommentUpdateRequest request, Long commentId, Member currentMember)
     {
         Comment comment = getComment(commentId);
         authService.isTheSameUser(comment.getMember().getId(), currentMember.getId());
 
         Optional.ofNullable(request.getText())
-                .ifPresent(text -> comment.updateText(text));
+                .ifPresent(comment::updateText);
 
-        return getCommentSingleResponse(commentId, currentMember);
+        return CommentMapper.INSTANCE.toCommentUpdateResponse(comment);
     }
 
     public Comment getComment(Long commentId)

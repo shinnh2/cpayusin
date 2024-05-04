@@ -6,9 +6,7 @@ import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.comment.CommentCreateRequest;
 import com.jbaacount.payload.request.comment.CommentUpdateRequest;
 import com.jbaacount.payload.response.*;
-import com.jbaacount.payload.response.comment.CommentParentResponse;
-import com.jbaacount.payload.response.comment.CommentResponseForProfile;
-import com.jbaacount.payload.response.comment.CommentSingleResponse;
+import com.jbaacount.payload.response.comment.*;
 import com.jbaacount.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +28,8 @@ public class CommentController
     private final CommentService commentService;
 
     @PostMapping("/comment/create")
-    public ResponseEntity<GlobalResponse<CommentSingleResponse>> saveComment(@RequestBody @Valid CommentCreateRequest request,
-                                                                             @AuthenticationPrincipal MemberDetails member)
+    public ResponseEntity<GlobalResponse<CommentCreatedResponse>> saveComment(@RequestBody @Valid CommentCreateRequest request,
+                                                                              @AuthenticationPrincipal MemberDetails member)
     {
         var data = commentService.saveComment(request, member.getMember());
 
@@ -39,7 +37,7 @@ public class CommentController
     }
 
     @PatchMapping("/comment/update/{commentId}")
-    public ResponseEntity<GlobalResponse<CommentSingleResponse>> updateComment(@RequestBody @Valid CommentUpdateRequest request,
+    public ResponseEntity<GlobalResponse<CommentUpdateResponse>> updateComment(@RequestBody @Valid CommentUpdateRequest request,
                                                                                @PathVariable("commentId") Long commentId,
                                                                                @AuthenticationPrincipal MemberDetails currentMember)
     {

@@ -2,9 +2,7 @@ package com.jbaacount.mapper;
 
 import com.jbaacount.model.Comment;
 import com.jbaacount.payload.request.comment.CommentCreateRequest;
-import com.jbaacount.payload.response.comment.CommentChildrenResponse;
-import com.jbaacount.payload.response.comment.CommentParentResponse;
-import com.jbaacount.payload.response.comment.CommentSingleResponse;
+import com.jbaacount.payload.response.comment.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -18,6 +16,10 @@ public interface CommentMapper
 {
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);
     Comment toCommentEntity(CommentCreateRequest request);
+
+    CommentCreatedResponse toCommentCreatedResponse(Comment comment);
+
+    CommentUpdateResponse toCommentUpdateResponse(Comment comment);
 
     default CommentSingleResponse toCommentSingleResponse(Comment entity, boolean voteStatus)
     {
