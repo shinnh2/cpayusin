@@ -30,7 +30,6 @@ public class CommentService
     private final CommentRepository commentRepository;
     private final PostService postService;
     private final UtilService authService;
-    private final MemberService memberService;
     private final VoteService voteService;
 
     @Transactional
@@ -38,7 +37,6 @@ public class CommentService
     {
         Post post = postService.getPostById(request.getPostId());
         Comment comment = CommentMapper.INSTANCE.toCommentEntity(request);
-
 
         comment.addPost(post);
         comment.addMember(currentMember);

@@ -29,7 +29,6 @@ public interface MemberMapper
     @Mapping(target = "score", ignore = true)
     @Mapping(target = "platform", ignore = true)
     @Mapping(target = "posts", ignore = true)
-    @Mapping(target = "comments", ignore = true)
     @Mapping(target = "file", ignore = true)
     Member toMemberEntity(MemberRegisterRequest postDto);
 

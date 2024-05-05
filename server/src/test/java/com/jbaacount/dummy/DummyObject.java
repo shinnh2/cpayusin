@@ -1,6 +1,7 @@
 package com.jbaacount.dummy;
 
 import com.jbaacount.model.Board;
+import com.jbaacount.model.Comment;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.model.type.Platform;
@@ -92,6 +93,19 @@ public class DummyObject
         post.addMember(member);
 
         return post;
+    }
+
+    protected Comment newMockComment(Long id, String text, Post post, Member member)
+    {
+        Comment comment = Comment.builder()
+                .text(text)
+                .build();
+
+        comment.setId(id);
+        comment.addPost(post);
+        comment.addMember(member);
+
+        return comment;
     }
 
 

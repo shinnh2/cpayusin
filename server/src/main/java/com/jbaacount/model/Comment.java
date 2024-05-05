@@ -73,11 +73,7 @@ public class Comment extends BaseEntity
 
     public void addMember(Member member)
     {
-        if(this.member != null)
-            this.member.getComments().remove(this);
-
         this.member = member;
-        member.getComments().add(this);
     }
 
     public void updateText(String text)
