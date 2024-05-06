@@ -81,18 +81,19 @@ public class CommentService
 
     public List<CommentParentResponse> getAllCommentByPostId(Long postId, Member member)
     {
-        log.info("postid = {}", postId);
-
         List<Comment> parentCommentsByPostId = commentRepository.findParentCommentsByPostId(postId, CommentType.PARENT_COMMENT.getCode());
         var parentList  = CommentMapper.INSTANCE.toCommentParentResponseList(parentCommentsByPostId);
 
         for (CommentParentResponse parent : parentList)
         {
-            parent.setVoteStatus(checkVoteStatus(member, parent.getId()));
+            boolean parentVoteStatus = voteService.checkIfMemberVotedComment(member.getId(), parent.getId());
+            parent.setVoteStatus(parentVoteStatus);
 
             for (CommentChildrenResponse child : parent.getChildren())
             {
-                child.setVoteStatus(checkVoteStatus(member, child.getId()));
+                boolean childVoteStatus = voteService.checkIfMemberVotedComment(member.getId(), child.getId());
+
+                child.setVoteStatus(childVoteStatus);
             }
         }
 
@@ -107,25 +108,28 @@ public class CommentService
     public CommentSingleResponse getCommentSingleResponse(Long commentId, Member member)
     {
         Comment comment = getComment(commentId);
-
-        boolean voteStatus = checkVoteStatus(member, commentId);
-        log.info("comment 내용 {}", comment.getText() );
+        boolean voteStatus = voteService.checkIfMemberVotedComment(member.getId(), comment.getId());
 
         return CommentMapper.INSTANCE.toCommentSingleResponse(comment, voteStatus);
     }
 
     @Transactional
-    public void deleteComment(Long commentId, Member currentMember)
+    public boolean deleteComment(Long commentId, Member currentMember)
     {
         Comment comment = getComment(commentId);
         authService.checkPermission(comment.getMember().getId(), currentMember);
 
         if(comment.getChildren().isEmpty())
+        {
             commentRepository.deleteById(commentId);
+            return !commentRepository.existsById(commentId);
+        }
 
         else
+        {
             comment.deleteComment();
-
+            return true;
+        }
     }
 
     private void checkIfPostHasExactComment(Post post, Comment comment)
@@ -133,15 +137,4 @@ public class CommentService
         if(comment.getPost() != post)
             throw new BusinessLogicException(ExceptionMessage.POST_NOT_FOUND);
     }
-
-    public boolean checkVoteStatus(Member member, Long commentId)
-    {
-        if(member == null)
-            return false;
-
-        log.info("member id = {}", member.getId());
-        log.info("comment id = {}", commentId);
-        return voteService.existByMemberAndComment(member.getId(), commentId);
-    }
-
 }
