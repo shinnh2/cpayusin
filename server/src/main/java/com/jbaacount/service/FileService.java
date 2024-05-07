@@ -71,25 +71,21 @@ public class FileService
     public List<File> storeFiles(List<MultipartFile> files, Post post)
     {
         List<File> storedFiles = new ArrayList<>();
-        log.info("파일 갯수 = {}", files.size());
 
         for(MultipartFile file : files)
         {
             File storedFile = storeFileInPost(file, post);
             storedFiles.add(storedFile);
 
-            log.info("file saved successfully = {}", storedFile.getStoredFileName());
         }
-
-        log.info("저장 후 파일 개수 = {}", storedFiles.size());
 
         return storedFiles;
     }
 
     @Transactional
-    public void deleteUploadedFile(Post post)
+    public void deleteUploadedFile(Long postId)
     {
-        List<File> files = fileRepository.findByPostId(post.getId());
+        List<File> files = fileRepository.findByPostId(postId);
 
         if(files != null && !files.isEmpty())
         {
@@ -97,7 +93,6 @@ public class FileService
             {
                 amazonS3.deleteObject(bucket, "post/" + file.getStoredFileName());
                 log.info("file removed successfully = {}", file.getStoredFileName());
-                post.removeFile(file);
             }
         }
 
@@ -105,9 +100,9 @@ public class FileService
     }
 
     @Transactional
-    public void deleteProfilePhoto(Member member)
+    public void deleteProfilePhoto(Long memberId)
     {
-        Optional<File> file = fileRepository.findByMemberId(member.getId());
+        Optional<File> file = fileRepository.findByMemberId(memberId);
 
         if(file.isPresent())
         {
@@ -117,7 +112,7 @@ public class FileService
     }
 
     @Transactional
-    public File storeProfileImage(MultipartFile multipartFile, Member member)
+    public String storeProfileImage(MultipartFile multipartFile, Member member)
     {
         String ext = multipartFile.getContentType();
         if(!ext.contains("image"))
@@ -141,8 +136,15 @@ public class FileService
                 .build();
 
         file.addMember(member);
-        return fileRepository.save(file);
+        return fileRepository.save(file).getUrl();
     }
+
+    public List<String> getFileUrlByPostId(Long postId)
+    {
+        return fileRepository.findUrlByPostId(postId);
+    }
+
+
 
     private Optional<File> getFileByMemberId(Long memberId)
     {

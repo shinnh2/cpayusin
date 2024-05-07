@@ -32,17 +32,13 @@ public class Member extends BaseEntity
     @Column(nullable = false, name = "score")
     private int score;
 
+    private String url;
+
     private String role;
 
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private Platform platform = Platform.HOME;
-
-    @OneToMany(mappedBy = "member")
-    private List<Post> posts = new ArrayList<>();
-
-    @OneToOne(mappedBy = "member", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.EAGER)
-    private File file;
 
 
     public void updatePassword(String password)

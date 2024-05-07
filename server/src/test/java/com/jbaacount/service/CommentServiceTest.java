@@ -1,11 +1,8 @@
 package com.jbaacount.service;
 
-import com.jbaacount.Setup;
+import com.jbaacount.MockSetup;
 import com.jbaacount.global.exception.BusinessLogicException;
-import com.jbaacount.mapper.CommentMapper;
-import com.jbaacount.model.Board;
 import com.jbaacount.model.Comment;
-import com.jbaacount.model.Member;
 import com.jbaacount.model.type.CommentType;
 import com.jbaacount.payload.request.comment.CommentCreateRequest;
 import com.jbaacount.payload.request.comment.CommentUpdateRequest;
@@ -14,7 +11,6 @@ import com.jbaacount.payload.response.comment.CommentParentResponse;
 import com.jbaacount.payload.response.comment.CommentUpdateResponse;
 import com.jbaacount.repository.CommentRepository;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +29,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class CommentServiceTest extends Setup
+class CommentServiceTest extends MockSetup
 {
     @Mock
     private CommentRepository commentRepository;

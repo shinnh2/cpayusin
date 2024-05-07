@@ -23,8 +23,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
-import java.util.List;
-
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -103,7 +101,6 @@ class AuthenticationControllerTest extends DummyObject
     {
         // given
         String email = "aa@naver.com";
-        List<String> roles = List.of("ADMIN");
         String refreshToken = jwtService.generateRefreshToken(email);
 
         System.out.println("refresh token = " +refreshToken);

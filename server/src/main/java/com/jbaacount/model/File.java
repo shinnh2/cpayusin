@@ -46,16 +46,11 @@ public class File extends BaseEntity
 
     public void addPost(Post post)
     {
-        if(this.post != null)
-            this.post.getFiles().remove(this);
-
         this.post = post;
-        post.getFiles().add(this);
     }
 
     public void addMember(Member member)
     {
         this.member = member;
-        member.setFile(this);
     }
 }

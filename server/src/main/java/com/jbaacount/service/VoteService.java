@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -41,10 +42,9 @@ public class VoteService
 
         else
         {
-            Vote savedVote = voteRepository.save(new Vote(currentMember, post));
+            voteRepository.save(new Vote(currentMember, post));
             post.getMember().getScoreByVote(2);
             post.upVote();
-            log.info("voted post = {}", savedVote.getPost().getTitle());
             return true;
         }
     }
@@ -59,7 +59,7 @@ public class VoteService
         {
             voteRepository.delete(optionalVote.get());
             comment.getMember().getScoreByVote(-2);
-
+            comment.setVoteCount(comment.getVoteCount() - 1);
             return false;
         }
 
@@ -67,7 +67,7 @@ public class VoteService
         {
             voteRepository.save(new Vote(currentMember, comment));
             comment.getMember().getScoreByVote(2);
-
+            comment.setVoteCount(comment.getVoteCount() + 1);
             return true;
         }
     }
@@ -89,10 +89,16 @@ public class VoteService
         return voteRepository.existsVoteByMemberAndPost(member, post);
     }
 
-    public boolean existByMemberAndComment(Long memberId, Long commentId)
+    public void deleteAllVoteInThePost(Long postId)
     {
-        return voteRepository.existsVoteByMemberIdAndCommentId(memberId, commentId);
+        voteRepository.deleteAllInBatch(voteRepository.findAllByPostId(postId));
     }
+
+    public void deleteAllVoteInTheComment(Long commentId)
+    {
+        voteRepository.deleteAllInBatch(voteRepository.findAllByCommentId(commentId));
+    }
+
 
     public boolean checkIfMemberVotedPost(Long memberId, Long postId)
     {

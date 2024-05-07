@@ -47,9 +47,6 @@ class PostServiceTest extends DummyObject
     private MemberRepository memberRepository;
 
     @Mock
-    private BoardRepository boardRepository;
-
-    @Mock
     private BoardService boardService;
 
     @Mock
@@ -57,6 +54,9 @@ class PostServiceTest extends DummyObject
 
     @Mock
     private VoteService voteService;
+
+    @Mock
+    private CommentService commentService;
 
     @Spy
     private ObjectMapper om;

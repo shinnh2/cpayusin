@@ -102,7 +102,7 @@ public class CommentService
 
     public Page<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
     {
-        return commentRepository.getAllCommentsForProfile(memberId, pageable);
+        return commentRepository.findCommentsForProfile(memberId, pageable);
     }
 
     public CommentSingleResponse getCommentSingleResponse(Long commentId, Member member)
@@ -121,6 +121,7 @@ public class CommentService
 
         if(comment.getChildren().isEmpty())
         {
+            voteService.deleteAllVoteInTheComment(commentId);
             commentRepository.deleteById(commentId);
             return !commentRepository.existsById(commentId);
         }
@@ -130,6 +131,18 @@ public class CommentService
             comment.deleteComment();
             return true;
         }
+    }
+
+    @Transactional
+    public void deleteAllByPostId(Long postId)
+    {
+        List<Comment> commentList = commentRepository.findAllByPostId(postId);
+        commentList
+                .forEach(comment -> {
+                    voteService.deleteAllVoteInTheComment(comment.getId());
+                });
+
+        commentRepository.deleteAllInBatch(commentList);
     }
 
     private void checkIfPostHasExactComment(Post post, Comment comment)

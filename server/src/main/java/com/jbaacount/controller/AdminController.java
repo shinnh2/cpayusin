@@ -38,7 +38,7 @@ public class AdminController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @PutMapping("/update")
+    @PatchMapping("/update")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
     public ResponseEntity<GlobalResponse<List<BoardMenuResponse>>> updateBoard(@Valid @RequestBody List<BoardUpdateRequest> request,
                                                                                @AuthenticationPrincipal MemberDetails currentMember)

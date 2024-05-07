@@ -10,8 +10,8 @@ import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.payload.request.post.PostUpdateRequest;
 import com.jbaacount.payload.response.post.*;
 import com.jbaacount.repository.PostRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class PostService
@@ -32,6 +31,22 @@ public class PostService
     private final BoardService boardService;
     private final VoteService voteService;
     private final FileService fileService;
+    private final CommentService commentService;
+
+    public PostService(PostRepository postRepository,
+                       UtilService utilService,
+                       @Lazy BoardService boardService,
+                       VoteService voteService,
+                       FileService fileService,
+                       @Lazy CommentService commentService)
+    {
+        this.postRepository = postRepository;
+        this.utilService = utilService;
+        this.boardService = boardService;
+        this.voteService = voteService;
+        this.fileService = fileService;
+        this.commentService = commentService;
+    }
 
     @Transactional
     public PostCreateResponse createPost(PostCreateRequest request, List<MultipartFile> files, Member currentMember)
@@ -71,7 +86,7 @@ public class PostService
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
 
 
-        fileService.deleteUploadedFile(post);
+        fileService.deleteUploadedFile(post.getId());
 
         if(files != null && !files.isEmpty())
         {
@@ -93,12 +108,15 @@ public class PostService
         Post post = getPostById(id);
         boolean voteStatus = voteService.checkIfMemberVotedPost(member.getId(), id);
 
-        return PostMapper.INSTANCE.toPostSingleResponse(post, voteStatus);
+        PostSingleResponse response = PostMapper.INSTANCE.toPostSingleResponse(post, voteStatus);
+        response.setFiles(fileService.getFileUrlByPostId(id));
+
+        return response;
     }
 
     public Page<PostResponseForProfile> getMyPosts(Member member, Pageable pageable)
     {
-        return postRepository.getPostsByMemberId(member.getId(), pageable);
+        return postRepository.findAllByMemberIdForProfile(member.getId(), pageable);
     }
 
     @Transactional
@@ -107,11 +125,23 @@ public class PostService
         Post post = getPostById(postId);
         utilService.checkPermission(post.getMember().getId(), currentMember);
 
-        /*voteService.deleteVoteByPostId(postId);
-        fileService.deleteUploadedFile(post);
-*/
+        deleteRelatedDataInPost(postId);
+
         postRepository.deleteById(postId);
+
         log.info("게시글이 삭제되었습니다");
+    }
+
+    @Transactional
+    public void deleteAllPostsByBoardId(Long boardId)
+    {
+        List<Post> postList = postRepository.findAllByBoardId(boardId);
+
+        postList.forEach(post -> {
+                    deleteRelatedDataInPost(post.getId());
+                });
+
+        postRepository.deleteAllInBatch(postList);
     }
 
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
@@ -119,19 +149,14 @@ public class PostService
         var childrenList = boardService.getBoardIdListByParentId(boardId);
         childrenList.add(boardId);
 
-        Page<Post> posts = postRepository.getPostsByBoardIds(childrenList, keyword, pageable);
 
-        return posts.map(PostMapper.INSTANCE::toPostMultiResponse);
+        return postRepository.findAllPostByBoardId(childrenList, keyword, pageable);
     }
 
-    private boolean checkIfAlreadyVote(Member member, Post post)
+    private void deleteRelatedDataInPost(Long postId)
     {
-        boolean voteStatus = false;
-
-        if(member != null)
-            voteStatus = voteService.existByMemberAndPost(member, post);
-
-        return voteStatus;
+        fileService.deleteUploadedFile(postId);
+        voteService.deleteAllVoteInThePost(postId);
+        commentService.deleteAllByPostId(postId);
     }
-
 }

@@ -15,6 +15,7 @@ import com.jbaacount.payload.response.board.BoardChildrenResponse;
 import com.jbaacount.payload.response.board.BoardMenuResponse;
 import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.repository.BoardRepository;
+import com.jbaacount.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,8 +34,7 @@ public class BoardService
 {
     private final BoardRepository boardRepository;
     private final UtilService utilService;
-    private final FileService fileService;
-    private final VoteService voteService;
+    private final PostService postService;
 
     @Transactional
     public BoardResponse createBoard(BoardCreateRequest request, Member currentMember)
@@ -52,7 +52,8 @@ public class BoardService
             Integer orderIndex = boardRepository.countChildrenByParentId(parent.getId());
             board.updateOrderIndex(orderIndex + 1);
             board.updateBoardType(BoardType.CATEGORY.getCode());
-        } else
+        }
+        else
         {
             Integer orderIndex = boardRepository.countParent();
             board.updateOrderIndex(orderIndex + 1);
@@ -67,43 +68,54 @@ public class BoardService
     {
         utilService.isAdmin(currentMember);
 
-        for(BoardUpdateRequest request : requests)
-        {
-            Board board = getBoardById(request.getId());
-            if(request.getIsDeleted() != null && request.getIsDeleted())
-                deleteBoard(board);
+        List<BoardUpdateRequest> removedBoardList = requests.stream()
+                .filter(board -> board.getIsDeleted() != null && board.getIsDeleted())
+                .collect(Collectors.toList());
 
-            else{
-                BoardMapper.INSTANCE.updateBoard(request, board);
-                board.setParent(null);
-                board.setType(BoardType.BOARD.getCode());
+        List<BoardUpdateRequest> updateBoardList = requests.stream()
+                .filter(board -> board.getIsDeleted() == null || !board.getIsDeleted())
+                .collect(Collectors.toList());
 
-                if(!request.getCategory().isEmpty())
-                    updateCategory(board, request.getCategory());
-            }
-        }
+        updateBoardList
+                .forEach(request -> {
+                    Board board = getBoardById(request.getId());
 
-        log.info("업데이트 종료");
+                    BoardMapper.INSTANCE.updateBoard(request, board);
+                    board.setParent(null);
+                    board.setType(BoardType.BOARD.getCode());
+
+                    if(!request.getCategory().isEmpty())
+                        updateCategory(board, request.getCategory());
+                });
+
+        removedBoardList
+                .forEach(request -> {
+                    getBoardById(request.getId());
+                    removeAllChildrenBoard(request.getId());
+                    deleteBoard(request.getId());
+                });
+
+
         return getMenuList();
     }
 
     public void updateCategory(Board parent, List<CategoryUpdateRequest> requests)
     {
+        requests.forEach(
+                request -> {
+                    Board category = getBoardById(request.getId());
 
-        for(CategoryUpdateRequest request : requests)
-        {
-            Board category = getBoardById(request.getId());
+                    if(request.getIsDeleted() != null && request.getIsDeleted())
+                        deleteBoard(request.getId());
 
-            if(request.getIsDeleted() != null && request.getIsDeleted())
-                deleteBoard(category);
+                    else{
+                        BoardMapper.INSTANCE.updateBoard(request, category);
+                        category.setType(BoardType.CATEGORY.getCode());
 
-            else{
-                BoardMapper.INSTANCE.updateBoard(request, category);
-                category.setType(BoardType.CATEGORY.getCode());
-
-                category.addParent(parent);
-            }
-        }
+                        category.addParent(parent);
+                    }
+                }
+        );
     }
 
     public Board getBoardById(Long boardId)
@@ -156,17 +168,21 @@ public class BoardService
     }
 
 
-    private void deleteBoard(Board board)
+    private void deleteBoard(Long boardId)
     {
-        if(!board.getPosts().isEmpty())
-        {
-            for(Post post : board.getPosts())
-            {
-                fileService.deleteUploadedFile(post);
-                voteService.deleteVoteByPostId(post.getId());
-            }
-        }
-        boardRepository.delete(board);
+        postService.deleteAllPostsByBoardId(boardId);
+
+        boardRepository.deleteById(boardId);
+    }
+
+    private void removeAllChildrenBoard(Long boardId)
+    {
+        List<Board> childrenList = boardRepository.findBoardByParentBoardId(boardId);
+
+        if(!childrenList.isEmpty())
+            childrenList.forEach(childBoard -> {
+                deleteBoard(childBoard.getId());
+            });
     }
 
 }

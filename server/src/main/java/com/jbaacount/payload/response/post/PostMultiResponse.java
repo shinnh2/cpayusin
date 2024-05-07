@@ -2,6 +2,7 @@ package com.jbaacount.payload.response.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @ToString
+@AllArgsConstructor
 @NoArgsConstructor
 public class PostMultiResponse
 {
@@ -27,19 +29,4 @@ public class PostMultiResponse
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
-
-    @QueryProjection
-    public PostMultiResponse(Long memberId, String memberName, Long boardId, String boardName, Long id, String title, String content, Integer commentsCount, LocalDateTime createdAt)
-    {
-        this.memberId = memberId;
-        this.memberName = memberName;
-        this.boardId = boardId;
-        this.boardName = boardName;
-
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.commentsCount = commentsCount;
-        this.createdAt = createdAt;
-    }
 }

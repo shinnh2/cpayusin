@@ -50,9 +50,9 @@ public class MemberService
 
         if(multipartFile != null && !multipartFile.isEmpty())
         {
-            fileService.deleteProfilePhoto(findMember);
-            fileService.storeProfileImage(multipartFile, findMember);
-            log.info("profile image = {}", findMember.getFile().getUrl());
+            fileService.deleteProfilePhoto(findMember.getId());
+            String url = fileService.storeProfileImage(multipartFile, findMember);
+            findMember.setUrl(url);
         }
 
         if(request != null)
@@ -102,10 +102,10 @@ public class MemberService
 
         log.info("deleted Member nickname = {}", member.getNickname());
 
-        if(member.getFile() != null)
+        if(member.getUrl() != null)
         {
-            log.info("delete image = {}", member.getFile().getUrl());
-            fileService.deleteProfilePhoto(member);
+            log.info("delete image = {}", member.getUrl());
+            fileService.deleteProfilePhoto(member.getId());
         }
 
         memberRepository.deleteById(member.getId());

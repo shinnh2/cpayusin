@@ -25,7 +25,7 @@ public class PostSingleResponse
     private Long id;
     private String title;
     private String content;
-    private List<FileResponse> files;
+    private List<String> files;
 
     private Integer voteCount;
     private boolean voteStatus;

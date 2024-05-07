@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.security.core.parameters.P;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface VoteRepository extends JpaRepository<Vote, Long>
@@ -24,6 +25,12 @@ public interface VoteRepository extends JpaRepository<Vote, Long>
 
     @Query("SELECT v FROM Vote v WHERE v.member.id = :memberId AND v.comment.id = :commentId")
     Optional<Vote> findByMemberIdAndCommentId(@Param("memberId") Long memberId, @Param("commentId") Long commentId);
+
+    @Query("SELECT v FROM Vote v WHERE v.post.id = :postId")
+    List<Vote> findAllByPostId(@Param("postId") Long postId);
+
+    @Query("SELECT v FROM Vote v WHERE v.comment.id = :commentId")
+    List<Vote> findAllByCommentId(@Param("commentId") Long commentId);
 
     void deleteVoteByPostId(@Param("postId") Long postId);
 

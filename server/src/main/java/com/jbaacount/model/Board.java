@@ -35,10 +35,6 @@ public class Board extends BaseEntity
     @OneToMany(mappedBy = "parent")
     private List<Board> children = new ArrayList<>();
 
-
-    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Post> posts = new ArrayList<>();
-
     @Builder
     public Board(String name, Boolean isAdminOnly)
     {

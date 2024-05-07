@@ -1,9 +1,6 @@
 package com.jbaacount.dummy;
 
-import com.jbaacount.model.Board;
-import com.jbaacount.model.Comment;
-import com.jbaacount.model.Member;
-import com.jbaacount.model.Post;
+import com.jbaacount.model.*;
 import com.jbaacount.model.type.Platform;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -108,6 +105,15 @@ public class DummyObject
         return comment;
     }
 
+    protected Vote newMockPostVote(Long id, Member member, Post post)
+    {
+        return new Vote(member, post);
+    }
+
+    protected Vote newMockCommentVote(Long id, Member member, Comment comment)
+    {
+        return new Vote(member, comment);
+    }
 
     private String getEncodedPassword()
     {

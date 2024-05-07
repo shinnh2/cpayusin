@@ -2,6 +2,7 @@ package com.jbaacount.repository;
 
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
+import com.jbaacount.model.type.Role;
 import com.jbaacount.payload.response.member.MemberMultiResponse;
 import com.jbaacount.payload.response.member.MemberScoreResponse;
 import com.querydsl.core.types.ConstructorExpression;
@@ -57,9 +58,8 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 .select(extractMemberScoreResponse())
                 .from(member)
                 .leftJoin(member.posts, post)
-                .leftJoin(post.votes, vote)
                 .where(post.createdAt.between(startMonth, endMonth))
-                .where(post.member.email.ne("mike@ticonsys.com"))
+                .where(post.member.role.eq(Role.ADMIN.getValue()))
                 .groupBy(member.id)
                 .orderBy(
                         member.score.desc(), //점수 기준

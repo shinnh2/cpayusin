@@ -33,7 +33,7 @@ public interface CommentMapper
                 .commentId(entity.getId())
                 .parentId(parentId)
                 .text(entity.getText())
-                .voteCount(entity.getVotes().size())
+                .voteCount(entity.getVoteCount())
                 .voteStatus(voteStatus)
                 .isRemoved(entity.getIsRemoved())
                 .createdAt(entity.getCreatedAt())
@@ -42,7 +42,6 @@ public interface CommentMapper
 
     @Mapping(target = "memberId", source = "member.id")
     @Mapping(target = "memberName", source = "member.nickname")
-    @Mapping(target = "voteCount", expression = "java(comment.getVotes().size())")
     @Mapping(target = "parentId", source = "parent.id")
     @Mapping(target = "voteStatus", ignore = true)
     CommentChildrenResponse toCommentChildrenResponse(Comment comment);
@@ -51,7 +50,6 @@ public interface CommentMapper
 
     @Mapping(target = "memberId", source = "member.id")
     @Mapping(target = "memberName", source = "member.nickname")
-    @Mapping(target = "voteCount", expression = "java(comment.getVotes().size())")
     @Mapping(target = "voteStatus", ignore = true)
     CommentParentResponse toCommentParentResponse(Comment comment);
 

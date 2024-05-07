@@ -28,38 +28,12 @@ public interface MemberMapper
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "score", ignore = true)
     @Mapping(target = "platform", ignore = true)
-    @Mapping(target = "posts", ignore = true)
-    @Mapping(target = "file", ignore = true)
+    @Mapping(target = "url", ignore = true)
     Member toMemberEntity(MemberRegisterRequest postDto);
 
-    default MemberDetailResponse toMemberDetailResponse(Member member)
-    {
-        if ( member == null ) {
-            return null;
-        }
-
-        MemberDetailResponse memberDetailResponse = new MemberDetailResponse();
-
-        memberDetailResponse.setId( member.getId() );
-        memberDetailResponse.setNickname( member.getNickname() );
-        memberDetailResponse.setEmail( member.getEmail() );
-        memberDetailResponse.setScore( member.getScore() );
-        memberDetailResponse.setRole(member.getRole());
-        memberDetailResponse.setUrl(mapFiles(member.getFile()));
-        memberDetailResponse.setCreatedAt( member.getCreatedAt() );
-
-        return memberDetailResponse;
-    }
+    MemberDetailResponse toMemberDetailResponse(Member member);
 
     List<MemberDetailResponse> toMemberDetailList(List<Member> members);
 
     MemberSimpleResponse toMemberSimpleInfo(Member member);
-
-    default String mapFiles(File file)
-    {
-        if(file == null)
-            return null;
-
-        return file.getUrl();
-    }
 }

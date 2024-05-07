@@ -50,27 +50,16 @@ public interface PostMapper
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .content(entity.getContent())
-                .files(mapFiles(entity.getFiles()))
-                .voteCount(entity.getVotes().size())
+                .voteCount(entity.getVoteCount())
                 .createdAt(entity.getCreatedAt())
                 .voteStatus(voteStatus)
                 .build();
     }
 
-    default List<FileResponse> mapFiles(List<File> files)
-    {
-        if(files == null)
-            return null;
-
-        return FileMapper.INSTANCE.toFileResponseList(files);
-    }
-
-
     @Mapping(target = "memberId", source = "post.member.id")
     @Mapping(target = "memberName", source = "post.member.nickname")
     @Mapping(target = "boardId", source = "post.board.id")
     @Mapping(target = "boardName", source = "post.board.name")
-    @Mapping(target = "commentsCount", expression = "java(post.getComments().size())")
     PostMultiResponse toPostMultiResponse(Post post);
 
 

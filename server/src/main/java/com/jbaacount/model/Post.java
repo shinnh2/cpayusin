@@ -34,15 +34,6 @@ public class Post extends BaseEntity
     @JoinColumn(name = "board_id", nullable = false)
     private Board board;
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<File> files = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<Vote> votes = new ArrayList<>();
-
     @Builder
     public Post(String title, String content)
     {
@@ -53,23 +44,12 @@ public class Post extends BaseEntity
 
     public void addMember(Member member)
     {
-        if(this.member != null)
-            this.member.getPosts().remove(this);
-
         this.member = member;
-        if (member.getPosts() == null) {
-            member.setPosts(new ArrayList<>());
-        }
-        member.getPosts().add(this);
     }
 
     public void addBoard(Board board)
     {
-        if(this.board != null)
-            this.board.getPosts().remove(this);
-
         this.board = board;
-        board.getPosts().add(this);
     }
 
     public void updateTitle(String title)
@@ -92,8 +72,4 @@ public class Post extends BaseEntity
         this.voteCount--;
     }
 
-    public void removeFile(File file)
-    {
-        this.files.remove(file);
-    }
 }
