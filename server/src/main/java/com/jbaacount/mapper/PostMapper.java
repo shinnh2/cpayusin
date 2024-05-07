@@ -1,10 +1,8 @@
 package com.jbaacount.mapper;
 
-import com.jbaacount.model.File;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.payload.request.post.PostUpdateRequest;
-import com.jbaacount.payload.response.FileResponse;
 import com.jbaacount.payload.response.post.PostCreateResponse;
 import com.jbaacount.payload.response.post.PostMultiResponse;
 import com.jbaacount.payload.response.post.PostSingleResponse;
@@ -13,8 +11,6 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
-
-import java.util.List;
 
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

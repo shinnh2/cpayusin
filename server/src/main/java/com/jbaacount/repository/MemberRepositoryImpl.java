@@ -20,7 +20,6 @@ import java.util.List;
 import static com.jbaacount.model.QFile.file;
 import static com.jbaacount.model.QMember.member;
 import static com.jbaacount.model.QPost.post;
-import static com.jbaacount.model.QVote.vote;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,7 +35,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         List<MemberMultiResponse> memberDto = query
                 .select(getMemberList())
                 .from(member)
-                .leftJoin(member.file, file)
                 .where(ltMemberId(memberId))
                 .where(checkEmailKeyword(keyword))
                 .where(checkNicknameKeyword(keyword))
@@ -57,7 +55,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         return query
                 .select(extractMemberScoreResponse())
                 .from(member)
-                .leftJoin(member.posts, post)
+                .leftJoin(post.member, member)
                 .where(post.createdAt.between(startMonth, endMonth))
                 .where(post.member.role.eq(Role.ADMIN.getValue()))
                 .groupBy(member.id)
@@ -65,7 +63,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                         member.score.desc(), //점수 기준
                         post.count().desc(), //해당 월에 작성한 게시글 기준
                         post.voteCount.sum().desc(), //해당 월에 받은 투표 개수 기준
-                        member.posts.size().desc(), //그 동안의 총 개시물 갯수
                         member.createdAt.asc() //가입 날짜 오래 된 순
                 )
                 .limit(3)
@@ -85,7 +82,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 member.id,
                 member.nickname,
                 member.email,
-                member.file != null ? member.file.url : null,
+                member.url != null ? member.url : null,
                 member.score,
                 member.role);
     }

@@ -1,8 +1,6 @@
 package com.jbaacount.mapper;
 
-import com.jbaacount.model.File;
 import com.jbaacount.model.Member;
-import com.jbaacount.model.type.Role;
 import com.jbaacount.payload.request.member.MemberRegisterRequest;
 import com.jbaacount.payload.response.member.MemberCreateResponse;
 import com.jbaacount.payload.response.member.MemberDetailResponse;
