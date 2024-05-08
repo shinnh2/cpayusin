@@ -14,6 +14,7 @@ public class MemberUpdateResponse
     private String nickname;
 
     private String email;
+    private String url;
 
     private String role;
 
