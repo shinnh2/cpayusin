@@ -276,7 +276,31 @@ class AdminControllerTest extends DummyObject
                                 fieldWithPath("[].category[].orderIndex").description("하위 게시판 순서").type(JsonFieldType.NUMBER),
                                 fieldWithPath("[].category[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
                                 fieldWithPath("[].category[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional()
+                        ),
+                        responseFields(
+                                fieldWithPath("data[].id").description("게시판 고유 식별 번호").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].name").description("게시판 이름").type(JsonFieldType.STRING),
+                                fieldWithPath("data[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
+                                fieldWithPath("data[].orderIndex").description("게시판 순서").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional(),
+                                fieldWithPath("data[].type").description("게시판 유형").type(JsonFieldType.STRING),
+
+                                fieldWithPath("data[].category").description("하위 게시판 정보").type(JsonFieldType.ARRAY).optional(),
+                                fieldWithPath("data[].category[].id").description("하위 게시판 아이디").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].category[].name").description("하위 게시판 이름").type(JsonFieldType.STRING),
+                                fieldWithPath("data[].category[].orderIndex").description("하위 게시판 순서").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].category[].type").description("게시판 유형").type(JsonFieldType.STRING),
+                                fieldWithPath("data[].category[].parentId").description("상위 게시판의 고유 식별 번호").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].category[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
+                                fieldWithPath("data[].category[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional(),
+
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
                         )
-                        ));
+
+                ));
     }
 }

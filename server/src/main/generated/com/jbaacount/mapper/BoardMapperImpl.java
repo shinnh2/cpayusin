@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-05-09T12:32:45+0900",
+    date = "2024-05-09T17:45:27+0900",
     comments = "version: 1.5.3.Final, compiler: IncrementalProcessingEnvironment from gradle-language-java-8.1.1.jar, environment: Java 17.0.7 (Azul Systems, Inc.)"
 )
 @Component
@@ -97,15 +97,15 @@ public class BoardMapperImpl implements BoardMapper {
             return null;
         }
 
-        BoardResponse boardResponse = new BoardResponse();
+        BoardResponse.BoardResponseBuilder boardResponse = BoardResponse.builder();
 
-        boardResponse.setParentId( entityParentId( entity ) );
-        boardResponse.setId( entity.getId() );
-        boardResponse.setName( entity.getName() );
-        boardResponse.setOrderIndex( entity.getOrderIndex() );
-        boardResponse.setIsAdminOnly( entity.getIsAdminOnly() );
+        boardResponse.parentId( entityParentId( entity ) );
+        boardResponse.id( entity.getId() );
+        boardResponse.name( entity.getName() );
+        boardResponse.orderIndex( entity.getOrderIndex() );
+        boardResponse.isAdminOnly( entity.getIsAdminOnly() );
 
-        return boardResponse;
+        return boardResponse.build();
     }
 
     @Override
