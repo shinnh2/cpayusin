@@ -1,7 +1,6 @@
 package com.jbaacount.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
@@ -13,6 +12,7 @@ import com.jbaacount.payload.response.board.BoardChildrenResponse;
 import com.jbaacount.payload.response.board.BoardCreateResponse;
 import com.jbaacount.payload.response.board.BoardMenuResponse;
 import com.jbaacount.service.BoardService;
+import com.jbaacount.setup.RestDocsSetup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +21,6 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
@@ -48,22 +46,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureRestDocs
 @ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(AdminController.class)
-class AdminControllerTest extends DummyObject
+class AdminControllerTest extends RestDocsSetup
 {
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private MockMvc mvc;
-
     @MockBean
     private BoardService boardService;
-
-    @MockBean
-    private RedisTemplate<String, String> redisTemplate;
-
-    @MockBean
-    private ValueOperations<String, String> valueOperations;
 
 
     Member member;

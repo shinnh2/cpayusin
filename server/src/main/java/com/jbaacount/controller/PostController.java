@@ -37,7 +37,6 @@ public class PostController
                                                                        @RequestPart(value = "files", required = false) List<MultipartFile> files,
                                                                        @AuthenticationPrincipal MemberDetails currentMember)
     {
-
         var data = postService.createPost(request, files, currentMember.getMember());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));

@@ -1,7 +1,6 @@
 package com.jbaacount.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jbaacount.MockSetup;
 import com.jbaacount.payload.request.member.MemberRegisterRequest;
 import com.jbaacount.payload.request.member.ResetPasswordDto;
 import com.jbaacount.payload.request.member.VerificationDto;
@@ -10,21 +9,14 @@ import com.jbaacount.payload.response.member.MemberCreateResponse;
 import com.jbaacount.payload.response.member.ResetPasswordResponse;
 import com.jbaacount.service.AuthenticationService;
 import com.jbaacount.service.MemberService;
-import org.junit.jupiter.api.BeforeEach;
+import com.jbaacount.setup.RestDocsSetup;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
@@ -40,36 +32,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WithMockUser(roles = "ADMIN")
-@MockBean(JpaMetamodelMappingContext.class)
-@AutoConfigureRestDocs
-@ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(AuthenticationController.class)
-class AuthenticationControllerTest extends MockSetup
+class AuthenticationControllerTest extends RestDocsSetup
 {
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private MockMvc mvc;
-
     @MockBean
     private AuthenticationService authenticationService;
 
     @MockBean
     private MemberService memberService;
 
-    @MockBean
-    private RedisTemplate<String, String> redisTemplate;
-
-    @MockBean
-    private ValueOperations<String, String> valueOperations;
-
-    @BeforeEach
-    void setUp()
-    {
-        given(redisTemplate.opsForValue()).willReturn(valueOperations);
-    }
 
     @Test
     void logout() throws Exception

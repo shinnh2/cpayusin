@@ -3,7 +3,7 @@ package com.jbaacount.integration;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jbaacount.MockSetup;
+import com.jbaacount.setup.MockSetup;
 import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.member.MemberUpdateRequest;

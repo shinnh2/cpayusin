@@ -2,7 +2,7 @@ package com.jbaacount.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jbaacount.MockSetup;
+import com.jbaacount.setup.MockSetup;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;

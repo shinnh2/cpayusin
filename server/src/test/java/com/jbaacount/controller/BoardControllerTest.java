@@ -6,6 +6,7 @@ import com.jbaacount.payload.response.board.BoardChildrenResponse;
 import com.jbaacount.payload.response.board.BoardMenuResponse;
 import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.service.BoardService;
+import com.jbaacount.setup.RestDocsSetup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,34 +38,12 @@ import static org.springframework.restdocs.request.RequestDocumentation.pathPara
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
-@WithMockUser(roles = "ADMIN")
-@MockBean(JpaMetamodelMappingContext.class)
-@AutoConfigureRestDocs
-@ExtendWith(RestDocumentationExtension.class)
 @WebMvcTest(BoardController.class)
-class BoardControllerTest
+class BoardControllerTest extends RestDocsSetup
 {
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private MockMvc mvc;
-
     @MockBean
     private BoardService boardService;
 
-    @MockBean
-    private RedisTemplate<String, String> redisTemplate;
-
-    @MockBean
-    private ValueOperations<String, String> valueOperations;
-
-    @BeforeEach
-    void setUp()
-    {
-        given(redisTemplate.opsForValue()).willReturn(valueOperations);
-    }
 
     @Test
     void getMenu() throws Exception

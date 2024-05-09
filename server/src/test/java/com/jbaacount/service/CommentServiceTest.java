@@ -1,6 +1,6 @@
 package com.jbaacount.service;
 
-import com.jbaacount.MockSetup;
+import com.jbaacount.setup.MockSetup;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.model.Comment;
 import com.jbaacount.model.type.CommentType;

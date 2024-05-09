@@ -1,4 +1,4 @@
-package com.jbaacount;
+package com.jbaacount.setup;
 
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.model.*;

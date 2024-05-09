@@ -1,6 +1,6 @@
 package com.jbaacount.service;
 
-import com.jbaacount.MockSetup;
+import com.jbaacount.setup.MockSetup;
 import com.jbaacount.model.Vote;
 import com.jbaacount.repository.CommentRepository;
 import com.jbaacount.repository.PostRepository;
