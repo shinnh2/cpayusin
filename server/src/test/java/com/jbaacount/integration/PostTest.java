@@ -1,4 +1,4 @@
-package com.jbaacount.controller;
+package com.jbaacount.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.dummy.DummyObject;
@@ -24,14 +24,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Sql("classpath:db/teardown.sql")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class PostControllerTest extends DummyObject
+class PostTest extends DummyObject
 {
     @Autowired
     private ObjectMapper objectMapper;

@@ -1,151 +1,315 @@
 package com.jbaacount.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jbaacount.dummy.DummyObject;
-import com.jbaacount.global.security.jwt.JwtService;
-import com.jbaacount.model.Member;
+import com.jbaacount.MockSetup;
 import com.jbaacount.payload.request.member.MemberRegisterRequest;
-import com.jbaacount.repository.MemberRepository;
-import com.jbaacount.repository.RedisRepository;
+import com.jbaacount.payload.request.member.ResetPasswordDto;
+import com.jbaacount.payload.request.member.VerificationDto;
+import com.jbaacount.payload.response.AuthenticationResponse;
+import com.jbaacount.payload.response.member.MemberCreateResponse;
+import com.jbaacount.payload.response.member.ResetPasswordResponse;
 import com.jbaacount.service.AuthenticationService;
-import jakarta.persistence.EntityManager;
+import com.jbaacount.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import static com.jbaacount.utils.DescriptionUtils.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql("classpath:db/teardown.sql")
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class AuthenticationControllerTest extends DummyObject
+@WithMockUser(roles = "ADMIN")
+@MockBean(JpaMetamodelMappingContext.class)
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
+@WebMvcTest(AuthenticationController.class)
+class AuthenticationControllerTest extends MockSetup
 {
-    @Autowired
-    private MockMvc mvc;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
-    private MemberRepository memberRepository;
+    private MockMvc mvc;
 
-    @Autowired
-    private EntityManager em;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Mock
-    private RedisRepository redisRepository;
-
-    @InjectMocks
+    @MockBean
     private AuthenticationService authenticationService;
+
+    @MockBean
+    private MemberService memberService;
+
+    @MockBean
+    private RedisTemplate<String, String> redisTemplate;
+
+    @MockBean
+    private ValueOperations<String, String> valueOperations;
 
     @BeforeEach
     void setUp()
     {
-        Member member1 = newMember("aa@naver.com", "test");
-
-        memberRepository.save(member1);
-        em.clear();
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
     }
 
     @Test
-    void signUp_test() throws Exception
+    void logout() throws Exception
     {
         // given
-        MemberRegisterRequest request = new MemberRegisterRequest();
-        request.setEmail("bb@naver.com");
-        request.setNickname("test2");
-        request.setPassword("123456789");
+        given(authenticationService.logout(any())).willReturn("로그아웃 되었습니다.");
+
+        // when
+        ResultActions resultActions = mvc
+                .perform(post("/api/v1/logout")
+                        .with(csrf())
+                        .header("Refresh", TOKEN))
+                .andExpect(status().isOk())
+                .andDo(document("logout",
+                        requestHeaders(
+                                headerWithName("Refresh").description("리프레시 토큰")
+                        ),
+
+                        responseFields(
+                                fieldWithPath("data").type(JsonFieldType.STRING).description("응답"),
+
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+
+                        )
+                ));
+
+        // then
+        System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
+
+
+    }
+
+    @Test
+    void signUp() throws Exception
+    {
+        // given
+        MemberRegisterRequest request = MemberRegisterRequest.builder()
+                .email("test@naver.com")
+                .nickname("test1")
+                .password("123456789")
+                .build();
 
         String requestBody = objectMapper.writeValueAsString(request);
 
+        MemberCreateResponse response = MemberCreateResponse.builder()
+                .id(1L)
+                .email(request.getEmail())
+                .nickname(request.getNickname())
+                .score(0)
+                .role("USER")
+                .build();
+
+        given(authenticationService.register(any(MemberRegisterRequest.class))).willReturn(response);
+
         // when
-        when(redisRepository.hasKey(any())).thenReturn(true);
 
         ResultActions resultActions = mvc
                 .perform(post("/api/v1/sign-up")
+                        .with(csrf())
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON));
 
         // then
         String responseBody = resultActions.andReturn().getResponse().getContentAsString();
+
+        System.out.println("request body " + requestBody);
         System.out.println("response body " + responseBody);
 
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.nickname").value("test2"))
-                .andExpect(jsonPath("$.data.email").value("bb@naver.com"))
-                .andExpect(jsonPath("$.data.score").value("0"));
+                .andExpect(jsonPath("$.data.nickname").value(response.getNickname()))
+                .andExpect(jsonPath("$.data.email").value(response.getEmail()))
+                .andExpect(jsonPath("$.data.score").value(0))
+                .andDo(document("signup",
+                            requestFields(
+                                    fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                                    fieldWithPath("email").type(JsonFieldType.STRING).description("유저 이메일"),
+                                    fieldWithPath("password").type(JsonFieldType.STRING).description("유저 비밀번호")
+                            ),
+                        responseFields(
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("유저 고유 식별 번호"),
+                                fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                                fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
+                                fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급"),
+                                fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("점수"),
+
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
     }
 
 
-    @WithMockUser(value = "test", setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @Test
-    void logout() throws Exception
+    void reissue() throws Exception
     {
         // given
-        String email = "aa@naver.com";
-        String refreshToken = jwtService.generateRefreshToken(email);
+        AuthenticationResponse response = AuthenticationResponse.builder()
+                .memberId(1L)
+                .role("ADMIN")
+                .email("test@naver.com")
+                .accessToken(TOKEN)
+                .refreshToken(TOKEN)
+                .build();
 
-        System.out.println("refresh token = " +refreshToken);
-
-
-        when(redisRepository.hasKey(eq(refreshToken))).thenReturn(true);
-        when(redisRepository.hasKey(refreshToken)).thenReturn(true);
+        given(authenticationService.reissue(any(String.class), any(String.class))).willReturn(response);
 
         // when
         ResultActions resultActions = mvc
-                .perform(post("/api/v1/logout")
-                        .header("Refresh", refreshToken));
+                .perform(post("/api/v1/reissue")
+                        .with(csrf())
+                        .header(HttpHeaders.AUTHORIZATION, TOKEN)
+                        .header("Refresh", TOKEN));
+
 
         // then
-        String responseBody = resultActions.andReturn().getResponse().getContentAsString();
-        System.out.println("response = " + responseBody);
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(document("reissue",
+                        requestHeaders(
+                                headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰"),
+                                headerWithName("Refresh").description("리프레시 토큰")
+                        ),
+                        responseFields(
+                                fieldWithPath("data.memberId").type(JsonFieldType.NUMBER).description("유저 고유 식별 번호"),
+                                fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
+                                fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급"),
+                                fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
+
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
+
+        System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
     }
 
     @Test
-    void reissue()
+    void verifyCode() throws Exception
     {
         // given
+        VerificationDto verificationDto = VerificationDto.builder()
+                .email("test@gmail.com")
+                .verificationCode(VERIFICATION_CODE)
+                .build();
+
+        String requestBody = objectMapper.writeValueAsString(verificationDto);
+
+        given(authenticationService.verifyCode(any(VerificationDto.class))).willReturn("인증이 완료되었습니다.");
 
         // when
+        ResultActions resultActions = mvc
+                .perform(get("/api/v1/verification")
+                        .with(csrf())
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON));
 
         // then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(document("verify code",
+                        requestFields(
+                                fieldWithPath("email").description("유저 이메일"),
+                                fieldWithPath("verificationCode").description("인증 코드")
+                        ),
+                        responseFields(
+                                fieldWithPath("data").type(JsonFieldType.STRING).description("결과"),
+
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
+
+        System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
     }
 
     @Test
-    void verifyCode()
+    void resetPassword() throws Exception
     {
         // given
+        ResetPasswordDto resetPasswordDto = ResetPasswordDto.builder()
+                .email("test@naver.com")
+                .password("123456789")
+                .build();
+
+        String requestBody = objectMapper.writeValueAsString(resetPasswordDto);
+
+        ResetPasswordResponse response = ResetPasswordResponse.builder()
+                .id(1L)
+                .email(resetPasswordDto.getEmail())
+                .nickname("가시제거연구소")
+                .role("ADMIN")
+                .build();
+
+
+        given(authenticationService.resetPassword(any(ResetPasswordDto.class))).willReturn(response);
 
         // when
+        ResultActions resultActions = mvc
+                .perform(patch("/api/v1/reset-password")
+                        .with(csrf())
+                        .content(requestBody)
+                        .contentType(MediaType.APPLICATION_JSON));
 
         // then
-    }
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(document("reset password",
+                        requestFields(
+                                fieldWithPath("email").description("유저 이메일"),
+                                fieldWithPath("password").description("새 비밀번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("유저 고유 식별 번호"),
+                                fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
+                                fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
+                                fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급"),
 
-    @Test
-    void resetPassword()
-    {
-        // given
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
 
-        // when
-
-        // then
+        System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
     }
 }

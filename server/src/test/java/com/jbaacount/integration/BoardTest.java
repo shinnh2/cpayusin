@@ -1,4 +1,4 @@
-package com.jbaacount.controller;
+package com.jbaacount.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.dummy.DummyObject;
@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Sql("classpath:db/teardown.sql")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class BoardControllerTest extends DummyObject
+class BoardTest extends DummyObject
 {
     @Autowired
     private ObjectMapper objectMapper;

@@ -5,11 +5,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@AllArgsConstructor
+@Data
 @NoArgsConstructor
-public class MemberCreateResponse
+@AllArgsConstructor
+public class ResetPasswordResponse
 {
     private Long id;
 
@@ -18,6 +18,4 @@ public class MemberCreateResponse
     private String email;
 
     private String role;
-
-    private int score;
 }

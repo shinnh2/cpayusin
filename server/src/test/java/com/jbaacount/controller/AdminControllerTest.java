@@ -33,6 +33,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
+import static com.jbaacount.utils.DescriptionUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -135,14 +136,14 @@ class AdminControllerTest extends DummyObject
                                 fieldWithPath("data.isAdminOnly").type(JsonFieldType.BOOLEAN).description("관리자만 글을 쓸 수 있는지 여부"),
                                 fieldWithPath("data.orderIndex").type(JsonFieldType.NUMBER).description("게시판 순서"),
                                 fieldWithPath("data.parentId").type(JsonFieldType.NUMBER).description("상위 게시판 아이디").optional(),
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description("페이지 정보").optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description("성공 여부"),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description("메세지"),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description("코드"),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description("상태")
-                        )
 
-                        ));
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
     }
 
     @Test
