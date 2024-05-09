@@ -1,12 +1,11 @@
 package com.jbaacount.controller;
 
 import com.jbaacount.global.security.userdetails.MemberDetails;
-import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.board.BoardCreateRequest;
 import com.jbaacount.payload.request.board.BoardUpdateRequest;
-import com.jbaacount.payload.response.board.BoardMenuResponse;
-import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.board.BoardCreateResponse;
+import com.jbaacount.payload.response.board.BoardMenuResponse;
 import com.jbaacount.service.BoardService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +29,8 @@ public class AdminController
 
     @PostMapping("/board/create")
     @PreAuthorize("hasAnyRole('ROLE_ADMIN')")
-    public ResponseEntity<GlobalResponse<BoardResponse>> saveBoard(@Valid @RequestBody BoardCreateRequest request,
-                                                                   @AuthenticationPrincipal MemberDetails currentMember)
+    public ResponseEntity<GlobalResponse<BoardCreateResponse>> saveBoard(@Valid @RequestBody BoardCreateRequest request,
+                                                                         @AuthenticationPrincipal MemberDetails currentMember)
     {
         var data = boardService.createBoard(request, currentMember.getMember());
 

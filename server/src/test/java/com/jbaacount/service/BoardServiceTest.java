@@ -7,6 +7,7 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.board.BoardCreateRequest;
+import com.jbaacount.payload.response.board.BoardCreateResponse;
 import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.repository.BoardRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -16,14 +17,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -69,7 +68,7 @@ public class BoardServiceTest extends MockSetup
         assertThrows(BusinessLogicException.class, () -> utilService.isAdmin(user));
 
         // when
-        BoardResponse response = boardService.createBoard(request, admin);
+        BoardCreateResponse response = boardService.createBoard(request, admin);
         String responseBody = om.writeValueAsString(response);
 
         System.out.println("response body = " + responseBody);

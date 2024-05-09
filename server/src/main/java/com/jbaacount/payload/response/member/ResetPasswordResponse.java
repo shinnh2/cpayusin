@@ -1,4 +1,4 @@
-package com.jbaacount.payload.response.board;
+package com.jbaacount.payload.response.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,14 +9,13 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BoardResponse
+public class ResetPasswordResponse
 {
     private Long id;
 
-    private String name;
+    private String nickname;
 
-    private Integer orderIndex;
+    private String email;
 
-    private Long parentId;
-    private Boolean isAdminOnly;
+    private String role;
 }

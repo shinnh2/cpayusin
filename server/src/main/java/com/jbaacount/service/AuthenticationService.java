@@ -9,9 +9,11 @@ import com.jbaacount.model.Member;
 import com.jbaacount.model.type.Platform;
 import com.jbaacount.model.type.Role;
 import com.jbaacount.payload.request.member.MemberRegisterRequest;
+import com.jbaacount.payload.request.member.ResetPasswordDto;
+import com.jbaacount.payload.request.member.VerificationDto;
 import com.jbaacount.payload.response.AuthenticationResponse;
 import com.jbaacount.payload.response.member.MemberCreateResponse;
-import com.jbaacount.payload.response.member.MemberDetailResponse;
+import com.jbaacount.payload.response.member.ResetPasswordResponse;
 import com.jbaacount.repository.RedisRepository;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
@@ -48,18 +50,17 @@ public class AuthenticationService
 
     }
 
-    public String verifyCode(String email, String inputCode)
+    public String verifyCode(VerificationDto verificationDto)
     {
-        log.info("email = {}", email);
-        String verificationCode = redisRepository.getVerificationCodeByEmail(email);
-        log.info("verification code = {}", verificationCode);
+        String verificationCode = redisRepository.getVerificationCodeByEmail(verificationDto.getEmail());
+
 
         if(verificationCode == null)
             throw new BusinessLogicException(ExceptionMessage.EXPIRED_VERIFICATION_CODE);
 
-        if(verificationCode.equals(inputCode))
+        if(verificationCode.equals(verificationDto.getVerificationCode()))
         {
-            redisRepository.deleteEmailAfterVerification(email);
+            redisRepository.deleteEmailAfterVerification(verificationDto.getEmail());
             log.info("email removed from redis successfully");
             return "인증이 완료되었습니다.";
         }
@@ -69,13 +70,13 @@ public class AuthenticationService
     }
 
     @Transactional
-    public MemberDetailResponse resetPassword(String email, String password)
+    public ResetPasswordResponse resetPassword(ResetPasswordDto resetPasswordDto)
     {
-        Member member = memberService.findMemberByEmail(email);
+        Member member = memberService.findMemberByEmail(resetPasswordDto.getEmail());
 
-        member.updatePassword(passwordEncoder.encode(password.toString()));
+        member.updatePassword(passwordEncoder.encode(resetPasswordDto.getPassword().toString()));
 
-        return MemberMapper.INSTANCE.toMemberDetailResponse(member);
+        return MemberMapper.INSTANCE.toResetPasswordResponse(member);
     }
 
 

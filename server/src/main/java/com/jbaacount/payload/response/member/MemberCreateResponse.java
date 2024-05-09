@@ -1,12 +1,14 @@
 package com.jbaacount.payload.response.member;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import org.checkerframework.checker.units.qual.N;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
 @AllArgsConstructor
-@N
+@NoArgsConstructor
 public class MemberCreateResponse
 {
     private Long id;

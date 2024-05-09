@@ -6,8 +6,10 @@ import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.member.MemberRegisterRequest;
+import com.jbaacount.payload.request.member.ResetPasswordDto;
+import com.jbaacount.payload.request.member.VerificationDto;
 import com.jbaacount.payload.response.member.MemberCreateResponse;
-import com.jbaacount.payload.response.member.MemberDetailResponse;
+import com.jbaacount.payload.response.member.ResetPasswordResponse;
 import com.jbaacount.repository.RedisRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -96,11 +98,16 @@ public class AuthenticationServiceTest extends DummyObject
         String email = "a.naver.com";
         String verificationCode = "ABCDEFGH";
 
+        VerificationDto verificationDto = VerificationDto.builder()
+                .email(email)
+                .verificationCode(verificationCode)
+                .build();
+
         // stub 1
         when(redisRepository.getVerificationCodeByEmail(any(String.class))).thenReturn(verificationCode);
 
         // when
-        String response = authenticationService.verifyCode(email, verificationCode);
+        String response = authenticationService.verifyCode(verificationDto);
 
         // then
         assertThat(response).isEqualTo("인증이 완료되었습니다.");
@@ -113,6 +120,11 @@ public class AuthenticationServiceTest extends DummyObject
         Member member = newMockMember(1L, "aa@naver.com", "test", "ADMIN");
         String newPassword = "12345";
 
+        ResetPasswordDto resetPasswordDto = ResetPasswordDto.builder()
+                .email(member.getEmail())
+                .password(newPassword)
+                .build();
+
         // stub 1
         when(memberService.findMemberByEmail(any())).thenReturn(member);
 
@@ -120,7 +132,7 @@ public class AuthenticationServiceTest extends DummyObject
         member.updatePassword(passwordEncoder.encode(newPassword));
 
         // when
-        MemberDetailResponse response = authenticationService.resetPassword(member.getEmail(), newPassword);
+        ResetPasswordResponse response = authenticationService.resetPassword(resetPasswordDto);
 
         // then
         assertThat(response.getEmail()).isEqualTo("aa@naver.com");

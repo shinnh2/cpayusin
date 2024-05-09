@@ -6,11 +6,13 @@ import com.jbaacount.global.validation.notspace.NotSpace;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 
 @AllArgsConstructor
+@Builder
 @NoArgsConstructor
 @Data
 public class MemberRegisterRequest

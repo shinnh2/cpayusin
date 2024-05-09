@@ -1,15 +1,13 @@
 package com.jbaacount.payload.response.board;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
 @ToString
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class BoardMenuResponse

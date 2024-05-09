@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,9 +26,8 @@ public class VisitorInterceptor implements HandlerInterceptor
         LocalDate date = LocalDate.now();
         String key = ipAddress + "_" + date;
 
-        ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
-
         if(!redisTemplate.hasKey(key)) {
+            ValueOperations<String, String> valueOperations = redisTemplate.opsForValue();
             log.info("ip = {}", ipAddress);
 
             valueOperations.set(key, userAgent);

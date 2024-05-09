@@ -1,30 +1,49 @@
 package com.jbaacount.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jbaacount.dummy.DummyObject;
-import com.jbaacount.model.Board;
-import com.jbaacount.model.Member;
 import com.jbaacount.model.type.BoardType;
-import com.jbaacount.repository.BoardRepository;
-import com.jbaacount.repository.MemberRepository;
+import com.jbaacount.payload.response.board.BoardChildrenResponse;
+import com.jbaacount.payload.response.board.BoardMenuResponse;
+import com.jbaacount.payload.response.board.BoardResponse;
+import com.jbaacount.service.BoardService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
+import org.springframework.restdocs.payload.JsonFieldType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.List;
+
+import static com.jbaacount.utils.DescriptionUtils.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@Sql("classpath:db/teardown.sql")
-@AutoConfigureMockMvc
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-class BoardControllerTest extends DummyObject
+@WithMockUser(roles = "ADMIN")
+@MockBean(JpaMetamodelMappingContext.class)
+@AutoConfigureRestDocs
+@ExtendWith(RestDocumentationExtension.class)
+@WebMvcTest(BoardController.class)
+class BoardControllerTest
 {
     @Autowired
     private ObjectMapper objectMapper;
@@ -32,105 +51,219 @@ class BoardControllerTest extends DummyObject
     @Autowired
     private MockMvc mvc;
 
-    @Autowired
-    private MemberRepository memberRepository;
+    @MockBean
+    private BoardService boardService;
 
-    @Autowired
-    private BoardRepository boardRepository;
+    @MockBean
+    private RedisTemplate<String, String> redisTemplate;
 
+    @MockBean
+    private ValueOperations<String, String> valueOperations;
 
     @BeforeEach
     void setUp()
     {
-        Member member = newMockMember(1L, "abc@naver.com", "mockUser", "ADMIN");
-        memberRepository.save(member);
-
-        Board board1 = boardRepository.save(newMockBoard(1L, "board1", 1));
-
-        boardRepository.save(newMockBoard(2L, "board2", 2));
-
-        Board category1 = newMockBoard(3L, "category1", 1);
-        Board category2 = newMockBoard(4L, "category2", 2);
-
-        category1.addParent(board1);
-        category2.addParent(board1);
-
-        boardRepository.save(category1);
-        boardRepository.save(category2);
+        given(redisTemplate.opsForValue()).willReturn(valueOperations);
     }
 
     @Test
     void getMenu() throws Exception
     {
         // given
+        BoardMenuResponse response1 = BoardMenuResponse.builder()
+                .id(1L)
+                .name("board 1")
+                .orderIndex(1)
+                .isAdminOnly(true)
+                .type(BoardType.BOARD.getCode())
+                .build();
+
+        BoardChildrenResponse childrenResponse1 =  BoardChildrenResponse.builder()
+                .id(4L)
+                .name("category 1")
+                .orderIndex(1)
+                .isAdminOnly(false)
+                .type(BoardType.CATEGORY.getCode())
+                .parentId(response1.getId())
+                .build();
+
+        BoardChildrenResponse childrenResponse2 =  BoardChildrenResponse.builder()
+                .id(5L)
+                .name("category 2")
+                .orderIndex(2)
+                .isAdminOnly(false)
+                .type(BoardType.CATEGORY.getCode())
+                .parentId(response1.getId())
+                .build();
+
+        response1.setCategory(List.of(childrenResponse1, childrenResponse2));
+
+
+        BoardMenuResponse response2 = BoardMenuResponse.builder()
+                .id(2L)
+                .name("board 2")
+                .orderIndex(2)
+                .isAdminOnly(true)
+                .type(BoardType.BOARD.getCode())
+                .build();
+
+        BoardMenuResponse response3 = BoardMenuResponse.builder()
+                .id(3L)
+                .name("board 3")
+                .orderIndex(3)
+                .isAdminOnly(false)
+                .type(BoardType.BOARD.getCode())
+                .build();
+
+        List<BoardMenuResponse> responseList = List.of(response1, response2, response3);
+
+        given(boardService.getMenuList()).willReturn(responseList);
 
         // when
         ResultActions resultActions = mvc
-                .perform(get("/api/v1/board/menu"));
+                .perform(get("/api/v1/board/menu")
+                        .with(csrf()));
 
-        String responseBody = objectMapper.writeValueAsString(resultActions.andReturn().getResponse().getContentAsString());
-
-        System.out.println("response body = " + responseBody);
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].id").value(1L))
-                .andExpect(jsonPath("$.data[0].name").value("board1"))
-                .andExpect(jsonPath("$.data[0].type").value(BoardType.BOARD.getCode()))
-                .andExpect(jsonPath("$.data[0].category[0].id").value(3L))
-                .andExpect(jsonPath("$.data[0].category[0].name").value("category1"))
-                .andExpect(jsonPath("$.data[0].category[0].type").value(BoardType.CATEGORY.getCode()))
-                .andExpect(jsonPath("$.data[0].category[1].id").value(4L))
-                .andExpect(jsonPath("$.data[0].category[1].name").value("category2"))
-                .andExpect(jsonPath("$.data[0].category[1].type").value(BoardType.CATEGORY.getCode()))
+                .andDo(document("get menu",
+                        responseFields(
+                                fieldWithPath("data[].id").description("게시판 고유 식별 번호").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].name").description("게시판 이름").type(JsonFieldType.STRING),
+                                fieldWithPath("data[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
+                                fieldWithPath("data[].orderIndex").description("게시판 순서").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional(),
+                                fieldWithPath("data[].type").description("게시판 유형").type(JsonFieldType.STRING),
 
+                                fieldWithPath("data[].category").description("하위 게시판 정보").type(JsonFieldType.ARRAY).optional(),
+                                fieldWithPath("data[].category[].id").description("하위 게시판 아이디").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].category[].name").description("하위 게시판 이름").type(JsonFieldType.STRING),
+                                fieldWithPath("data[].category[].orderIndex").description("하위 게시판 순서").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].category[].type").description("게시판 유형").type(JsonFieldType.STRING),
+                                fieldWithPath("data[].category[].parentId").description("상위 게시판의 고유 식별 번호").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data[].category[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
+                                fieldWithPath("data[].category[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional(),
 
-                .andExpect(jsonPath("$.data[1].id").value(2L))
-                .andExpect(jsonPath("$.data[1].name").value("board2"))
-                .andExpect(jsonPath("$.data[1].type").value(BoardType.BOARD.getCode()));
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
 
+        System.out.println("resultActions: " + resultActions.andReturn().getResponse().getContentAsString());
     }
 
     @Test
     void getBoardById() throws Exception
     {
         // given
+        Long boardId = 3L;
+
+        BoardResponse response = BoardResponse.builder()
+                .id(boardId)
+                .name("운영체제의 종류")
+                .orderIndex(1)
+                .parentId(2L)
+                .isAdminOnly(false)
+                .build();
+
+        given(boardService.findBoardById(any(Long.class))).willReturn(response);
 
         // when
         ResultActions resultActions = mvc
-                .perform(get("/api/v1/board/single-info/" + 1));
+                .perform(get("/api/v1/board/single-info/{board-id}", boardId)
+                        .with(csrf()));
 
-        String responseBody = objectMapper.writeValueAsString(resultActions.andReturn().getResponse().getContentAsString());
-
-        System.out.println("response body = " + responseBody);
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(1L))
-                .andExpect(jsonPath("$.data.name").value("board1"));
+                .andDo(document("get board detail",
+                        pathParameters(
+                                parameterWithName("board-id").description("게시판 고유 식별 번호")
+                        ),
+
+                        responseFields(
+                                fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("게시판 고유 식별 번호"),
+                                fieldWithPath("data.name").type(JsonFieldType.STRING).description("게시판 이름"),
+                                fieldWithPath("data.orderIndex").type(JsonFieldType.NUMBER).description("게시판 순서"),
+                                fieldWithPath("data.parentId").type(JsonFieldType.NUMBER).description("상위 게시판 고유 식별 번호").optional(),
+                                fieldWithPath("data.isAdminOnly").type(JsonFieldType.BOOLEAN).description("관리자만 글을 쓸 수 있는지 여부"),
+
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
+
+        System.out.println("resultActions: " + resultActions.andReturn().getResponse().getContentAsString());
     }
 
     @Test
-    void getCategoryList() throws Exception
+    void getCategoryList()  throws Exception
     {
         // given
+        Long parentBoardId = 1L;
+
+        BoardResponse response1 = BoardResponse.builder()
+                .id(2L)
+                .name("Java Script")
+                .orderIndex(1)
+                .parentId(parentBoardId)
+                .isAdminOnly(false)
+                .build();
+
+        BoardResponse response2 = BoardResponse.builder()
+                .id(3L)
+                .name("Java")
+                .orderIndex(2)
+                .parentId(parentBoardId)
+                .isAdminOnly(false)
+                .build();
+
+        BoardResponse response3 = BoardResponse.builder()
+                .id(4L)
+                .name("질문 게시판")
+                .orderIndex(2)
+                .parentId(parentBoardId)
+                .isAdminOnly(true)
+                .build();
+
+        List<BoardResponse> boardResponse = List.of(response1, response2, response3);
+
+        given(boardService.findCategoryByBoardId(parentBoardId)).willReturn(boardResponse);
 
         // when
         ResultActions resultActions = mvc
-                .perform(get("/api/v1/board/category/" + 1));
+                .perform(get("/api/v1/board/category/{board-id}", parentBoardId)
+                        .with(csrf()));
 
-        String responseBody = objectMapper.writeValueAsString(resultActions.andReturn().getResponse().getContentAsString());
-
-        System.out.println("response body = " + responseBody);
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].id").value(3L))
-                .andExpect(jsonPath("$.data[0].name").value("category1"))
-                .andExpect(jsonPath("$.data[0].orderIndex").value(1))
+                .andDo(document("category list",
+                        pathParameters(
+                                parameterWithName("board-id").description("게시판 고유 식별 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("게시판 고유 식별 번호"),
+                                fieldWithPath("data[].name").type(JsonFieldType.STRING).description("게시판 이름"),
+                                fieldWithPath("data[].orderIndex").type(JsonFieldType.NUMBER).description("게시판 순서"),
+                                fieldWithPath("data[].parentId").type(JsonFieldType.NUMBER).description("상위 게시판 고유 식별 번호").optional(),
+                                fieldWithPath("data[].isAdminOnly").type(JsonFieldType.BOOLEAN).description("관리자만 글을 쓸 수 있는지 여부"),
 
-                .andExpect(jsonPath("$.data[1].id").value(4L))
-                .andExpect(jsonPath("$.data[1].name").value("category2"))
-                .andExpect(jsonPath("$.data[1].orderIndex").value(2));
+                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+                        )
+                ));
+
+        System.out.println("resultActions: " + resultActions.andReturn().getResponse().getContentAsString());
     }
 }

@@ -2,20 +2,18 @@ package com.jbaacount.service;
 
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
-import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.mapper.BoardMapper;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
-import com.jbaacount.model.Post;
 import com.jbaacount.model.type.BoardType;
 import com.jbaacount.payload.request.board.BoardCreateRequest;
 import com.jbaacount.payload.request.board.BoardUpdateRequest;
 import com.jbaacount.payload.request.board.CategoryUpdateRequest;
 import com.jbaacount.payload.response.board.BoardChildrenResponse;
+import com.jbaacount.payload.response.board.BoardCreateResponse;
 import com.jbaacount.payload.response.board.BoardMenuResponse;
 import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.repository.BoardRepository;
-import com.jbaacount.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,7 @@ public class BoardService
     private final PostService postService;
 
     @Transactional
-    public BoardResponse createBoard(BoardCreateRequest request, Member currentMember)
+    public BoardCreateResponse createBoard(BoardCreateRequest request, Member currentMember)
     {
         utilService.isAdmin(currentMember);
 
@@ -59,7 +57,7 @@ public class BoardService
             board.updateOrderIndex(orderIndex + 1);
         }
 
-        return BoardMapper.INSTANCE.boardToResponse(boardRepository.save(board));
+        return BoardMapper.INSTANCE.toBoardCreateResponse(boardRepository.save(board));
     }
 
 

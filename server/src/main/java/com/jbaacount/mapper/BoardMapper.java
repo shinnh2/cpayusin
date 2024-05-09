@@ -5,6 +5,7 @@ import com.jbaacount.payload.request.board.BoardCreateRequest;
 import com.jbaacount.payload.request.board.BoardUpdateRequest;
 import com.jbaacount.payload.request.board.CategoryUpdateRequest;
 import com.jbaacount.payload.response.board.BoardChildrenResponse;
+import com.jbaacount.payload.response.board.BoardCreateResponse;
 import com.jbaacount.payload.response.board.BoardMenuResponse;
 import com.jbaacount.payload.response.board.BoardResponse;
 import org.mapstruct.Mapper;
@@ -22,12 +23,13 @@ public interface BoardMapper
 
     Board toBoardEntity(BoardCreateRequest request);
 
+    BoardCreateResponse toBoardCreateResponse(Board board);
+
     @Mapping(target = "modifiedAt", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "posts", ignore = true)
     void updateBoard(BoardUpdateRequest request, @MappingTarget Board board);
 
     @Mapping(target = "modifiedAt", ignore = true)
@@ -35,7 +37,6 @@ public interface BoardMapper
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "children", ignore = true)
     @Mapping(target = "parent", ignore = true)
-    @Mapping(target = "posts", ignore = true)
     void updateBoard(CategoryUpdateRequest request, @MappingTarget Board board);
 
 
