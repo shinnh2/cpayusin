@@ -1,13 +1,12 @@
 = API Documentation
-
 :doctype: book
 :icons: font
 :toc: left
-:toclevels: 4
+:toc-title: 순서
+
 :sectnums:
 :sectnumlevels: 5
 :source-highlighter: highlightjs
-
 == 게시글 API
 
 
