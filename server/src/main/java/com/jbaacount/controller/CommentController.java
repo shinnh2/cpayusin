@@ -11,6 +11,7 @@ import com.jbaacount.service.CommentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -56,8 +57,8 @@ public class CommentController
     }
 
     @GetMapping("/comment")
-    public ResponseEntity<GlobalResponse<List<CommentParentResponse>>> getAllComments(@RequestParam("post") Long postId,
-                                                                                      @AuthenticationPrincipal MemberDetails currentMember)
+    public ResponseEntity<GlobalResponse<List<CommentMultiResponse>>> getAllComments(@RequestParam("postId") Long postId,
+                                                                                     @AuthenticationPrincipal MemberDetails currentMember)
     {
         var data = commentService.getAllCommentByPostId(postId, currentMember.getMember());
 
@@ -65,21 +66,25 @@ public class CommentController
     }
 
     @GetMapping("/profile/my-comments")
-    public ResponseEntity<GlobalResponse<List<CommentResponseForProfile>>> getAllCommentsForProfile(@AuthenticationPrincipal Member member,
+    public ResponseEntity<GlobalResponse<List<CommentResponseForProfile>>> getAllCommentsForProfile(@AuthenticationPrincipal MemberDetails memberDetails,
                                                                                                     @PageableDefault(size = 8) Pageable pageable)
     {
-        var data = commentService.getAllCommentsForProfile(member.getId(), pageable.previousOrFirst());
+        Page<CommentResponseForProfile> data = commentService.getAllCommentsForProfile(memberDetails.getMember(), pageable.previousOrFirst());
 
         return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }
 
 
-    @DeleteMapping("/comment/{comment-id}")
+    @DeleteMapping("/comment/delete/{comment-id}")
     public ResponseEntity deleteComment(@PathVariable("comment-id") Long commentId,
                                         @AuthenticationPrincipal Member currentMember)
     {
-        commentService.deleteComment(commentId, currentMember);
+        boolean result = commentService.deleteComment(commentId, currentMember);
 
-        return ResponseEntity.ok(new GlobalResponse("댓글을 삭제했습니다."));
+        if(result)
+            return ResponseEntity.ok(new GlobalResponse("댓글을 삭제했습니다."));
+
+        else
+            return ResponseEntity.ok(new GlobalResponse("댓글 삭제에 실패했습니다."));
     }
 }

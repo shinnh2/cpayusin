@@ -4,10 +4,7 @@ import com.amazonaws.HttpMethod;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.payload.request.post.PostUpdateRequest;
-import com.jbaacount.payload.response.post.PostCreateResponse;
-import com.jbaacount.payload.response.post.PostResponseForProfile;
-import com.jbaacount.payload.response.post.PostSingleResponse;
-import com.jbaacount.payload.response.post.PostUpdateResponse;
+import com.jbaacount.payload.response.post.*;
 import com.jbaacount.service.PostService;
 import com.jbaacount.setup.RestDocsSetup;
 import org.junit.jupiter.api.Test;
@@ -109,14 +106,8 @@ class PostControllerTest extends RestDocsSetup
                                 fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜"),
-                                fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("게시글 수정 날짜"),
-
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                                fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("게시글 수정 날짜")
+                        ).andWithPrefix("", pageResponseFields())
                 ));
 
         System.out.println(resultActions.andReturn().getResponse().getContentAsString());
@@ -181,14 +172,8 @@ class PostControllerTest extends RestDocsSetup
                                 fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜"),
-                                fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("게시글 수정 날짜"),
-
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                                fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("게시글 수정 날짜")
+                        ).andWithPrefix("", pageResponseFields())
                 ));
 
         System.out.println("response = " + resultActions.andReturn().getResponse().getContentAsString());
@@ -205,8 +190,6 @@ class PostControllerTest extends RestDocsSetup
         String title = "게시글 제목";
         String content = "게시글 내용";
 
-        String url = "https://jbaccount.s3.ap-northeast-2.amazonaws.com/post/1fe55e99-4bf3-4691-972f-2c67f75736fb.PNG";
-
         PostSingleResponse response = PostSingleResponse.builder()
                 .boardId(boardId)
                 .memberId(memberId)
@@ -216,7 +199,7 @@ class PostControllerTest extends RestDocsSetup
                 .content(content)
                 .voteCount(1)
                 .voteStatus(true)
-                .files(List.of(url))
+                .files(List.of(URL))
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -255,15 +238,8 @@ class PostControllerTest extends RestDocsSetup
                                 fieldWithPath("data.voteCount").type(JsonFieldType.NUMBER).description("게시글 숫자"),
                                 fieldWithPath("data.voteStatus").type(JsonFieldType.BOOLEAN).description("게시글 투표 여부"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜"),
-                                fieldWithPath("data.files[]").type(JsonFieldType.ARRAY).description("게시글 이미지 저장 위치"),
-
-
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                                fieldWithPath("data.files[]").type(JsonFieldType.ARRAY).description("게시글 이미지 저장 위치")
+                        ).andWithPrefix("", pageResponseFields())
                 ))
         ;
 
@@ -275,7 +251,6 @@ class PostControllerTest extends RestDocsSetup
     void getMyPosts() throws Exception
     {
         // given
-
         PostResponseForProfile response1 = PostResponseForProfile.builder()
                 .title("고등어 구이 vs 조림")
                 .id(1L)
@@ -350,20 +325,129 @@ class PostControllerTest extends RestDocsSetup
     void getAllByBoardId() throws Exception
     {
         // given
+        Long boardId = 1L;
+        String boardName = "공지사항 게시판";
+        Long memberId = 1L;
+        String memberName = "관리자";
+
+        PostMultiResponse response1 = PostMultiResponse.builder()
+                .boardId(boardId)
+                .boardName(boardName)
+                .memberId(memberId)
+                .memberName(memberName)
+                .postId(1L)
+                .title("1월 21일 업데이트 공지")
+                .content("주저리 주저리")
+                .voteCount(1)
+                .commentsCount(2)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        PostMultiResponse response2 = PostMultiResponse.builder()
+                .boardId(boardId)
+                .boardName(boardName)
+                .memberId(memberId)
+                .memberName(memberName)
+                .title("3월 3일 업데이트 공지")
+                .content("주저리 주저리")
+                .postId(2L)
+                .voteCount(3)
+                .commentsCount(2)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        PostMultiResponse response3 = PostMultiResponse.builder()
+                .boardId(boardId)
+                .boardName(boardName)
+                .memberId(memberId)
+                .memberName(memberName)
+                .title("5월 2일 업데이트 공지")
+                .content("주저리 주저리")
+                .postId(3L)
+                .voteCount(3)
+                .commentsCount(2)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        List<PostMultiResponse> responseList = List.of(response1, response2, response3);
+
+        Integer page = 1;
+        Integer size = 10;
+        Pageable pageable = PageRequest.of(page, size);
+        Page<PostMultiResponse> pageResponse = new PageImpl<>(responseList, pageable, responseList.size());
+
+        given(postService.getPostsByBoardId(any(Long.class), any(String.class), any(Pageable.class))).willReturn(pageResponse);
 
         // when
+        ResultActions resultActions = mvc
+                .perform(RestDocumentationRequestBuilders.get("/api/v1/post/board")
+                        .param("keyword", "공지")
+                        .param("id", boardId.toString())
+                        .param("page", page.toString())
+                        .param("size", size.toString()));
 
         // then
+        resultActions
+                .andExpect(status().isOk())
+                .andDo(document("get-board-posts",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        queryParameters(
+                                parameterWithName("keyword").description("검색 키워드").optional(),
+                                parameterWithName("id").description("게시판 고유 식별 번호"),
+                                parameterWithName("page").description("페이지 번호"),
+                                parameterWithName("size").description("페이지 당 데이터 개수")
+                        ),
+
+                        responseFields(
+                                fieldWithPath("data[].memberId").type(JsonFieldType.NUMBER).description("유저 고유 식별 번호"),
+                                fieldWithPath("data[].memberName").type(JsonFieldType.STRING).description("작성자 이름"),
+                                fieldWithPath("data[].boardId").type(JsonFieldType.NUMBER).description("게시판 고유 식별 번호"),
+                                fieldWithPath("data[].boardName").type(JsonFieldType.STRING).description("게시판 이름"),
+                                fieldWithPath("data[].postId").type(JsonFieldType.NUMBER).description("게시글 고유 식별 번호"),
+                                fieldWithPath("data[].title").type(JsonFieldType.STRING).description("게시글 제목"),
+                                fieldWithPath("data[].content").type(JsonFieldType.STRING).description("게시글 내용"),
+                                fieldWithPath("data[].voteCount").type(JsonFieldType.NUMBER).description("추천 개수"),
+                                fieldWithPath("data[].commentsCount").type(JsonFieldType.NUMBER).description("댓글 개수"),
+                                fieldWithPath("data[].createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜")
+
+                        ).andWithPrefix("", pageInfoResponseFields())
+                ));
+
+        System.out.println("response = " + resultActions.andReturn().getResponse().getContentAsString());
     }
 
     @Test
     void deletePost() throws Exception
     {
         // given
+        Long postId = 1L;
+
+        given(postService.deletePostById(any(Long.class), any(Member.class))).willReturn(true);
 
         // when
+        ResultActions resultActions = mvc
+                .perform(RestDocumentationRequestBuilders.delete("/api/v1/post/delete/{post-id}", postId)
+                        .with(csrf())
+                        .with(user(memberDetails)));
 
         // then
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("data").value("삭제가 완료되었습니다."))
+                .andDo(document("delete-post",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        pathParameters(
+                                parameterWithName("post-id").description("게시글 고유 식별 번호")
+                        ),
+                        responseFields(
+                                fieldWithPath("data").type(JsonFieldType.STRING).description("데이터")
+
+                        ).andWithPrefix("", pageResponseFields())
+                ));
+
+        System.out.println("response = " + resultActions.andReturn().getResponse().getContentAsString());
     }
 
     private MockMultipartHttpServletRequestBuilder multipartPatchBuilder(String url)

@@ -113,14 +113,9 @@ class AdminControllerTest extends RestDocsSetup
                                 fieldWithPath("data.name").type(JsonFieldType.STRING).description("게시판 제목"),
                                 fieldWithPath("data.isAdminOnly").type(JsonFieldType.BOOLEAN).description("관리자만 글을 쓸 수 있는지 여부"),
                                 fieldWithPath("data.orderIndex").type(JsonFieldType.NUMBER).description("게시판 순서"),
-                                fieldWithPath("data.parentId").type(JsonFieldType.NUMBER).description("상위 게시판 아이디").optional(),
+                                fieldWithPath("data.parentId").type(JsonFieldType.NUMBER).description("상위 게시판 아이디").optional()
 
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                        ).andWithPrefix("", pageResponseFields())
                 ));
     }
 
@@ -272,14 +267,9 @@ class AdminControllerTest extends RestDocsSetup
                                 fieldWithPath("data[].category[].type").description("게시판 유형").type(JsonFieldType.STRING),
                                 fieldWithPath("data[].category[].parentId").description("상위 게시판의 고유 식별 번호").type(JsonFieldType.NUMBER),
                                 fieldWithPath("data[].category[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
-                                fieldWithPath("data[].category[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional(),
+                                fieldWithPath("data[].category[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional()
 
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                        ).andWithPrefix("", pageResponseFields())
 
                 ));
     }

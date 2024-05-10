@@ -120,7 +120,7 @@ public class PostService
     }
 
     @Transactional
-    public void deletePostById(Long postId, Member currentMember)
+    public boolean deletePostById(Long postId, Member currentMember)
     {
         Post post = getPostById(postId);
         utilService.checkPermission(post.getMember().getId(), currentMember);
@@ -129,7 +129,7 @@ public class PostService
 
         postRepository.deleteById(postId);
 
-        log.info("게시글이 삭제되었습니다");
+        return postRepository.existsById(postId);
     }
 
     @Transactional

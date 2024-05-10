@@ -2,13 +2,11 @@ package com.jbaacount.payload.response.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
+@Builder
 @Data
 @ToString
 @AllArgsConstructor
@@ -22,9 +20,11 @@ public class PostMultiResponse
     private String boardName;
 
 
-    private Long id;
+    private Long postId;
     private String title;
     private String content;
+    private Integer voteCount;
+
     private Integer commentsCount;
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")

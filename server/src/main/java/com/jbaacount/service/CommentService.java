@@ -79,12 +79,12 @@ public class CommentService
     }
 
 
-    public List<CommentParentResponse> getAllCommentByPostId(Long postId, Member member)
+    public List<CommentMultiResponse> getAllCommentByPostId(Long postId, Member member)
     {
         List<Comment> parentCommentsByPostId = commentRepository.findParentCommentsByPostId(postId, CommentType.PARENT_COMMENT.getCode());
         var parentList  = CommentMapper.INSTANCE.toCommentParentResponseList(parentCommentsByPostId);
 
-        for (CommentParentResponse parent : parentList)
+        for (CommentMultiResponse parent : parentList)
         {
             boolean parentVoteStatus = voteService.checkIfMemberVotedComment(member.getId(), parent.getId());
             parent.setVoteStatus(parentVoteStatus);
@@ -100,9 +100,9 @@ public class CommentService
         return parentList;
     }
 
-    public Page<CommentResponseForProfile> getAllCommentsForProfile(Long memberId, Pageable pageable)
+    public Page<CommentResponseForProfile> getAllCommentsForProfile(Member member, Pageable pageable)
     {
-        return commentRepository.findCommentsForProfile(memberId, pageable);
+        return commentRepository.findCommentsForProfile(member.getId(), pageable);
     }
 
     public CommentSingleResponse getCommentSingleResponse(Long commentId, Member member)

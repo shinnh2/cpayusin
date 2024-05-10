@@ -77,18 +77,22 @@ public class PostController
                                                                                    @RequestParam(required = false) String keyword,
                                                                                    @RequestParam("id") Long boardId)
     {
-        var data = postService.getPostsByBoardId(boardId, keyword, pageable.previousOrFirst());
+        Page<PostMultiResponse> data = postService.getPostsByBoardId(boardId, keyword, pageable.previousOrFirst());
 
         return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }
 
 
-    @DeleteMapping("/post/{post-id}")
+    @DeleteMapping("/post/delete/{post-id}")
     public ResponseEntity<GlobalResponse<String>> deletePost(@PathVariable("post-id") @Positive Long postId,
                                      @AuthenticationPrincipal MemberDetails currentMember)
     {
-        postService.deletePostById(postId, currentMember.getMember());
+        boolean result = postService.deletePostById(postId, currentMember.getMember());
 
-        return ResponseEntity.ok(new GlobalResponse<>("삭제가 완료되었습니다."));
+        if(result)
+            return ResponseEntity.ok(new GlobalResponse<>("삭제가 완료되었습니다."));
+
+        else
+            return ResponseEntity.ok(new GlobalResponse<>("삭제에 실패했습니다."));
     }
 }

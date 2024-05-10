@@ -7,7 +7,7 @@ import com.jbaacount.model.type.CommentType;
 import com.jbaacount.payload.request.comment.CommentCreateRequest;
 import com.jbaacount.payload.request.comment.CommentUpdateRequest;
 import com.jbaacount.payload.response.comment.CommentCreatedResponse;
-import com.jbaacount.payload.response.comment.CommentParentResponse;
+import com.jbaacount.payload.response.comment.CommentMultiResponse;
 import com.jbaacount.payload.response.comment.CommentUpdateResponse;
 import com.jbaacount.repository.CommentRepository;
 import jakarta.persistence.EntityManager;
@@ -191,7 +191,7 @@ class CommentServiceTest extends MockSetup
         given(commentRepository.findParentCommentsByPostId(mockPost.getId(), CommentType.PARENT_COMMENT.getCode()))
                 .willReturn(commentList);
 
-        List<CommentParentResponse> response = commentService.getAllCommentByPostId(mockPost.getId(), mockMember);
+        List<CommentMultiResponse> response = commentService.getAllCommentByPostId(mockPost.getId(), mockMember);
 
         // then
         assertThat(response.get(0).getText()).isEqualTo(mockComment.getText());

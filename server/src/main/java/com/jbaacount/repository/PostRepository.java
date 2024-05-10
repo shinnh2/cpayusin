@@ -35,6 +35,7 @@ public interface PostRepository extends JpaRepository<Post, Long>
             "p.id, " +
             "p.title, " +
             "p.content, " +
+            "p.voteCount, " +
             "CAST((SELECT COUNT(c) FROM Comment c WHERE c.post = p) AS integer )," +
             "p.createdAt) " +
             "FROM Post p " +

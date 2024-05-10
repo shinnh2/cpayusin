@@ -30,6 +30,7 @@ public interface CommentMapper
         return CommentSingleResponse.builder()
                 .memberId(entity.getMember().getId())
                 .nickname(entity.getMember().getNickname())
+                .memberProfile(entity.getMember().getUrl())
                 .commentId(entity.getId())
                 .parentId(parentId)
                 .text(entity.getText())
@@ -42,6 +43,7 @@ public interface CommentMapper
 
     @Mapping(target = "memberId", source = "member.id")
     @Mapping(target = "memberName", source = "member.nickname")
+    @Mapping(target = "memberProfile", source = "member.url")
     @Mapping(target = "parentId", source = "parent.id")
     @Mapping(target = "voteStatus", ignore = true)
     CommentChildrenResponse toCommentChildrenResponse(Comment comment);
@@ -50,8 +52,9 @@ public interface CommentMapper
 
     @Mapping(target = "memberId", source = "member.id")
     @Mapping(target = "memberName", source = "member.nickname")
+    @Mapping(target = "memberProfile", source = "member.url")
     @Mapping(target = "voteStatus", ignore = true)
-    CommentParentResponse toCommentParentResponse(Comment comment);
+    CommentMultiResponse toCommentParentResponse(Comment comment);
 
-    List<CommentParentResponse> toCommentParentResponseList(List<Comment> comments);
+    List<CommentMultiResponse> toCommentParentResponseList(List<Comment> comments);
 }

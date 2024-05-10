@@ -14,10 +14,14 @@ import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static com.jbaacount.utils.DescriptionUtils.*;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 
 @MockBean(JpaMetamodelMappingContext.class)
 @ExtendWith(RestDocumentationExtension.class)
@@ -39,6 +43,7 @@ public abstract class RestDocsSetup extends DummyObject
 
     protected MemberDetails memberDetails;
     protected Member member;
+    protected  String URL = "https://jbaccount.s3.ap-northeast-2.amazonaws.com/post/1fe55e99-4bf3-4691-972f-2c67f75736fb.PNG";
 
     @BeforeEach
     void setUp()
@@ -47,5 +52,31 @@ public abstract class RestDocsSetup extends DummyObject
         memberDetails = new MemberDetails(member);
 
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
+    }
+
+    protected FieldDescriptor[] pageResponseFields()
+    {
+        return new FieldDescriptor[]{
+                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
+
+                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+        };
+    }
+
+    protected FieldDescriptor[] pageInfoResponseFields()
+    {
+        return new FieldDescriptor[]{
+                fieldWithPath("pageInfo.page").type(JsonFieldType.NUMBER).description("현재 페이지 숫자"),
+                fieldWithPath("pageInfo.size").type(JsonFieldType.NUMBER).description("페이지당 데이터 개수"),
+                fieldWithPath("pageInfo.totalElements").type(JsonFieldType.NUMBER).description("데이터 총 개수"),
+                fieldWithPath("pageInfo.totalPages").type(JsonFieldType.NUMBER).description("페이지 총 개수"),
+                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
+                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
+                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
+                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
+        };
     }
 }

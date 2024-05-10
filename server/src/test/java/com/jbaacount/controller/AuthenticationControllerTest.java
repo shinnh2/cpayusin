@@ -60,15 +60,9 @@ class AuthenticationControllerTest extends RestDocsSetup
                         ),
 
                         responseFields(
-                                fieldWithPath("data").type(JsonFieldType.STRING).description("응답"),
+                                fieldWithPath("data").type(JsonFieldType.STRING).description("응답")
 
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-
-                        )
+                        ).andWithPrefix("", pageResponseFields())
                 ));
 
         // then
@@ -118,7 +112,9 @@ class AuthenticationControllerTest extends RestDocsSetup
                 .andExpect(jsonPath("$.data.nickname").value(response.getNickname()))
                 .andExpect(jsonPath("$.data.email").value(response.getEmail()))
                 .andExpect(jsonPath("$.data.score").value(0))
-                .andDo(document("signup", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                .andDo(document("signup",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                             requestFields(
                                     fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
                                     fieldWithPath("email").type(JsonFieldType.STRING).description("유저 이메일"),
@@ -129,14 +125,9 @@ class AuthenticationControllerTest extends RestDocsSetup
                                 fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
                                 fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
                                 fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급"),
-                                fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("점수"),
+                                fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("점수")
 
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                        ).andWithPrefix("", pageResponseFields())
                 ));
     }
 
@@ -176,14 +167,9 @@ class AuthenticationControllerTest extends RestDocsSetup
                                 fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
                                 fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급"),
                                 fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
-                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰"),
+                                fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰")
 
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                        ).andWithPrefix("", pageResponseFields())
                 ));
 
         System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
@@ -217,14 +203,9 @@ class AuthenticationControllerTest extends RestDocsSetup
                                 fieldWithPath("verificationCode").description("인증 코드")
                         ),
                         responseFields(
-                                fieldWithPath("data").type(JsonFieldType.STRING).description("결과"),
+                                fieldWithPath("data").type(JsonFieldType.STRING).description("결과")
 
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                        ).andWithPrefix("", pageResponseFields())
                 ));
 
         System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
@@ -270,14 +251,9 @@ class AuthenticationControllerTest extends RestDocsSetup
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("유저 고유 식별 번호"),
                                 fieldWithPath("data.nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
                                 fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
-                                fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급"),
+                                fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급")
 
-                                fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
-                                fieldWithPath("success").type(JsonFieldType.BOOLEAN).description(SUCCESS),
-                                fieldWithPath("message").type(JsonFieldType.STRING).description(MESSAGE),
-                                fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
-                                fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
-                        )
+                        ).andWithPrefix("", pageResponseFields())
                 ));
 
         System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());

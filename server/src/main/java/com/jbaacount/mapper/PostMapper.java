@@ -4,11 +4,9 @@ import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.payload.request.post.PostUpdateRequest;
 import com.jbaacount.payload.response.post.PostCreateResponse;
-import com.jbaacount.payload.response.post.PostMultiResponse;
 import com.jbaacount.payload.response.post.PostSingleResponse;
 import com.jbaacount.payload.response.post.PostUpdateResponse;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
@@ -51,12 +49,6 @@ public interface PostMapper
                 .voteStatus(voteStatus)
                 .build();
     }
-
-    @Mapping(target = "memberId", source = "post.member.id")
-    @Mapping(target = "memberName", source = "post.member.nickname")
-    @Mapping(target = "boardId", source = "post.board.id")
-    @Mapping(target = "boardName", source = "post.board.name")
-    PostMultiResponse toPostMultiResponse(Post post);
 
 
     PostUpdateResponse toPostUpdateResponse(Post post);

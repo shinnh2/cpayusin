@@ -14,6 +14,7 @@ public class CommentSingleResponse
 {
     private Long memberId;
     private String nickname;
+    private String memberProfile;
 
     private Long commentId;
     private Long parentId;
