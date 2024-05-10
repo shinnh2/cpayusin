@@ -27,6 +27,8 @@ import static com.jbaacount.utils.DescriptionUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -98,6 +100,8 @@ class AdminControllerTest extends RestDocsSetup
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.name").value(request.getName()))
                 .andDo(document("board-save",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("name").type(JsonFieldType.STRING).description("게시판 제목"),
                                 fieldWithPath("isAdminOnly").type(JsonFieldType.BOOLEAN).description("관리자만 글을 쓸 수 있는지 여부"),
@@ -238,6 +242,8 @@ class AdminControllerTest extends RestDocsSetup
                 .andExpect(jsonPath("$.data[2].name").value("board3 after change"))
                 .andExpect(jsonPath("$.data[2].type").value(BoardType.BOARD.getCode()))
                 .andDo(document("board-update",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("[].id").description("게시판 아이디").type(JsonFieldType.NUMBER),
                                 fieldWithPath("[].name").description("게시판 이름").type(JsonFieldType.STRING),

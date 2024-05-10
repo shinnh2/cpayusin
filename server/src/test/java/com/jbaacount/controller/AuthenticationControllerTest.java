@@ -1,6 +1,5 @@
 package com.jbaacount.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.payload.request.member.MemberRegisterRequest;
 import com.jbaacount.payload.request.member.ResetPasswordDto;
 import com.jbaacount.payload.request.member.VerificationDto;
@@ -11,13 +10,11 @@ import com.jbaacount.service.AuthenticationService;
 import com.jbaacount.service.MemberService;
 import com.jbaacount.setup.RestDocsSetup;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static com.jbaacount.utils.DescriptionUtils.*;
@@ -26,6 +23,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -55,6 +53,8 @@ class AuthenticationControllerTest extends RestDocsSetup
                         .header("Refresh", TOKEN))
                 .andExpect(status().isOk())
                 .andDo(document("logout",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         requestHeaders(
                                 headerWithName("Refresh").description("리프레시 토큰")
                         ),
@@ -118,7 +118,7 @@ class AuthenticationControllerTest extends RestDocsSetup
                 .andExpect(jsonPath("$.data.nickname").value(response.getNickname()))
                 .andExpect(jsonPath("$.data.email").value(response.getEmail()))
                 .andExpect(jsonPath("$.data.score").value(0))
-                .andDo(document("signup",
+                .andDo(document("signup", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                             requestFields(
                                     fieldWithPath("nickname").type(JsonFieldType.STRING).description("유저 닉네임"),
                                     fieldWithPath("email").type(JsonFieldType.STRING).description("유저 이메일"),
@@ -166,7 +166,7 @@ class AuthenticationControllerTest extends RestDocsSetup
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andDo(document("reissue",
+                .andDo(document("reissue", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         requestHeaders(
                                 headerWithName(HttpHeaders.AUTHORIZATION).description("액세스 토큰"),
                                 headerWithName("Refresh").description("리프레시 토큰")
@@ -205,14 +205,13 @@ class AuthenticationControllerTest extends RestDocsSetup
         // when
         ResultActions resultActions = mvc
                 .perform(get("/api/v1/verification")
-                        .with(csrf())
                         .content(requestBody)
                         .contentType(MediaType.APPLICATION_JSON));
 
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andDo(document("verify code",
+                .andDo(document("verify code", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("email").description("유저 이메일"),
                                 fieldWithPath("verificationCode").description("인증 코드")
@@ -262,7 +261,7 @@ class AuthenticationControllerTest extends RestDocsSetup
         // then
         resultActions
                 .andExpect(status().isOk())
-                .andDo(document("reset password",
+                .andDo(document("reset password", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
                         requestFields(
                                 fieldWithPath("email").description("유저 이메일"),
                                 fieldWithPath("password").description("새 비밀번호")

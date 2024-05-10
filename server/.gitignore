@@ -37,5 +37,8 @@ out/
 .vscode/
 
 
-### application propertie s###
+### application properties ###
 application.yml
+
+
+/src/main/generated/

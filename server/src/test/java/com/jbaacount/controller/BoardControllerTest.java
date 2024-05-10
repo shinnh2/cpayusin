@@ -1,27 +1,15 @@
 package com.jbaacount.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.model.type.BoardType;
 import com.jbaacount.payload.response.board.BoardChildrenResponse;
 import com.jbaacount.payload.response.board.BoardMenuResponse;
 import com.jbaacount.payload.response.board.BoardResponse;
 import com.jbaacount.service.BoardService;
 import com.jbaacount.setup.RestDocsSetup;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
-import org.springframework.restdocs.RestDocumentationExtension;
-import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
@@ -31,11 +19,12 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BoardController.class)
@@ -100,13 +89,14 @@ class BoardControllerTest extends RestDocsSetup
 
         // when
         ResultActions resultActions = mvc
-                .perform(get("/api/v1/board/menu")
-                        .with(csrf()));
+                .perform(get("/api/v1/board/menu"));
 
         // then
         resultActions
                 .andExpect(status().isOk())
                 .andDo(document("get menu",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         responseFields(
                                 fieldWithPath("data[].id").description("게시판 고유 식별 번호").type(JsonFieldType.NUMBER),
                                 fieldWithPath("data[].name").description("게시판 이름").type(JsonFieldType.STRING),
@@ -153,13 +143,14 @@ class BoardControllerTest extends RestDocsSetup
 
         // when
         ResultActions resultActions = mvc
-                .perform(get("/api/v1/board/single-info/{board-id}", boardId)
-                        .with(csrf()));
+                .perform(get("/api/v1/board/single-info/{board-id}", boardId));
 
         // then
         resultActions
                 .andExpect(status().isOk())
                 .andDo(document("get board detail",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("board-id").description("게시판 고유 식별 번호")
                         ),
@@ -218,13 +209,14 @@ class BoardControllerTest extends RestDocsSetup
 
         // when
         ResultActions resultActions = mvc
-                .perform(get("/api/v1/board/category/{board-id}", parentBoardId)
-                        .with(csrf()));
+                .perform(get("/api/v1/board/category/{board-id}", parentBoardId));
 
         // then
         resultActions
                 .andExpect(status().isOk())
                 .andDo(document("category list",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
                         pathParameters(
                                 parameterWithName("board-id").description("게시판 고유 식별 번호")
                         ),
