@@ -7,12 +7,12 @@ import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.payload.request.post.PostUpdateRequest;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.payload.response.post.*;
-import com.jbaacount.service.MemberService;
 import com.jbaacount.service.PostService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
@@ -67,7 +67,7 @@ public class PostController
     public ResponseEntity<GlobalResponse<List<PostResponseForProfile>>> getMyPosts(@AuthenticationPrincipal MemberDetails currentMember,
                                                                                    @PageableDefault Pageable pageable)
     {
-        var data = postService.getMyPosts(currentMember.getMember(), pageable.previousOrFirst());
+        Page<PostResponseForProfile> data = postService.getMyPosts(currentMember.getMember(), pageable.previousOrFirst());
 
         return ResponseEntity.ok(new GlobalResponse<>(data.getContent(), PageInfo.of(data)));
     }

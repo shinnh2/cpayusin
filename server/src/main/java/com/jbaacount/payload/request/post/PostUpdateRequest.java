@@ -2,14 +2,12 @@ package com.jbaacount.payload.request.post;
 
 import com.jbaacount.global.validation.notspace.NotSpace;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @ToString
 public class PostUpdateRequest
 {
