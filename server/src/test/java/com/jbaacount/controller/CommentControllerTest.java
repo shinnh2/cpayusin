@@ -293,7 +293,7 @@ class CommentControllerTest extends RestDocsSetup
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         queryParameters(
-                                parameterWithName("postId").description("게시글 ID")
+                                parameterWithName("postId").description("게시글 고유 식별 번호")
                         ),
                         responseFields(
                                 fieldWithPath("data[].id").type(JsonFieldType.NUMBER).description("댓글 고유 식별 번호"),
