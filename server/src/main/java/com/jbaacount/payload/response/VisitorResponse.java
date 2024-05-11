@@ -1,8 +1,13 @@
 package com.jbaacount.payload.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 public class VisitorResponse
 {
@@ -10,11 +15,4 @@ public class VisitorResponse
     private Long today;
     private Long total;
 
-    @Builder
-    public VisitorResponse(Long yesterday, Long today, Long total)
-    {
-        this.yesterday = yesterday;
-        this.today = today;
-        this.total = total;
-    }
 }

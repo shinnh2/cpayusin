@@ -10,11 +10,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.util.Random;
 
 @Transactional(readOnly = true)
 @Service
 public class UtilService
 {
+    private static final String WORDS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
     public void checkPermission(Long memberId, Member currentMember)
     {
         if (Role.ADMIN.getValue().equals(currentMember.getRole()))
@@ -41,4 +44,16 @@ public class UtilService
             isAdmin(currentMember);
     }
 
+    public static String generateVerificationCode()
+    {
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        for(int i = 0; i < 8; i++)
+        {
+            sb.append(WORDS.charAt(random.nextInt(WORDS.length())));
+        }
+        String verificationCode = sb.toString();
+
+        return verificationCode;
+    }
 }

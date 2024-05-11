@@ -57,6 +57,11 @@ public enum ExceptionMessage
 
     BOARD_NOT_FOUND("존재하지 않는 게시판입니다."),
 
+    /**
+     * mail
+     */
+    MAIL_ERROR("메일 전송에 실패했습니다."),
+
 
     /**
      * file

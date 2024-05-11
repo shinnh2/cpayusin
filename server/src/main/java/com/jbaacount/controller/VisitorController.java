@@ -1,6 +1,7 @@
 package com.jbaacount.controller;
 
 import com.jbaacount.payload.response.GlobalResponse;
+import com.jbaacount.payload.response.VisitorResponse;
 import com.jbaacount.service.VisitorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +19,9 @@ public class VisitorController
     private final VisitorService visitorService;
 
     @GetMapping
-    public ResponseEntity getVisitors()
+    public ResponseEntity<GlobalResponse<VisitorResponse>> getVisitors()
     {
-        var data = visitorService.getVisitorResponse();
+        VisitorResponse data = visitorService.getVisitorResponse();
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
