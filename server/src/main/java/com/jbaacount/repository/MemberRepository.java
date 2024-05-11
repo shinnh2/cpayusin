@@ -1,6 +1,7 @@
 package com.jbaacount.repository;
 
 import com.jbaacount.model.Member;
+import com.jbaacount.payload.response.member.MemberSingleResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -19,4 +20,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
     boolean existsByEmail(@Param("email") String email);
 
     boolean existsByNickname(@Param("nickname") String nickname);
+
+    @Query("SELECT new com.jbaacount.payload.response.member.MemberSingleResponse(m.id, m.nickname, m.url, m.role) FROM Member m WHERE m.id = :memberId ")
+    Optional<MemberSingleResponse> findSingleResponseById(@Param("memberId") Long memberId);
 }

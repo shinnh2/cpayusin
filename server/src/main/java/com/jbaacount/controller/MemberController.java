@@ -7,10 +7,7 @@ import com.jbaacount.payload.request.member.EmailRequest;
 import com.jbaacount.payload.request.member.MemberUpdateRequest;
 import com.jbaacount.payload.request.member.NicknameRequest;
 import com.jbaacount.payload.response.GlobalResponse;
-import com.jbaacount.payload.response.member.MemberDetailResponse;
-import com.jbaacount.payload.response.member.MemberMultiResponse;
-import com.jbaacount.payload.response.member.MemberScoreResponse;
-import com.jbaacount.payload.response.member.MemberUpdateResponse;
+import com.jbaacount.payload.response.member.*;
 import com.jbaacount.service.MemberService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,13 +46,22 @@ public class MemberController
     }
 
 
-    @GetMapping("/single-info")
-    public ResponseEntity<GlobalResponse<MemberDetailResponse>> getMember(@AuthenticationPrincipal MemberDetails member)
+    @GetMapping("/profile")
+    public ResponseEntity<GlobalResponse<MemberDetailResponse>> getMemberOwnProfile(@AuthenticationPrincipal MemberDetails member)
     {
         var data = memberService.getMemberDetailResponse(member.getMember().getId());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
+
+    @GetMapping("/get/{member-id}")
+    public ResponseEntity<GlobalResponse<MemberSingleResponse>> getSingleMember(@PathVariable("member-id") Long memberId)
+    {
+        MemberSingleResponse data = memberService.getMemberSingleResponse(memberId);
+
+        return ResponseEntity.ok(new GlobalResponse<>(data));
+    }
+
 
     @GetMapping("/multi-info")
     public ResponseEntity getMemberList(@RequestParam(value = "keyword", required = false) String keyword,
@@ -72,26 +78,25 @@ public class MemberController
     @GetMapping("/score")
     public ResponseEntity<GlobalResponse<List<MemberScoreResponse>>> get3MembersByScore()
     {
-        LocalDateTime now = LocalDateTime.now();
-        log.info("date = {}", now.getYear() + " " + now.getMonthValue());
-        var data = memberService.findTop3MembersByScore(now);
+        var data = memberService.findTop3MembersByScore();
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
 
     @DeleteMapping("/delete")
-    public ResponseEntity<GlobalResponse<String>> deleteMember(@AuthenticationPrincipal Member member)
+    public ResponseEntity<GlobalResponse<String>> deleteMember(@AuthenticationPrincipal MemberDetails memberDetails)
     {
-        log.info("===deleteMember===");
+        boolean result = memberService.deleteById(memberDetails.getMember());
 
-        memberService.deleteById(member);
+        if(result)
+            return ResponseEntity.ok(new GlobalResponse<>("삭제되었습니다."));
 
-        log.info("user deleted successfully, deleted id = {}", member.getId());
-        return ResponseEntity.ok(new GlobalResponse<>("유저가 삭제되었습니다."));
+        else
+            return ResponseEntity.ok(new GlobalResponse<>("삭제에 실패했습니다."));
     }
 
-    @GetMapping("/verify-email")
+    @PostMapping("/verify-email")
     public ResponseEntity<GlobalResponse<String>> checkExistEmail(@RequestBody @Valid EmailRequest request)
     {
         var data = memberService.checkExistEmail(request.getEmail());
@@ -99,7 +104,7 @@ public class MemberController
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
 
-    @GetMapping("/verify-nickname")
+    @PostMapping("/verify-nickname")
     public ResponseEntity<GlobalResponse<String>> checkExistNickname(@RequestBody @Valid NicknameRequest request)
     {
         var data = memberService.checkExistNickname(request.getNickname());

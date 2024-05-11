@@ -6,10 +6,7 @@ import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.member.MemberUpdateRequest;
-import com.jbaacount.payload.response.member.MemberDetailResponse;
-import com.jbaacount.payload.response.member.MemberMultiResponse;
-import com.jbaacount.payload.response.member.MemberScoreResponse;
-import com.jbaacount.payload.response.member.MemberUpdateResponse;
+import com.jbaacount.payload.response.member.*;
 import com.jbaacount.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +29,7 @@ public class MemberService
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final FileService fileService;
+    private final PostService postService;
 
 
     @Transactional
@@ -76,10 +74,7 @@ public class MemberService
     {
         Member member = getMemberById(memberId);
 
-        var response = MemberMapper.INSTANCE.toMemberDetailResponse(member);
-
-
-        return response;
+        return MemberMapper.INSTANCE.toMemberDetailResponse(member);
     }
 
     public SliceDto<MemberMultiResponse> getAllMembers(String keyword, Long memberId, Pageable pageable)
@@ -87,8 +82,10 @@ public class MemberService
         return memberRepository.findAllMembers(keyword, memberId, pageable);
     }
 
-    public List<MemberScoreResponse> findTop3MembersByScore(LocalDateTime now)
+    public List<MemberScoreResponse> findTop3MembersByScore()
     {
+        LocalDateTime now = LocalDateTime.now();
+
         LocalDateTime startMonth = LocalDateTime.of(now.getYear(), now.getMonthValue(), 1, 0, 0);
         LocalDateTime endMonth = startMonth.plusMonths(1);
 
@@ -97,9 +94,9 @@ public class MemberService
     }
 
     @Transactional
-    public void deleteById(Member member)
+    public boolean deleteById(Member member)
     {
-
+        Long memberId = member.getId();
         log.info("deleted Member nickname = {}", member.getNickname());
 
         if(member.getUrl() != null)
@@ -107,8 +104,17 @@ public class MemberService
             log.info("delete image = {}", member.getUrl());
             fileService.deleteProfilePhoto(member.getId());
         }
+        postService.deleteAllPostsByMemberId(memberId);
 
-        memberRepository.deleteById(member.getId());
+        memberRepository.deleteById(memberId);
+
+        return !memberRepository.existsById(memberId);
+    }
+
+    public MemberSingleResponse getMemberSingleResponse(Long memberId)
+    {
+        return memberRepository.findSingleResponseById(memberId)
+                .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
     }
 
     public boolean verifyExistEmail(String email)

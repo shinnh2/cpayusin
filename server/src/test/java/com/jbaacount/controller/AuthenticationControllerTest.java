@@ -62,7 +62,7 @@ class AuthenticationControllerTest extends RestDocsSetup
                         responseFields(
                                 fieldWithPath("data").type(JsonFieldType.STRING).description("응답")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         // then
@@ -127,7 +127,7 @@ class AuthenticationControllerTest extends RestDocsSetup
                                 fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급"),
                                 fieldWithPath("data.score").type(JsonFieldType.NUMBER).description("점수")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
     }
 
@@ -169,7 +169,7 @@ class AuthenticationControllerTest extends RestDocsSetup
                                 fieldWithPath("data.accessToken").type(JsonFieldType.STRING).description("액세스 토큰"),
                                 fieldWithPath("data.refreshToken").type(JsonFieldType.STRING).description("리프레시 토큰")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
@@ -205,7 +205,7 @@ class AuthenticationControllerTest extends RestDocsSetup
                         responseFields(
                                 fieldWithPath("data").type(JsonFieldType.STRING).description("결과")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());
@@ -253,7 +253,7 @@ class AuthenticationControllerTest extends RestDocsSetup
                                 fieldWithPath("data.email").type(JsonFieldType.STRING).description("유저 이메일"),
                                 fieldWithPath("data.role").type(JsonFieldType.STRING).description("유저 등급")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response body = " + resultActions.andReturn().getResponse().getContentAsString());

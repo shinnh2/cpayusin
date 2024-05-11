@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
-import static com.jbaacount.utils.DescriptionUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -114,7 +113,7 @@ class BoardControllerTest extends RestDocsSetup
                                 fieldWithPath("data[].category[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
                                 fieldWithPath("data[].category[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional()
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("resultActions: " + resultActions.andReturn().getResponse().getContentAsString());
@@ -157,7 +156,7 @@ class BoardControllerTest extends RestDocsSetup
                                 fieldWithPath("data.parentId").type(JsonFieldType.NUMBER).description("상위 게시판 고유 식별 번호").optional(),
                                 fieldWithPath("data.isAdminOnly").type(JsonFieldType.BOOLEAN).description("관리자만 글을 쓸 수 있는지 여부")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("resultActions: " + resultActions.andReturn().getResponse().getContentAsString());
@@ -217,7 +216,7 @@ class BoardControllerTest extends RestDocsSetup
                                 fieldWithPath("data[].parentId").type(JsonFieldType.NUMBER).description("상위 게시판 고유 식별 번호").optional(),
                                 fieldWithPath("data[].isAdminOnly").type(JsonFieldType.BOOLEAN).description("관리자만 글을 쓸 수 있는지 여부")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("resultActions: " + resultActions.andReturn().getResponse().getContentAsString());

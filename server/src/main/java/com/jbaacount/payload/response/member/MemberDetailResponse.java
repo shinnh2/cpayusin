@@ -2,12 +2,15 @@ package com.jbaacount.payload.response.member;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.querydsl.core.annotations.QueryProjection;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
+@AllArgsConstructor
+@Builder
 @NoArgsConstructor
 @Data
 public class MemberDetailResponse
@@ -28,16 +31,4 @@ public class MemberDetailResponse
 
     private String role;
 
-
-    @QueryProjection
-    public MemberDetailResponse(Long id, String nickname, String email, String url, int score, LocalDateTime createdAt, String role)
-    {
-        this.id = id;
-        this.nickname = nickname;
-        this.email = email;
-        this.url = url;
-        this.score = score;
-        this.createdAt = createdAt;
-        this.role = role;
-    }
 }

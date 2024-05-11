@@ -1,6 +1,5 @@
 package com.jbaacount.controller;
 
-import com.amazonaws.HttpMethod;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.payload.request.post.PostUpdateRequest;
@@ -19,7 +18,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.FileInputStream;
@@ -45,8 +43,6 @@ class PostControllerTest extends RestDocsSetup
     @MockBean
     private PostService postService;
 
-    private static final String FILE_PATH1= "src/test/resources/image/";
-    private static final String FILE_NAME1 = "photo1.jpeg";
     private static final String CONTENT = "로렘 입숨(lorem ipsum; 줄여서 립숨, lipsum)은 출판이나 그래픽 디자인 분야에서 폰트, 타이포그래피, 레이아웃 같은 그래픽 요소나 시각적 연출을 보여줄 때 사용하는 표준 채우기 텍스트로, 최종 결과물에 들어가는 실제적인 문장 내용이 채워지기 전에 시각 디자인 프로젝트 모형의 채움 글로도 이용된다. 이런 용도로 사용할 때 로렘 입숨을 그리킹(greeking)이라고도 부르며, 때로 로렘 입숨은 공간만 차지하는 무언가를 지칭하는 용어로도 사용된다.";
 
     @Test
@@ -107,7 +103,7 @@ class PostControllerTest extends RestDocsSetup
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜"),
                                 fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("게시글 수정 날짜")
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println(resultActions.andReturn().getResponse().getContentAsString());
@@ -173,7 +169,7 @@ class PostControllerTest extends RestDocsSetup
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜"),
                                 fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("게시글 수정 날짜")
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response = " + resultActions.andReturn().getResponse().getContentAsString());
@@ -239,7 +235,7 @@ class PostControllerTest extends RestDocsSetup
                                 fieldWithPath("data.voteStatus").type(JsonFieldType.BOOLEAN).description("게시글 투표 여부"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜"),
                                 fieldWithPath("data.files[]").type(JsonFieldType.ARRAY).description("게시글 이미지 저장 위치")
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ))
         ;
 
@@ -444,23 +440,9 @@ class PostControllerTest extends RestDocsSetup
                         responseFields(
                                 fieldWithPath("data").type(JsonFieldType.STRING).description("데이터")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response = " + resultActions.andReturn().getResponse().getContentAsString());
-    }
-
-    private MockMultipartHttpServletRequestBuilder multipartPatchBuilder(String url)
-    {
-        MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders
-                .multipart(url);
-
-        builder
-                .with(request -> {
-                    request.setMethod(HttpMethod.PATCH.name());
-                    return request;
-                });
-
-        return builder;
     }
 }

@@ -1,6 +1,7 @@
 package com.jbaacount.setup;
 
 
+import com.amazonaws.HttpMethod;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.global.security.userdetails.MemberDetails;
@@ -18,6 +19,8 @@ import org.springframework.restdocs.payload.FieldDescriptor;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import static com.jbaacount.utils.DescriptionUtils.*;
 import static org.mockito.BDDMockito.given;
@@ -44,6 +47,8 @@ public abstract class RestDocsSetup extends DummyObject
     protected MemberDetails memberDetails;
     protected Member member;
     protected  String URL = "https://jbaccount.s3.ap-northeast-2.amazonaws.com/post/1fe55e99-4bf3-4691-972f-2c67f75736fb.PNG";
+    protected static final String FILE_PATH1= "src/test/resources/image/";
+    protected static final String FILE_NAME1 = "photo1.jpeg";
 
     @BeforeEach
     void setUp()
@@ -54,7 +59,7 @@ public abstract class RestDocsSetup extends DummyObject
         given(redisTemplate.opsForValue()).willReturn(valueOperations);
     }
 
-    protected FieldDescriptor[] pageResponseFields()
+    protected FieldDescriptor[] pageNoContentResponseFields()
     {
         return new FieldDescriptor[]{
                 fieldWithPath("pageInfo").type(JsonFieldType.NUMBER).description(PAGE_INFO).optional(),
@@ -78,5 +83,19 @@ public abstract class RestDocsSetup extends DummyObject
                 fieldWithPath("code").type(JsonFieldType.NUMBER).description(CODE),
                 fieldWithPath("status").type(JsonFieldType.STRING).description(STATUS)
         };
+    }
+
+    protected MockMultipartHttpServletRequestBuilder multipartPatchBuilder(String url)
+    {
+        MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders
+                .multipart(url);
+
+        builder
+                .with(request -> {
+                    request.setMethod(HttpMethod.PATCH.name());
+                    return request;
+                });
+
+        return builder;
     }
 }

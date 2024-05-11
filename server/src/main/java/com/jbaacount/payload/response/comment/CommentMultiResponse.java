@@ -24,6 +24,7 @@ public class CommentMultiResponse
 
     private Long memberId;
     private String memberName;
+
     private String memberProfile;
 
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")

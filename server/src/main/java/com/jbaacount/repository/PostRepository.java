@@ -27,6 +27,9 @@ public interface PostRepository extends JpaRepository<Post, Long>
     @Query("SELECT p FROM Post p WHERE p.board.id = :boardId")
     List<Post> findAllByBoardId(@Param("boardId") Long boardId);
 
+    @Query("SELECT p FROM Post p WHERE p.member.id = :memberId ")
+    List<Post> findAllByMemberId(@Param("memberId") Long memberId);
+
     @Query("SELECT new com.jbaacount.payload.response.post.PostMultiResponse(" +
             "p.member.id, " +
             "p.member.nickname, " +
@@ -48,4 +51,6 @@ public interface PostRepository extends JpaRepository<Post, Long>
 
     @Query("SELECT new com.jbaacount.payload.response.post.PostResponseForProfile(p.id, p.title, p.createdAt) FROM Post p WHERE p.member.id = :memberId ORDER BY p.id DESC")
     Page<PostResponseForProfile> findAllByMemberIdForProfile(@Param("memberId") Long memberId, Pageable pageable);
+
+
 }

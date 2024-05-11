@@ -20,8 +20,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.jbaacount.utils.DescriptionUtils.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -93,7 +91,7 @@ class CommentControllerTest extends RestDocsSetup
                                 fieldWithPath("data.text").type(JsonFieldType.STRING).description("댓글 내용"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("댓글 작성 시간")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response: " + resultActions.andReturn().getResponse().getContentAsString());
@@ -150,7 +148,7 @@ class CommentControllerTest extends RestDocsSetup
                                 fieldWithPath("data.text").type(JsonFieldType.STRING).description("댓글 내용"),
                                 fieldWithPath("data.modifiedAt").type(JsonFieldType.STRING).description("댓글 수정 시간")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response: " + resultActions.andReturn().getResponse().getContentAsString());
@@ -215,7 +213,7 @@ class CommentControllerTest extends RestDocsSetup
                                 fieldWithPath("data.isRemoved").type(JsonFieldType.BOOLEAN).description("삭제 여부"),
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("댓글 생성 시간")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response: " + resultActions.andReturn().getResponse().getContentAsString());
@@ -322,7 +320,7 @@ class CommentControllerTest extends RestDocsSetup
                                 fieldWithPath("data[].children[].parentId").type(JsonFieldType.NUMBER).description("상위 댓글 고유 식별 번호").optional(),
                                 fieldWithPath("data[].children[].createdAt").type(JsonFieldType.STRING).description("댓글 생성 시간").optional()
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response: " + resultActions.andReturn().getResponse().getContentAsString());
@@ -432,7 +430,7 @@ class CommentControllerTest extends RestDocsSetup
                         responseFields(
                                 fieldWithPath("data").type(JsonFieldType.STRING).description("데이터")
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
 
         System.out.println("response: " + resultActions.andReturn().getResponse().getContentAsString());

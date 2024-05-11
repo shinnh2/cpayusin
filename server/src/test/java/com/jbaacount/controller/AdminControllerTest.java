@@ -23,7 +23,6 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
 
-import static com.jbaacount.utils.DescriptionUtils.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -115,7 +114,7 @@ class AdminControllerTest extends RestDocsSetup
                                 fieldWithPath("data.orderIndex").type(JsonFieldType.NUMBER).description("게시판 순서"),
                                 fieldWithPath("data.parentId").type(JsonFieldType.NUMBER).description("상위 게시판 아이디").optional()
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
                 ));
     }
 
@@ -269,7 +268,7 @@ class AdminControllerTest extends RestDocsSetup
                                 fieldWithPath("data[].category[].isAdminOnly").description("관리자만 글을 쓸 수 있는지 여부").type(JsonFieldType.BOOLEAN),
                                 fieldWithPath("data[].category[].isDeleted").description("삭제 여부").type(JsonFieldType.BOOLEAN).optional()
 
-                        ).andWithPrefix("", pageResponseFields())
+                        ).andWithPrefix("", pageNoContentResponseFields())
 
                 ));
     }

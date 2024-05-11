@@ -2,7 +2,10 @@ package com.jbaacount.mapper;
 
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.member.MemberRegisterRequest;
-import com.jbaacount.payload.response.member.*;
+import com.jbaacount.payload.response.member.MemberCreateResponse;
+import com.jbaacount.payload.response.member.MemberDetailResponse;
+import com.jbaacount.payload.response.member.MemberUpdateResponse;
+import com.jbaacount.payload.response.member.ResetPasswordResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
@@ -29,8 +32,6 @@ public interface MemberMapper
     MemberDetailResponse toMemberDetailResponse(Member member);
 
     List<MemberDetailResponse> toMemberDetailList(List<Member> members);
-
-    MemberSimpleResponse toMemberSimpleInfo(Member member);
 
     ResetPasswordResponse toResetPasswordResponse(Member member);
 }
