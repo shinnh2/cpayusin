@@ -11,7 +11,7 @@ const createMenuNode = (data: any[]) => {
 		<li key={idx} className="nav_menu_item">
 			{el.name ? (
 				<NavLink
-					to={`/board/${el.id}-${el.name}`}
+					to={`/board/${el.id}-${el.name}${el.isAdminOnly?"-adminOnly":""}`}
 					onClick={clickHandler}
 					className={({ isActive }) => (isActive ? "active" : "")}
 				>
