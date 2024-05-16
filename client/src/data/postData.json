@@ -1,0 +1,19 @@
+{
+	"data": {
+		"memberId": 1,
+		"boardId": 1,
+		"nickname": "운영자수정",
+		"title": "ㅎㅇdd",
+		"content": "<h1>이것은 제목</h1><p>이것은 내용이지요 다양한 것을 확인하기 위함입니다.</p>",
+		"files": [],
+		"voteCount": 0,
+		"voteStatus": false,
+		"createdAt": "13시간 전",
+		"postId": 54
+	},
+	"pageInfo": null,
+	"success": true,
+	"message": "Success",
+	"code": 200,
+	"status": "OK"
+}
