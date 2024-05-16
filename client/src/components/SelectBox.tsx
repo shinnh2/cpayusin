@@ -76,16 +76,19 @@ const SelectBox = ({
 					{children
 						? children
 						: selectItem
-						? selectItem.map((value, idx) => (
-								<li
-									key={idx}
-									onClick={(event) => {
-										handleClickListItem(event);
-									}}
-								>
-									{value}
-								</li>
-						  ))
+						? selectItem.map((value, idx) => {
+								if (value === "") return null;
+								return (
+									<li
+										key={idx}
+										onClick={(event) => {
+											handleClickListItem(event);
+										}}
+									>
+										{value}
+									</li>
+								);
+						  })
 						: null}
 				</ul>
 			</div>
