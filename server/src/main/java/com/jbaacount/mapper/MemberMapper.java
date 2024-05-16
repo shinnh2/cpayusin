@@ -27,11 +27,11 @@ public interface MemberMapper
     @Mapping(target = "score", ignore = true)
     @Mapping(target = "platform", ignore = true)
     @Mapping(target = "url", ignore = true)
+    @Mapping(target = "role", ignore = true)
     Member toMemberEntity(MemberRegisterRequest postDto);
 
     MemberDetailResponse toMemberDetailResponse(Member member);
 
-    List<MemberDetailResponse> toMemberDetailList(List<Member> members);
 
     ResetPasswordResponse toResetPasswordResponse(Member member);
 }

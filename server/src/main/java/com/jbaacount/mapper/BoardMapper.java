@@ -23,6 +23,7 @@ public interface BoardMapper
 
     Board toBoardEntity(BoardCreateRequest request);
 
+    @Mapping(target = "parentId", ignore = true)
     BoardCreateResponse toBoardCreateResponse(Board board);
 
     @Mapping(target = "modifiedAt", ignore = true)

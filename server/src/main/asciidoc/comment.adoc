@@ -49,7 +49,6 @@ include::{snippets}/update comment/response-fields.adoc[]
 
 === 댓글 단일 조회
 ==== curl request
-include::{snippets}/comment-delete/curl-request.adoc[]
 
 ==== http request
 include::{snippets}/comment-detail/http-request.adoc[]

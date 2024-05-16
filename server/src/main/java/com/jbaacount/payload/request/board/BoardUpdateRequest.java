@@ -31,5 +31,6 @@ public class BoardUpdateRequest
     @NotBlank
     private Integer orderIndex;
 
+    @Builder.Default
     private List<CategoryUpdateRequest> category = new ArrayList<>();
 }

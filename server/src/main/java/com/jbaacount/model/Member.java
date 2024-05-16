@@ -36,6 +36,7 @@ public class Member extends BaseEntity
 
     private String role;
 
+    @Builder.Default
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)
     private Platform platform = Platform.HOME;

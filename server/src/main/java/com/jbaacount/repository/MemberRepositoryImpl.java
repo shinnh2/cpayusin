@@ -2,9 +2,7 @@ package com.jbaacount.repository;
 
 import com.jbaacount.global.dto.SliceDto;
 import com.jbaacount.global.utils.PaginationUtils;
-import com.jbaacount.model.type.Role;
 import com.jbaacount.payload.response.member.MemberMultiResponse;
-import com.jbaacount.payload.response.member.MemberScoreResponse;
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -49,32 +47,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
         return new SliceDto<>(memberDto, slice);
     }
 
-    @Override
-    public List<MemberScoreResponse> memberResponseForReward(LocalDateTime startMonth, LocalDateTime endMonth)
-    {
-        return query
-                .select(extractMemberScoreResponse())
-                .from(member)
-                .leftJoin(post.member, member)
-                .where(post.createdAt.between(startMonth, endMonth))
-                .where(post.member.role.eq(Role.ADMIN.getValue()))
-                .groupBy(member.id)
-                .orderBy(
-                        member.score.desc(), //점수 기준
-                        post.count().desc(), //해당 월에 작성한 게시글 기준
-                        post.voteCount.sum().desc(), //해당 월에 받은 투표 개수 기준
-                        member.createdAt.asc() //가입 날짜 오래 된 순
-                )
-                .limit(3)
-                .fetch();
-
-        /*List<MemberScoreResponse> responses = memberListTuple.stream()
-                .map(tuple -> new MemberScoreResponse(tuple.get(member.id), tuple.get(member.nickname), tuple.get(member.score)))
-                .collect(Collectors.toList());
-
-        return responses;*/
-    }
-
     private ConstructorExpression<MemberMultiResponse> getMemberList()
     {
         log.info("===memberToResponse===");
@@ -85,14 +57,6 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 member.url != null ? member.url : null,
                 member.score,
                 member.role);
-    }
-
-    private ConstructorExpression<MemberScoreResponse> extractMemberScoreResponse()
-    {
-        return Projections.constructor(MemberScoreResponse.class,
-                member.id,
-                member.nickname,
-                member.score);
     }
 
 

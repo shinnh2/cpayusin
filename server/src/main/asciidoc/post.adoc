@@ -17,9 +17,6 @@ include::{snippets}/create post/curl-request.adoc[]
 ==== request parts
 include::{snippets}/create post/request-parts.adoc[]
 
-==== request fields
-include::{snippets}/create post/request-fields.adoc[]
-
 ==== http response
 include::{snippets}/create post/http-response.adoc[]
 

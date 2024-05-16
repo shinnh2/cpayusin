@@ -21,5 +21,6 @@ public class BoardMenuResponse
     private Integer orderIndex;
     private Boolean isAdminOnly;
 
+    @Builder.Default
     private List<BoardChildrenResponse> category = new ArrayList<>();
 }

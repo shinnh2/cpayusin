@@ -7,6 +7,7 @@ import com.jbaacount.payload.response.post.PostCreateResponse;
 import com.jbaacount.payload.response.post.PostSingleResponse;
 import com.jbaacount.payload.response.post.PostUpdateResponse;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
@@ -51,7 +52,9 @@ public interface PostMapper
     }
 
 
+    @Mapping(target = "updatedAt", ignore = true)
     PostUpdateResponse toPostUpdateResponse(Post post);
 
+    @Mapping(target = "updatedAt", ignore = true)
     PostCreateResponse toPostCreateResponse(Post post);
 }

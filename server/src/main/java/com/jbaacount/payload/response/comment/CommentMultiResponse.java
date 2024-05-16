@@ -30,6 +30,7 @@ public class CommentMultiResponse
     @JsonFormat(pattern = "yyyy-MM-dd hh:mm")
     private LocalDateTime createdAt;
 
+    @Builder.Default
     private List<CommentChildrenResponse> children = new ArrayList<>();
 
 }
