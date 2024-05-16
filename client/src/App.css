@@ -727,12 +727,18 @@ input.error {
 	margin-right: 16px;
 }
 /* board list */
+.board_title_wrap {
+	padding-bottom: 32px;
+}
+.board_title_desc {
+	margin-top: 8px;
+	color: var(--on-background-secondary-color);
+}
 .no_board_list {
 	padding: 48px 0;
 }
 .board_list_box {
 	padding: 0 16px;
-	margin-top: 16px;
 	background: var(--white);
 	border-radius: var(--br-md);
 	box-shadow: var(--bs-layer1);
@@ -1574,6 +1580,13 @@ input.error {
 	/* board write */
 	.board_write_box {
 		padding: 16px;
+	}
+	.board_select_wrap {
+		display: block;
+	}
+	.board_select_wrap .select_wrap {
+		margin-right: 0;
+		margin-bottom: 16px;
 	}
 	.board_write_box .toastui-editor-dropdown-toolbar {
 		height: auto;
