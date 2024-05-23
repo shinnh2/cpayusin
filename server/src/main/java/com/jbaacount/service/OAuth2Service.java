@@ -3,7 +3,6 @@ package com.jbaacount.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.jbaacount.global.oauth2.OAuth2Response;
 import com.jbaacount.global.security.jwt.JwtService;
-import com.jbaacount.model.File;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.type.Platform;
 import com.jbaacount.model.type.Role;
@@ -11,14 +10,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,8 +25,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class OAuth2Service
-{
+public class OAuth2Service {
 
     private final JwtService jwtService;
     private final MemberService memberService;
@@ -51,7 +47,6 @@ public class OAuth2Service
         return userLoginProcess(userResource, registrationId);
     }
 
-
     private String getAccessToken(String code, String registrationId)
     {
         String clientId = env.getProperty(BASIC_URL + registrationId + ".client-id");
@@ -71,10 +66,9 @@ public class OAuth2Service
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 
-        HttpEntity httpEntity = new HttpEntity<>(params, headers);
+        HttpEntity<MultiValueMap<String, String>> httpEntity = new HttpEntity<>(params, headers);
 
         ResponseEntity<JsonNode> exchange = restTemplate.exchange(tokenUri, HttpMethod.POST, httpEntity, JsonNode.class);
-
 
         return exchange.getBody().get("access_token").asText();
     }
@@ -86,7 +80,7 @@ public class OAuth2Service
         HttpHeaders headers = new HttpHeaders();
         headers.set(AUTHORIZATION, "Bearer " + accessToken);
 
-        HttpEntity entity = new HttpEntity(headers);
+        HttpEntity<Void> entity = new HttpEntity<>(headers);
         log.info("entity = {}", entity);
 
         return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
@@ -96,8 +90,7 @@ public class OAuth2Service
     {
         log.info("registrationId = {}", registrationId);
 
-        switch (registrationId)
-        {
+        switch (registrationId) {
             case "google":
                 return processGoogleLogin(resource);
 
@@ -121,14 +114,7 @@ public class OAuth2Service
         String picture = response.get("profile_image").asText();
         Member member = saveOrUpdate(nickname, email, picture, Platform.NAVER.getValue());
 
-        setToken(email);
-
-        return OAuth2Response.builder()
-                .name(nickname)
-                .email(email)
-                .picture(picture)
-                .role("USER")
-                .build();
+        return createOAuth2Response(nickname, email, picture);
     }
 
     private OAuth2Response processKakaoLogin(JsonNode resource)
@@ -140,38 +126,39 @@ public class OAuth2Service
 
         Member member = saveOrUpdate(nickname, email, picture, Platform.KAKAO.getValue());
 
-        setToken(email);
-
-        return OAuth2Response.builder()
-                .name(nickname)
-                .email(email)
-                .picture(picture)
-                .role("USER")
-                .build();
+        return createOAuth2Response(nickname, email, picture);
     }
 
-    private OAuth2Response processGoogleLogin(JsonNode resource) {
+    private OAuth2Response processGoogleLogin(JsonNode resource)
+    {
         String name = resource.get("name").asText();
         String email = resource.get("email").asText();
         String picture = resource.get("picture").asText();
 
         Member member = saveOrUpdate(name, email, picture, Platform.GOOGLE.getValue());
 
-        setToken(email);
+        return createOAuth2Response(name, email, picture);
+    }
+
+    private OAuth2Response createOAuth2Response(String name, String email, String picture)
+    {
+        String accessToken = jwtService.generateAccessToken(email);
+        String refreshToken = jwtService.generateRefreshToken(email);
 
         return OAuth2Response.builder()
                 .name(name)
                 .email(email)
                 .picture(picture)
                 .role("USER")
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 
     private Member saveOrUpdate(String name, String email, String picture, String registrationId)
     {
         Member member = memberService.findOptionalMemberByEmail(email)
-                .orElseGet(() ->
-                {
+                .orElseGet(() -> {
                     Member savedMember = memberService.save(Member.builder()
                             .nickname(name)
                             .email(email)
@@ -191,29 +178,4 @@ public class OAuth2Service
 
         return member;
     }
-
-    private void setToken(String email)
-    {
-        String accessToken = jwtService.generateAccessToken(email);
-        String refreshToken = jwtService.generateRefreshToken(email);
-
-        log.info("accessToken = {}", accessToken);
-
-        setHeadersWithNewAccessToken(accessToken);
-        setHeadersWithRefreshToken(refreshToken);
-    }
-
-    private void setHeadersWithNewAccessToken(String newAccessToken)
-    {
-        HttpHeaders response = new HttpHeaders();
-        response.set(AUTHORIZATION, "Bearer " + newAccessToken);
-    }
-
-
-    private void setHeadersWithRefreshToken(String refreshToken)
-    {
-        HttpHeaders response = new HttpHeaders();
-        response.set("Refresh", refreshToken);
-    }
-
 }

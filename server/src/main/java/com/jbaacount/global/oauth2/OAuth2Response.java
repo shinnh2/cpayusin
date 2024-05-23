@@ -16,4 +16,7 @@ public class OAuth2Response
     private String name;
     private String picture;
     private String role;
+
+    private String accessToken;
+    private String refreshToken;
 }

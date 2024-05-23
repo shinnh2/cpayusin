@@ -9,6 +9,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @RequiredArgsConstructor
 @RequestMapping("/login/oauth2")
 @RestController
@@ -21,12 +23,17 @@ public class OAuth2Controller
 
     @GetMapping("/code/{registrationId}")
     public void getGoogleUser(@RequestParam("code") String code,
-                                        @PathVariable("registrationId") String registrationId,
-                                        HttpServletResponse response) throws IOException
+                              @PathVariable("registrationId") String registrationId,
+                              HttpServletResponse response) throws IOException
     {
         OAuth2Response data = oAuth2Service.oauth2Login(code, registrationId);
-        response.sendRedirect(UriComponentsBuilder.fromUriString(REDIRECT_URI).toUriString());
 
-        //return new ResponseEntity(new GlobalResponse<>(data), HttpStatus.OK);
+        // Set tokens in headers
+        response.setHeader(AUTHORIZATION, "Bearer " + data.getAccessToken());
+        response.setHeader("Refresh", data.getRefreshToken());
+
+        // Redirect to frontend
+        String redirectUrl = UriComponentsBuilder.fromUriString(REDIRECT_URI).toUriString();
+        response.sendRedirect(redirectUrl);
     }
 }
