@@ -6,10 +6,14 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.io.Encoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.WebUtils;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -24,14 +28,17 @@ public class JwtService
     private SecretKey secretKey;
     private int accessTokenExpirationMinutes;
     private int refreshTokenExpirationMinutes;
+    private String COOKIE_NAME;
 
     public JwtService(@Value("${jwt.key}")String secretKey,
                         @Value("${jwt.access-token-expiration-minutes}")int accessTokenExpirationMinutes,
-                        @Value("${jwt.refresh-token-expiration-minutes}")int refreshTokenExpirationMinutes)
+                        @Value("${jwt.refresh-token-expiration-minutes}")int refreshTokenExpirationMinutes,
+                      @Value("${jwt.cookie-name}") String COOKIE_NAME)
     {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpirationMinutes = accessTokenExpirationMinutes;
         this.refreshTokenExpirationMinutes = refreshTokenExpirationMinutes;
+        this.COOKIE_NAME = COOKIE_NAME;
     }
 
     public String generateAccessToken(String email)
@@ -64,6 +71,32 @@ public class JwtService
                 .getBody();
 
         return claims;
+    }
+
+    public ResponseCookie generateCookie(String token)
+    {
+        return ResponseCookie.from(COOKIE_NAME, token)
+                .path("/")
+                .maxAge(60 * 60)
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("Strict")
+                .build();
+    }
+
+    public String getTokenFromCookie(HttpServletRequest request)
+    {
+        return Optional.ofNullable(WebUtils.getCookie(request, COOKIE_NAME))
+                .map(Cookie::getValue)
+                .orElse(null);
+    }
+
+    public ResponseCookie getCleanCookie()
+    {
+        return ResponseCookie.from(COOKIE_NAME,  "")
+                .path("/")
+                .maxAge(0)
+                .build();
     }
 
     public boolean isValidToken(String jws)
