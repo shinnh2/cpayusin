@@ -51,7 +51,8 @@ public class CommentController
     public ResponseEntity<GlobalResponse<CommentSingleResponse>> getComment(@PathVariable("comment-id") Long commentId,
                                                                             @AuthenticationPrincipal MemberDetails currentMember)
     {
-        var data = commentService.getCommentSingleResponse(commentId, currentMember.getMember());
+        Member member = currentMember != null ? currentMember.getMember() : null;
+        var data = commentService.getCommentSingleResponse(commentId, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

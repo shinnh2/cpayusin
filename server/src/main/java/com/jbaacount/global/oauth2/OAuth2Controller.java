@@ -13,8 +13,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
 
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-
 @RequiredArgsConstructor
 @RequestMapping("/login/oauth2")
 @RestController

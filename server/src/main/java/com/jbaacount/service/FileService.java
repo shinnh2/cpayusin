@@ -83,18 +83,21 @@ public class FileService
     }
 
     @Transactional
-    public void deleteUploadedFile(Long postId)
+    public void deleteUploadedFiles(Long postId)
     {
         List<File> files = fileRepository.findByPostId(postId);
 
-        if(files != null && !files.isEmpty())
-        {
-            for (File file : files)
-            {
-                amazonS3.deleteObject(bucket, "post/" + file.getStoredFileName());
-                log.info("file removed successfully = {}", file.getStoredFileName());
-            }
-        }
+        deleteFiles(files);
+
+        fileRepository.deleteAll(files);
+    }
+
+    @Transactional
+    public void deleteUploadedFiles(List<String> urls)
+    {
+        List<File> files = fileRepository.findAllByUrl(urls);
+
+        deleteFiles(files);
 
         fileRepository.deleteAll(files);
     }
@@ -149,6 +152,17 @@ public class FileService
     private Optional<File> getFileByMemberId(Long memberId)
     {
         return fileRepository.findByMemberId(memberId);
+    }
+
+    private void deleteFiles(List<File> files)
+    {
+        if(files != null && !files.isEmpty())
+        {
+            files.forEach(img -> {
+                amazonS3.deleteObject(bucket, "post/" + img.getStoredFileName());
+                log.info("file removed successfully = {}", img.getStoredFileName());
+            });
+        }
     }
 
 

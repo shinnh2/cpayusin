@@ -46,9 +46,9 @@ public class PostController
     public ResponseEntity<GlobalResponse<PostUpdateResponse>> updatePost(@RequestPart(value = "data") @Valid PostUpdateRequest request,
                                                                          @PathVariable("post-id") @Positive Long postId,
                                                                          @RequestPart(value = "files", required = false) List<MultipartFile> files,
-                                                                         @AuthenticationPrincipal Member currentMember)
+                                                                         @AuthenticationPrincipal MemberDetails currentMember)
     {
-        var data = postService.updatePost(postId, request, files, currentMember);
+        var data = postService.updatePost(postId, request, files, currentMember.getMember());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
@@ -57,7 +57,8 @@ public class PostController
     public ResponseEntity<GlobalResponse<PostSingleResponse>> getPost(@PathVariable("post-id") @Positive Long postId,
                                   @AuthenticationPrincipal MemberDetails currentMember)
     {
-        var data = postService.getPostSingleResponse(postId, currentMember.getMember());
+        Member member = currentMember != null ? currentMember.getMember() : null;
+        var data = postService.getPostSingleResponse(postId, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

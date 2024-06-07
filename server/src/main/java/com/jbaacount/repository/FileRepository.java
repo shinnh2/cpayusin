@@ -16,4 +16,8 @@ public interface FileRepository extends JpaRepository<File, Long>
 
     @Query("SELECT f.url FROM File f WHERE f.post.id = :postId")
     List<String> findUrlByPostId(@Param("postId") Long postId);
+
+
+    @Query("SELECT f FROM File f WHERE f.url IN :urls")
+    List<File> findAllByUrl(@Param("urls") List<String> urls);
 }

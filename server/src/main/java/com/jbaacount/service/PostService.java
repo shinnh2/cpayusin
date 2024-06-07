@@ -85,8 +85,10 @@ public class PostService
 
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
 
-
-        fileService.deleteUploadedFile(post.getId());
+        if(!request.getDeletedImg().isEmpty())
+        {
+            fileService.deleteUploadedFiles(request.getDeletedImg());
+        }
 
         if(files != null && !files.isEmpty())
         {
@@ -106,7 +108,11 @@ public class PostService
     public PostSingleResponse getPostSingleResponse(Long id, Member member)
     {
         Post post = getPostById(id);
-        boolean voteStatus = voteService.checkIfMemberVotedPost(member.getId(), id);
+        boolean voteStatus = false;
+        if(member != null)
+        {
+            voteStatus = voteService.checkIfMemberVotedPost(member.getId(), id);
+        }
 
         PostSingleResponse response = PostMapper.INSTANCE.toPostSingleResponse(post, voteStatus);
         response.setFiles(fileService.getFileUrlByPostId(id));
@@ -167,7 +173,7 @@ public class PostService
 
     private void deleteRelatedDataInPost(Long postId)
     {
-        fileService.deleteUploadedFile(postId);
+        fileService.deleteUploadedFiles(postId);
         voteService.deleteAllVoteInThePost(postId);
         commentService.deleteAllByPostId(postId);
     }

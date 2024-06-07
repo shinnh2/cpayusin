@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.io.FileInputStream;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.jbaacount.utils.DescriptionUtils.*;
@@ -131,6 +132,7 @@ class PostControllerTest extends RestDocsSetup
                 .title(title)
                 .content(content)
                 .boardId(boardId)
+                .deletedImg(new ArrayList<>())
                 .build();
 
         byte[] requestBody = objectMapper.writeValueAsBytes(request);

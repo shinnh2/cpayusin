@@ -108,7 +108,11 @@ public class CommentService
     public CommentSingleResponse getCommentSingleResponse(Long commentId, Member member)
     {
         Comment comment = getComment(commentId);
-        boolean voteStatus = voteService.checkIfMemberVotedComment(member.getId(), comment.getId());
+
+        boolean voteStatus = false;
+
+        if(member != null)
+            voteStatus = voteService.checkIfMemberVotedComment(member.getId(), comment.getId());
 
         return CommentMapper.INSTANCE.toCommentSingleResponse(comment, voteStatus);
     }

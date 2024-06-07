@@ -4,6 +4,9 @@ import com.jbaacount.global.validation.notspace.NotSpace;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -17,4 +20,6 @@ public class PostUpdateRequest
 
     private String content;
     private Long boardId;
+
+    private List<String> deletedImg = new ArrayList<>();
 }
