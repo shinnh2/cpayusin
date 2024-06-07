@@ -78,7 +78,7 @@ public class JwtService
         return ResponseCookie.from(COOKIE_NAME, token)
                 .path("/")
                 .maxAge(60 * 60)
-                .httpOnly(true)
+                .httpOnly(false)
                 .secure(true)
                 .sameSite("Strict")
                 .build();
