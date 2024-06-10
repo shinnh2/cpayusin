@@ -28,7 +28,7 @@ const Header = (props: HeaderProps) => {
 		let token = getAccessToken();
 		if (token) {
 			axios
-				.get(`${api}/api/v1/member/single-info`, {
+				.get(`${api}/api/v1/member/profile`, {
 					headers: { Authorization: token },
 				})
 				.then((res) => {
