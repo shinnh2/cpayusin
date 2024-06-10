@@ -38,7 +38,7 @@ const BoardDetail = () => {
 
 		if (accessToken) {
 			axios
-				.get(`${api}/api/v1/member/single-info`, {
+				.get(`${api}/api/v1/member/profile`, {
 					headers: { Authorization: accessToken },
 				})
 				.then((res) => {
