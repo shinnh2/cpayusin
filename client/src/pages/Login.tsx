@@ -1,4 +1,4 @@
-import React, { useState, Dispatch, SetStateAction } from "react";
+import React, { useState, Dispatch, useEffect } from "react";
 import Input from "./../components/Input";
 import Button from "./../components/Button";
 import { validator, ValidatorStatus } from "../assets/validater";
@@ -13,6 +13,7 @@ interface Props {
 const Login = (props: Props) => {
 	const api = process.env.REACT_APP_API_URL;
 	const navigate = useNavigate();
+	const googleLoginURI = process.env.REACT_APP_GOOGLE_LOGIN_URI;
 	const [form, setForm] = useState({
 		email: "",
 		password: "",
@@ -33,6 +34,7 @@ const Login = (props: Props) => {
 			password: value,
 		}));
 	};
+
 	//유효성 검사
 	const validatorStatusEmail: ValidatorStatus = {
 		value: form.email,
@@ -54,7 +56,6 @@ const Login = (props: Props) => {
 		axios
 			.post(`${api}/api/v1/login`, form, { withCredentials: true })
 			.then((response) => {
-				console.log(response.headers.authorization);
 				saveAccessToken(response.headers.authorization);
 				props.setIsLogin(true);
 				navigate("/");
@@ -103,7 +104,9 @@ const Login = (props: Props) => {
 				<div className="sns_login_btns">
 					<button className="sns_btn kakao">카카오 로그인</button>
 					<button className="sns_btn naver">네이버 로그인</button>
-					<button className="sns_btn google">구글 로그인</button>
+					<a className="sns_btn google" href={googleLoginURI}>
+						구글 로그인
+					</a>
 				</div>
 			</div>
 		</div>
