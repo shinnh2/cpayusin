@@ -21,5 +21,6 @@ public class PostUpdateRequest
     private String content;
     private Long boardId;
 
+    @Builder.Default
     private List<String> deletedImg = new ArrayList<>();
 }
