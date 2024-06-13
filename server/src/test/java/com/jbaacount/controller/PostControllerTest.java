@@ -65,6 +65,8 @@ class PostControllerTest extends RestDocsSetup
                 .title(title)
                 .content(CONTENT)
                 .createdAt(LocalDateTime.now())
+                .files(List.of("https://jbaccount.s3.ap-northeast-2.amazonaws.com/post/331dd65c-5da5-44ab-9e8d-8cfa323b6532.jpg",
+                        "https://jbaccount.s3.ap-northeast-2.amazonaws.com/post/ced49c08-39a0-4c72-be7f-4d53d747d061.jpg"))
                 .updatedAt(LocalDateTime.now())
                 .build();
 
@@ -102,6 +104,8 @@ class PostControllerTest extends RestDocsSetup
                                 fieldWithPath("data.id").type(JsonFieldType.NUMBER).description("게시글 고유 식별 번호"),
                                 fieldWithPath("data.title").type(JsonFieldType.STRING).description("게시글 제목"),
                                 fieldWithPath("data.content").type(JsonFieldType.STRING).description("게시글 내용"),
+                                fieldWithPath("data.files").type(JsonFieldType.ARRAY).description("게시글 사진 url"),
+
                                 fieldWithPath("data.createdAt").type(JsonFieldType.STRING).description("게시글 생성 날짜"),
                                 fieldWithPath("data.updatedAt").type(JsonFieldType.STRING).description("게시글 수정 날짜")
                         ).andWithPrefix("", pageNoContentResponseFields())

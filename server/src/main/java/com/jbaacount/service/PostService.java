@@ -4,6 +4,7 @@ import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.global.exception.ExceptionMessage;
 import com.jbaacount.mapper.PostMapper;
 import com.jbaacount.model.Board;
+import com.jbaacount.model.File;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.post.PostCreateRequest;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -59,15 +61,17 @@ public class PostService
         post.addBoard(board);
 
         Post savedPost = postRepository.save(post);
+        List<String> urls = new ArrayList<>();
 
         if(files != null && !files.isEmpty())
         {
-            fileService.storeFiles(files, savedPost);
+            fileService.storeFiles(files, savedPost)
+                    .forEach(file -> urls.add(file.getUrl()));
         }
 
         currentMember.getScoreByPost();
 
-        return PostMapper.INSTANCE.toPostCreateResponse(savedPost);
+        return PostMapper.INSTANCE.toPostCreateResponse(savedPost, urls);
     }
 
     @Transactional

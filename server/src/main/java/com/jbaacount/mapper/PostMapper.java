@@ -11,6 +11,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface PostMapper
@@ -56,5 +58,6 @@ public interface PostMapper
     PostUpdateResponse toPostUpdateResponse(Post post);
 
     @Mapping(target = "updatedAt", ignore = true)
-    PostCreateResponse toPostCreateResponse(Post post);
+    @Mapping(target = "files", source = "files")
+    PostCreateResponse toPostCreateResponse(Post post, List<String> files);
 }
