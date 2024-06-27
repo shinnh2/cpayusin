@@ -58,7 +58,7 @@ const BoardDetail = () => {
 		if (isDeleteYes) {
 			console.log(params.postId);
 			axios
-				.delete(`${api}/api/v1/post/${params.postId}`, {
+				.delete(`${api}/api/v1/post/delete/${params.postId}`, {
 					headers: { Authorization: accessToken },
 				})
 				.then((res) => {
@@ -77,14 +77,14 @@ const BoardDetail = () => {
 			) : (
 				<>
 					<div className="board_header">
-						<p className="board_date">{postData.createdAt}</p>
-						<h4 className="board_detail_title">{postData.title}</h4>
 						<div className="board_detail_info">
 							<p className="board_info">{params.boardInfo?.split("-")[1]}</p>
 							{postData!.categoryId ? (
 								<p className="board_info">{postData!.categoryId}</p>
 							) : null}
+							<p className="board_date">{postData.createdAt}</p>
 						</div>
+						<h4 className="board_detail_title">{postData.title}</h4>
 						<div className="board_detail_info">
 							<div className="writer_profile">
 								<div className="profile_img_wrap"></div>
