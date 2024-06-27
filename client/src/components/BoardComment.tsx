@@ -20,7 +20,7 @@ const BoardComment = ({
 		const accessToken = getAccessToken();
 		if (accessToken) {
 			axios
-				.get(`${api}/api/v1/comment?post=${postId}`, {
+				.get(`${api}/api/v1/comment?postId=${postId}`, {
 					headers: { Authorization: accessToken },
 				})
 				.then((res) => {
