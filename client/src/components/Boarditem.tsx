@@ -14,10 +14,11 @@
 // 	timeInfo: string;
 // }
 
+import { useEffect } from "react";
+
 //서버 응답 기준
 interface BoardItemData {
 	postId?: number;
-	id?: number;
 	boardId: number;
 	boardName: string;
 	categoryId?: number;
@@ -35,7 +36,7 @@ const BoardItem = ({ data }: { data: BoardItemData }) => {
 	return (
 		<div className="board_item">
 			<a
-				href={`/board/${data.boardId}-${data.boardName}/${data.id}`}
+				href={`/board/${data.boardId}-${data.boardName}/${data.postId}`}
 				title={data.title}
 			>
 				<div className="board_item_element_wrap">
