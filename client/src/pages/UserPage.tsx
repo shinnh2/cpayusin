@@ -14,8 +14,7 @@ import iconUser from "./../assets/icon_user.svg";
 // 	nickname: string;
 // 	profileImage: string | null;
 // 	score: number;
-//  isAdmin: boolean;
-// 	timeInfo: string;
+//  role: string;
 // }
 
 interface userPageProps {
@@ -37,6 +36,7 @@ const UserPage: React.FC<userPageProps> = ({ userData }) => {
 			alert("로그인이 필요한 서비스입니다.");
 			navigate(`/login`);
 		}
+		console.log(userData);
 	}, []);
 
 	return (
@@ -54,7 +54,9 @@ const UserPage: React.FC<userPageProps> = ({ userData }) => {
 				</div>
 				<div className="user_button_wrap">
 					<a href={`/user/${userData?.id}/edit`}>사용자 정보 수정</a>
-					{userData?.isAdmin ? <a href={`/admin`}>관리자 페이지</a> : null}
+					{userData?.role === "ADMIN" ? (
+						<a href={`/admin`}>관리자 페이지</a>
+					) : null}
 				</div>
 			</div>
 			<div className="user_written_wrap">
