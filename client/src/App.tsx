@@ -24,8 +24,8 @@ export interface userDataType {
 	nickname: string;
 	profileImage: string | null;
 	score: number;
-	isAdmin: boolean;
-	timeInfo: string;
+	role: string;
+	timeInfo?: string;
 }
 
 function App() {
