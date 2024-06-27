@@ -14,5 +14,8 @@ export const saveAccessToken = (token: string) => {
 	localStorage.setItem("accessToken", token);
 };
 export const removeAccessToken = () => {
+	if (document.cookie !== "") {
+		document.cookie = "cookiename= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
+	}
 	localStorage.removeItem("accessToken");
 };
