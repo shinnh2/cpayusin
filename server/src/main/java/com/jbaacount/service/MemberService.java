@@ -99,8 +99,6 @@ public class MemberService
     @Transactional
     public boolean deleteById(Member member)
     {
-        Long memberId = member.getId();
-
         member.setEmail(generateRemovedEmail());
         member.setNickname(generateRemovedNickname());
         member.setRemoved(true);
