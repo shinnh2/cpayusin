@@ -33,7 +33,6 @@ public class MemberService
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder passwordEncoder;
     private final FileService fileService;
-    private final PostService postService;
 
 
     @Transactional
@@ -106,6 +105,9 @@ public class MemberService
         member.setNickname(generateRemovedNickname());
         member.setRemoved(true);
 
+        log.info("member email = {}, member nickname = {}", member.getEmail(), member.getNickname());
+
+        memberRepository.save(member);
         return member.isRemoved();
     }
 

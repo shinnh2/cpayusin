@@ -15,6 +15,7 @@ import java.util.Optional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom
 {
+    @Query("SELECT m FROM Member m WHERE m.email = :email AND m.isRemoved = FALSE ")
     Optional<Member> findByEmail(@Param("email") String email);
 
     @Query("select m from Member m where REPLACE(lower(m.nickname), ' ', '') = REPLACE(lower(:nickname), ' ', '')")
