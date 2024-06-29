@@ -12,12 +12,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.jbaacount.model.QFile.file;
 import static com.jbaacount.model.QMember.member;
-import static com.jbaacount.model.QPost.post;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -36,6 +33,7 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom
                 .where(ltMemberId(memberId))
                 .where(checkEmailKeyword(keyword))
                 .where(checkNicknameKeyword(keyword))
+                .where(member.isRemoved.isFalse())
                 .orderBy(member.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();

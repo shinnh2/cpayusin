@@ -163,6 +163,7 @@ public class OAuth2Service {
                             .nickname(name)
                             .email(email)
                             .password(UUID.randomUUID().toString())
+                            .url(picture)
                             .role(Role.USER.getValue())
                             .platform(Platform.platformValue(registrationId))
                             .build());

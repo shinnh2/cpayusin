@@ -24,12 +24,16 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberRep
 
     boolean existsByNickname(@Param("nickname") String nickname);
 
-    @Query("SELECT new com.jbaacount.payload.response.member.MemberSingleResponse(m.id, m.nickname, m.url, m.role) FROM Member m WHERE m.id = :memberId ")
+    @Query("SELECT new com.jbaacount.payload.response.member.MemberSingleResponse(m.id, m.nickname, m.url, m.role) FROM Member m " +
+            "WHERE m.id = :memberId AND m.isRemoved = FALSE ")
     Optional<MemberSingleResponse> findSingleResponseById(@Param("memberId") Long memberId);
 
     @Query("SELECT new com.jbaacount.payload.response.member.MemberScoreResponse(m.id, m.nickname, m.score) FROM Member m " +
             "JOIN Post p ON p.member.id = m.id " +
-            "WHERE m.role != 'ADMIN' " +
+            "WHERE m.isRemoved = FALSE AND m.role != 'ADMIN' " +
             "ORDER BY m.score LIMIT 3")
     List<MemberScoreResponse> memberResponseForReward(LocalDateTime startMonth, LocalDateTime endMonth);
+
+    @Query("SELECT m FROM Member m WHERE m.id = :memberId AND m.isRemoved = FALSE ")
+    Optional<Member> findById(@Param("memberId") Long memberId);
 }

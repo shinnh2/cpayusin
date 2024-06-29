@@ -36,6 +36,8 @@ public class Member extends BaseEntity
 
     private String role;
 
+    private boolean isRemoved;
+
     @Builder.Default
     @Enumerated(value = EnumType.STRING)
     @Column(nullable = false)

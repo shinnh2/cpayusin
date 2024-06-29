@@ -61,7 +61,8 @@ public class CommentController
     public ResponseEntity<GlobalResponse<List<CommentMultiResponse>>> getAllComments(@RequestParam("postId") Long postId,
                                                                                      @AuthenticationPrincipal MemberDetails currentMember)
     {
-        var data = commentService.getAllCommentByPostId(postId, currentMember.getMember());
+        Member member = currentMember != null ? currentMember.getMember() : null;
+        var data = commentService.getAllCommentByPostId(postId, member);
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }

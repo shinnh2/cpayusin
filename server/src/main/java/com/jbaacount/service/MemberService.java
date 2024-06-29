@@ -19,6 +19,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
+
+import static com.jbaacount.service.UtilService.generateRemovedEmail;
+import static com.jbaacount.service.UtilService.generateRemovedNickname;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -97,18 +101,12 @@ public class MemberService
     public boolean deleteById(Member member)
     {
         Long memberId = member.getId();
-        log.info("deleted Member nickname = {}", member.getNickname());
 
-        if(member.getUrl() != null)
-        {
-            log.info("delete image = {}", member.getUrl());
-            fileService.deleteProfilePhoto(member.getId());
-        }
-        postService.deleteAllPostsByMemberId(memberId);
+        member.setEmail(generateRemovedEmail());
+        member.setNickname(generateRemovedNickname());
+        member.setRemoved(true);
 
-        memberRepository.deleteById(memberId);
-
-        return !memberRepository.existsById(memberId);
+        return member.isRemoved();
     }
 
     public MemberSingleResponse getMemberSingleResponse(Long memberId)

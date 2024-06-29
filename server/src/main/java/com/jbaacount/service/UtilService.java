@@ -7,16 +7,16 @@ import com.jbaacount.model.type.Role;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.Period;
 import java.util.Random;
+import java.util.UUID;
 
 @Transactional(readOnly = true)
 @Service
 public class UtilService
 {
     private static final String WORDS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    private static final String REMOVED_EMAIL = "deleted email_";
+    private static final String REMOVED_NICKNAME = "deleted user_";
 
     public void checkPermission(Long memberId, Member currentMember)
     {
@@ -55,5 +55,15 @@ public class UtilService
         String verificationCode = sb.toString();
 
         return verificationCode;
+    }
+
+    public static String generateRemovedEmail()
+    {
+        return REMOVED_EMAIL + UUID.randomUUID().toString();
+    }
+
+    public static String generateRemovedNickname()
+    {
+        return REMOVED_NICKNAME + UUID.randomUUID().toString();
     }
 }

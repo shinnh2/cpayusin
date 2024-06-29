@@ -28,6 +28,7 @@ public interface MemberMapper
     @Mapping(target = "platform", ignore = true)
     @Mapping(target = "url", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "isRemoved", ignore = true)
     Member toMemberEntity(MemberRegisterRequest postDto);
 
     MemberDetailResponse toMemberDetailResponse(Member member);
