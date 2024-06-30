@@ -1,6 +1,7 @@
 package com.jbaacount.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jbaacount.config.TestContainerExtension;
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
@@ -12,29 +13,37 @@ import com.jbaacount.payload.request.board.CategoryUpdateRequest;
 import com.jbaacount.repository.BoardRepository;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.repository.PostRepository;
+import com.jbaacount.config.TearDownExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql("classpath:db/teardown.sql")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
+@ExtendWith(TearDownExtension.class)
+@ExtendWith(TestContainerExtension.class)
 class AdminTest extends DummyObject
 {
     @Autowired
@@ -49,14 +58,13 @@ class AdminTest extends DummyObject
     @Autowired
     private BoardRepository boardRepository;
 
+    @Autowired
+    private PostRepository postRepository;
+
     Member member;
     Board board1;
     Board board2;
     Board childBoard1;
-    
-    @Autowired
-    private PostRepository postRepository;
-
 
     @BeforeEach
     void setUp()
@@ -282,7 +290,6 @@ class AdminTest extends DummyObject
         String requestBody = objectMapper.writeValueAsString(boardUpdateRequestList);
 
         // when
-
         ResultActions resultActions = mvc
                 .perform(patch("/api/v1/admin/manage/update")
                         .contentType(MediaType.APPLICATION_JSON)

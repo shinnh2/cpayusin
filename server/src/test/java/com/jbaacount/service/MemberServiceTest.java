@@ -1,16 +1,23 @@
 package com.jbaacount.service;
 
+import com.jbaacount.config.TestContainerExtension;
 import com.jbaacount.global.exception.BusinessLogicException;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.response.member.MemberDetailResponse;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.setup.MockSetup;
+import com.jbaacount.config.TearDownExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.Optional;
 
@@ -18,7 +25,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Sql("classpath:db/teardown.sql")
+@ExtendWith(TestContainerExtension.class)
+@ExtendWith(TearDownExtension.class)
 @SpringBootTest
 class MemberServiceTest extends MockSetup
 {
@@ -27,6 +35,7 @@ class MemberServiceTest extends MockSetup
 
     @Autowired
     private MemberRepository memberRepository;
+
 
     @BeforeEach
     void beforeEach()

@@ -3,15 +3,18 @@ package com.jbaacount.integration;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jbaacount.setup.MockSetup;
+import com.jbaacount.config.TearDownExtension;
+import com.jbaacount.config.TestContainerExtension;
 import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Member;
 import com.jbaacount.payload.request.member.MemberUpdateRequest;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.service.FileService;
 import com.jbaacount.service.MemberService;
+import com.jbaacount.setup.MockSetup;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,22 +24,27 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.web.multipart.MultipartFile;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
 
 import java.io.FileInputStream;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql("classpath:db/teardown.sql")
+
 @AutoConfigureMockMvc
+@ExtendWith(TestContainerExtension.class)
+@ExtendWith(TearDownExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class MemberTest extends MockSetup
 {
@@ -60,6 +68,7 @@ class MemberTest extends MockSetup
 
     @Autowired
     private FileService fileService;
+
 
     private static final String FILE_PATH1= "src/test/resources/image/";
     private static final String FILE_NAME1 = "photo1.jpeg";

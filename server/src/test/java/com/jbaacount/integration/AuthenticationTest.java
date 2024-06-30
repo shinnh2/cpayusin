@@ -1,6 +1,7 @@
 package com.jbaacount.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jbaacount.config.TestContainerExtension;
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.model.Member;
@@ -8,9 +9,11 @@ import com.jbaacount.payload.request.member.MemberRegisterRequest;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.repository.RedisRepository;
 import com.jbaacount.service.AuthenticationService;
+import com.jbaacount.config.TearDownExtension;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +22,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -29,8 +36,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql("classpath:db/teardown.sql")
+//@Sql("classpath:db/teardown.sql")
 @AutoConfigureMockMvc
+@ExtendWith(TearDownExtension.class)
+@ExtendWith(TestContainerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class AuthenticationTest extends DummyObject
 {

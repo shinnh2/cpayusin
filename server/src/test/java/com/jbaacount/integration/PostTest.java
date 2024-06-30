@@ -1,6 +1,7 @@
 package com.jbaacount.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jbaacount.config.TestContainerExtension;
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.global.security.userdetails.MemberDetails;
 import com.jbaacount.model.Board;
@@ -9,8 +10,10 @@ import com.jbaacount.payload.request.post.PostCreateRequest;
 import com.jbaacount.repository.BoardRepository;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.repository.PostRepository;
+import com.jbaacount.config.TearDownExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,17 +21,22 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Sql("classpath:db/teardown.sql")
 @AutoConfigureMockMvc
+@ExtendWith(TestContainerExtension.class)
+@ExtendWith(TearDownExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class PostTest extends DummyObject
 {
@@ -51,6 +59,7 @@ class PostTest extends DummyObject
     private Board board1;
     private Board board2;
 
+
     @BeforeEach
     void setUp()
     {
@@ -62,8 +71,6 @@ class PostTest extends DummyObject
         board2 = boardRepository.save(newMockBoard(2L, "board2", 2));
 
         postRepository.save(newMockPost(1L, "title", "content", board1, member));
-
-
     }
 
 

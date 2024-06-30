@@ -1,28 +1,36 @@
 package com.jbaacount.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jbaacount.config.TestContainerExtension;
 import com.jbaacount.dummy.DummyObject;
 import com.jbaacount.model.Board;
 import com.jbaacount.model.Member;
 import com.jbaacount.model.type.BoardType;
 import com.jbaacount.repository.BoardRepository;
 import com.jbaacount.repository.MemberRepository;
+import com.jbaacount.config.TearDownExtension;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@Sql("classpath:db/teardown.sql")
 @AutoConfigureMockMvc
+@ExtendWith(TearDownExtension.class)
+@ExtendWith(TestContainerExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 class BoardTest extends DummyObject
 {
@@ -37,6 +45,17 @@ class BoardTest extends DummyObject
 
     @Autowired
     private BoardRepository boardRepository;
+
+/*    @Container
+    private static MySQLContainer container = new MySQLContainer("mysql:latest");
+
+    @DynamicPropertySource
+    public static void overrideProps(DynamicPropertyRegistry registry)
+    {
+        registry.add("spring.datasource.url", container::getJdbcUrl);
+        registry.add("spring.datasource.username", container::getUsername);
+        registry.add("spring.datasource.password", container::getPassword);
+    }*/
 
 
     @BeforeEach
