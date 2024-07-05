@@ -1,6 +1,7 @@
 package com.jbaacount.global.validation;
 
 import com.jbaacount.service.MemberService;
+import com.jbaacount.validator.MemberValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -25,12 +26,12 @@ public @interface CustomEmailValidation
 @RequiredArgsConstructor
 class CustomEmailValidator implements ConstraintValidator<CustomEmailValidation, String>
 {
-    private final MemberService memberService;
+    private final MemberValidator memberValidator;
 
     @Override
     public boolean isValid(String email, ConstraintValidatorContext context)
     {
-        return !memberService.verifyExistEmail(email);
+        return !memberValidator.verifyExistEmail(email);
     }
 
 

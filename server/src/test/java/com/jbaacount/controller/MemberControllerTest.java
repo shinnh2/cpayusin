@@ -8,6 +8,7 @@ import com.jbaacount.payload.request.member.NicknameRequest;
 import com.jbaacount.payload.response.member.*;
 import com.jbaacount.service.MemberService;
 import com.jbaacount.setup.RestDocsSetup;
+import com.jbaacount.validator.MemberValidator;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -42,6 +43,9 @@ class MemberControllerTest extends RestDocsSetup
 {
     @MockBean
     private MemberService memberService;
+
+    @MockBean
+    private MemberValidator memberValidator;
 
     @Test
     void updateMember() throws Exception
@@ -346,7 +350,7 @@ class MemberControllerTest extends RestDocsSetup
         String response = "사용할 수 있는 이메일입니다.";
         String requestBody = objectMapper.writeValueAsString(request);
 
-        given(memberService.checkExistEmail(any(String.class))).willReturn(response);
+        given(memberValidator.checkExistEmail(any(String.class))).willReturn(response);
 
         // when
         ResultActions resultActions = mvc
@@ -384,7 +388,7 @@ class MemberControllerTest extends RestDocsSetup
         String response = "사용할 수 있는 닉네임입니다.";
         String requestBody = objectMapper.writeValueAsString(request);
 
-        given(memberService.checkExistNickname(any(String.class))).willReturn(response);
+        given(memberValidator.checkExistNickname(any(String.class))).willReturn(response);
 
         // when
         ResultActions resultActions = mvc

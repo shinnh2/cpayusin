@@ -71,22 +71,6 @@ public class VoteService
         }
     }
 
-    @Transactional
-    public void deleteVoteByPostId(Long postId)
-    {
-        voteRepository.deleteVoteByPostId(postId);
-    }
-
-    @Transactional
-    public void deleteVoteByCommentId(Long commentId)
-    {
-        voteRepository.deleteVoteByCommentId(commentId);
-    }
-
-    public boolean existByMemberAndPost(Member member, Post post)
-    {
-        return voteRepository.existsVoteByMemberAndPost(member, post);
-    }
 
     public void deleteAllVoteInThePost(Long postId)
     {

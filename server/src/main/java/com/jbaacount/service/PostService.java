@@ -154,18 +154,6 @@ public class PostService
         postRepository.deleteAllInBatch(postList);
     }
 
-    @Transactional
-    public void deleteAllPostsByMemberId(Long memberId)
-    {
-        List<Post> postList = postRepository.findAllByMemberId(memberId);
-
-        postList.forEach(post -> {
-            deleteRelatedDataInPost(post.getId());
-        });
-
-        postRepository.deleteAllInBatch(postList);
-    }
-
     public Page<PostMultiResponse> getPostsByBoardId(Long boardId, String keyword, Pageable pageable)
     {
         var childrenList = boardService.getBoardIdListByParentId(boardId);

@@ -115,30 +115,6 @@ public class MemberService
                 .orElseThrow(() -> new BusinessLogicException(ExceptionMessage.USER_NOT_FOUND));
     }
 
-    public boolean verifyExistEmail(String email)
-    {
-        return memberRepository.existsByEmail(email);
-    }
-
-
-    public boolean verifyExistNickname(String nickname)
-    {
-         return memberRepository.existsByNickname(nickname);
-    }
-
-    public String checkExistEmail(String email)
-    {
-        boolean response = memberRepository.findByEmail(email).isPresent();
-
-        return response ? "이미 사용중인 이메일입니다." : "사용할 수 있는 이메일입니다.";
-    }
-
-    public String checkExistNickname(String nickname)
-    {
-        boolean response = memberRepository.findByNickname(nickname).isPresent();
-
-        return response ? "이미 사용중인 닉네임입니다." : "사용할 수 있는 닉네임입니다.";
-    }
 
     public Member findMemberByEmail(String email)
     {

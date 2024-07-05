@@ -7,6 +7,8 @@ import com.jbaacount.payload.response.member.MemberDetailResponse;
 import com.jbaacount.repository.MemberRepository;
 import com.jbaacount.setup.MockSetup;
 import com.jbaacount.config.TearDownExtension;
+import com.jbaacount.validator.MemberValidator;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +37,9 @@ class MemberServiceTest extends MockSetup
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @Autowired
+    private MemberValidator memberValidator;
 
 
     @BeforeEach
@@ -74,13 +79,13 @@ class MemberServiceTest extends MockSetup
         // when
 
 
-        String result = memberService.checkExistEmail(email);
+        String result = memberValidator.checkExistEmail(email);
         assertThat(result).isEqualTo("이미 사용중인 이메일입니다.");
 
         memberService.deleteById(mockMember);
 
         // then
-        result = memberService.checkExistEmail(email);
+        result = memberValidator.checkExistEmail(email);
         assertThat(result).isEqualTo("사용할 수 있는 이메일입니다.");
     }
 
@@ -96,13 +101,13 @@ class MemberServiceTest extends MockSetup
         // when
 
 
-        String result = memberService.checkExistNickname(nickname);
+        String result = memberValidator.checkExistNickname(nickname);
         assertThat(result).isEqualTo("이미 사용중인 닉네임입니다.");
 
         memberService.deleteById(mockMember);
 
         // then
-        result = memberService.checkExistNickname(nickname);
+        result = memberValidator.checkExistNickname(nickname);
         assertThat(result).isEqualTo("사용할 수 있는 닉네임입니다.");
     }
 

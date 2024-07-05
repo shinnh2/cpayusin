@@ -1,6 +1,6 @@
 package com.jbaacount.global.validation;
 
-import com.jbaacount.service.MemberService;
+import com.jbaacount.validator.MemberValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -25,11 +25,11 @@ public @interface NicknameValidation
 @RequiredArgsConstructor
 class NicknameValidator implements ConstraintValidator<NicknameValidation, String>
 {
-    private final MemberService memberService;
+    private final MemberValidator memberValidator;
 
     @Override
     public boolean isValid(String nickname, ConstraintValidatorContext constraintValidatorContext)
     {
-        return !memberService.verifyExistNickname(nickname);
+        return !memberValidator.verifyExistNickname(nickname);
     }
 }

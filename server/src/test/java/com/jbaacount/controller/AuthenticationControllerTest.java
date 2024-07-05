@@ -9,6 +9,7 @@ import com.jbaacount.payload.response.member.ResetPasswordResponse;
 import com.jbaacount.service.AuthenticationService;
 import com.jbaacount.service.MemberService;
 import com.jbaacount.setup.RestDocsSetup;
+import com.jbaacount.validator.MemberValidator;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -39,6 +40,8 @@ class AuthenticationControllerTest extends RestDocsSetup
     @MockBean
     private MemberService memberService;
 
+    @MockBean
+    private MemberValidator memberValidator;
 
     @Test
     void logout() throws Exception

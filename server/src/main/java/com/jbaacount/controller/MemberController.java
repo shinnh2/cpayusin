@@ -9,6 +9,7 @@ import com.jbaacount.payload.request.member.NicknameRequest;
 import com.jbaacount.payload.response.GlobalResponse;
 import com.jbaacount.payload.response.member.*;
 import com.jbaacount.service.MemberService;
+import com.jbaacount.validator.MemberValidator;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,7 @@ import java.util.List;
 public class MemberController
 {
     private final MemberService memberService;
+    private final MemberValidator memberValidator;
 
     @PatchMapping("/update")
     public ResponseEntity<GlobalResponse<MemberUpdateResponse>> updateMember(@RequestPart(value = "data", required = false) @Valid MemberUpdateRequest patchDto,
@@ -99,7 +101,7 @@ public class MemberController
     @PostMapping("/verify-email")
     public ResponseEntity<GlobalResponse<String>> checkExistEmail(@RequestBody @Valid EmailRequest request)
     {
-        var data = memberService.checkExistEmail(request.getEmail());
+        var data = memberValidator.checkExistEmail(request.getEmail());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
@@ -107,7 +109,7 @@ public class MemberController
     @PostMapping("/verify-nickname")
     public ResponseEntity<GlobalResponse<String>> checkExistNickname(@RequestBody @Valid NicknameRequest request)
     {
-        var data = memberService.checkExistNickname(request.getNickname());
+        var data = memberValidator.checkExistNickname(request.getNickname());
 
         return ResponseEntity.ok(new GlobalResponse<>(data));
     }
