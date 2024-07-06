@@ -1,5 +1,4 @@
 HELP.md
-.gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
@@ -38,7 +37,5 @@ out/
 
 
 ### application properties ###
-application.yml
-
 
 /src/main/generated/
