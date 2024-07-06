@@ -2,10 +2,12 @@ import { useState } from "react";
 import Input from "./../components/Input";
 import Button from "./../components/Button";
 import { validator, ValidatorStatus } from "../assets/validater";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Signup = () => {
 	const api = process.env.REACT_APP_API_URL;
+	const navigate = useNavigate();
 	const [form, setForm] = useState({
 		email: "",
 		password: "",
@@ -66,9 +68,11 @@ const Signup = () => {
 			.post(`${api}/api/v1/sign-up`, form, { withCredentials: true })
 			.then((response) => {
 				console.log("회원가입 성공 !!!!", response.data);
+				navigate("/login");
 			})
 			.catch((error) => {
 				if (error.response) {
+					alert("회원가입에 실패했습니다."); //팝업으로 바꾸기
 					// 서버 응답이 있을 경우 (에러 상태 코드가 반환된 경우)
 					console.error("서버 응답 에러:", error.response.data);
 					console.error("응답 상태 코드:", error.response.status);
@@ -84,7 +88,7 @@ const Signup = () => {
 			});
 	};
 	return (
-		<div className="input_box sign_box col_4">
+		<div className="input_box sign_box">
 			<h3 className="title_h3">회원가입</h3>
 			<div className="validate_email_wrap">
 				<Input

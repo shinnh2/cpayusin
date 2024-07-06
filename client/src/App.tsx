@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import Header from "./components/Header";
 import Nav from "./components/Nav";
+import NavDrawer from "./components/NavDrawer";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -14,6 +15,7 @@ import BoardWrite from "./pages/BoardWrite";
 import UserPage from "./pages/UserPage";
 import UserEdit from "./pages/UserEdit";
 import BoardDetailEdit from "./pages/BoardDetailEdit";
+import Admin from "./pages/Admin";
 
 export interface userDataType {
 	createdAt: string;
@@ -22,13 +24,14 @@ export interface userDataType {
 	nickname: string;
 	profileImage: string | null;
 	score: number;
-	isAdmin: boolean;
-	timeInfo: string;
+	role: string;
+	timeInfo?: string;
 }
 
 function App() {
 	const [isLogin, setIsLogin] = useState(false);
 	const [userData, setUserData] = useState<userDataType>();
+	const [isNavDrawerOn, setIsNavDrawerOn] = useState(false);
 	return (
 		<div className="App">
 			<Router>
@@ -37,6 +40,7 @@ function App() {
 					setIsLogin={setIsLogin}
 					setUserData={setUserData}
 					userData={userData}
+					setIsNavDrawerOn={setIsNavDrawerOn}
 				/>
 				<div className="page_wrap">
 					<Nav />
@@ -68,10 +72,17 @@ function App() {
 								path="/user/:userId/edit"
 								element={<UserEdit userData={userData} />}
 							/>
-							<Route path="/admin" element={<Signup />} />
+							<Route path="/admin" element={<Admin />} />
 						</Routes>
 					</main>
 				</div>
+				<NavDrawer
+					isLogin={isLogin}
+					setIsLogin={setIsLogin}
+					userData={userData}
+					setIsNavDrawerOn={setIsNavDrawerOn}
+					isNavDrawerOn={isNavDrawerOn}
+				/>
 			</Router>
 		</div>
 	);

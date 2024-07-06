@@ -8,9 +8,9 @@ import com.jbaacount.model.Member;
 import com.jbaacount.model.Post;
 import com.jbaacount.payload.request.PostCreateRequest;
 import com.jbaacount.payload.request.PostUpdateRequest;
-import com.jbaacount.payload.response.PostMultiResponse;
-import com.jbaacount.payload.response.PostResponseForProfile;
-import com.jbaacount.payload.response.PostSingleResponse;
+import com.jbaacount.payload.response.post.PostMultiResponse;
+import com.jbaacount.payload.response.post.PostResponseForProfile;
+import com.jbaacount.payload.response.post.PostSingleResponse;
 import com.jbaacount.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -63,7 +64,15 @@ public class PostService
         //Only the owner of the post has the authority to update
         utilService.isTheSameUser(post.getMember().getId(), currentMember.getId());
 
+        Optional.ofNullable(request.getBoardId())
+                        .ifPresent(newBoardId -> {
+                            Board board = boardService.getBoardById(newBoardId);
+                            post.addBoard(board);
+                        });
+
         PostMapper.INSTANCE.updatePostFromUpdateRequest(request, post);
+
+
 
         fileService.deleteUploadedFile(post);
 

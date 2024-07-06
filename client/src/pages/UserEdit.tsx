@@ -40,6 +40,7 @@ const UserEdit: React.FC<userPageProps> = ({ userData }) => {
 		if (isNameError) return;
 		const data = {
 			nickname: userNickname,
+			//비밀번호 받아야 함. 그런데 그러면 화면을 수정해야할 필요가 있으므로 논의할 것
 		};
 
 		const formData = new FormData();

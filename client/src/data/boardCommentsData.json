@@ -1,0 +1,92 @@
+[
+	{
+		"id": 1,
+		"text": "댓글 테스트1",
+		"voteCount": 1,
+		"voteStatus": true,
+		"isRemoved": true,
+		"memberId": 1,
+		"memberName": "운영자수정",
+		"createdAt": "2024-03-24 03:12",
+		"children": [
+			{
+				"id": 2,
+				"text": "댓글 테스트1",
+				"voteCount": 0,
+				"voteStatus": false,
+				"memberId": 1,
+				"memberName": "운영자수정",
+				"parentId": 1,
+				"createdAt": "2024-03-24 03:13",
+				"removed": false
+			},
+			{
+				"id": 3,
+				"text": "댓글 테스트2",
+				"voteCount": 0,
+				"voteStatus": false,
+				"memberId": 1,
+				"memberName": "운영자수정",
+				"parentId": 1,
+				"createdAt": "2024-03-24 03:15",
+				"removed": false
+			},
+			{
+				"id": 4,
+				"text": "댓글 테스트3",
+				"voteCount": 0,
+				"voteStatus": false,
+				"memberId": 1,
+				"memberName": "운영자수정",
+				"parentId": 1,
+				"createdAt": "2024-03-24 03:15",
+				"removed": false
+			}
+		]
+	},
+	{
+		"id": 5,
+		"text": "댓글 테스트2",
+		"voteCount": 0,
+		"voteStatus": false,
+		"isRemoved": false,
+		"memberId": 1,
+		"memberName": "운영자수정",
+		"createdAt": "2024-03-24 03:36",
+		"children": [
+			{
+				"id": 6,
+				"text": "댓글 테스트 하위 1",
+				"voteCount": 0,
+				"voteStatus": false,
+				"memberId": 1,
+				"memberName": "운영자수정",
+				"parentId": 5,
+				"createdAt": "2024-03-24 03:37",
+				"removed": false
+			},
+			{
+				"id": 7,
+				"text": "댓글 테스트 하위 2",
+				"voteCount": 0,
+				"voteStatus": false,
+				"memberId": 1,
+				"memberName": "운영자수정",
+				"parentId": 5,
+				"createdAt": "2024-03-24 03:37",
+				"removed": false
+			},
+			{
+				"id": 8,
+				"text": "댓글 테스트 하위 3",
+				"voteCount": 0,
+				"voteStatus": false,
+				"memberId": 1,
+				"memberName": "운영자수정",
+				"parentId": 5,
+				"createdAt": "2024-03-24 03:37",
+				"removed": false
+			}
+		]
+	}
+]

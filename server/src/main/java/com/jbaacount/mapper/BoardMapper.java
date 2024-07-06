@@ -22,8 +22,20 @@ public interface BoardMapper
 
     Board toBoardEntity(BoardCreateRequest request);
 
+    @Mapping(target = "modifiedAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "children", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "posts", ignore = true)
     void updateBoard(BoardUpdateRequest request, @MappingTarget Board board);
 
+    @Mapping(target = "modifiedAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "type", ignore = true)
+    @Mapping(target = "children", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "posts", ignore = true)
     void updateBoard(CategoryUpdateRequest request, @MappingTarget Board board);
 
 
@@ -35,6 +47,7 @@ public interface BoardMapper
 
     List<BoardMenuResponse> toBoardMenuResponse(List<Board> boards);
 
+    @Mapping(target = "category", ignore = true)
     BoardMenuResponse toMenuResponse(Board board);
 
     @Mapping(target = "parentId", source = "parent.id")

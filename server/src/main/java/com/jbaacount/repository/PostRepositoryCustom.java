@@ -1,10 +1,9 @@
 package com.jbaacount.repository;
 
 import com.jbaacount.model.Post;
-import com.jbaacount.payload.response.PostResponseForProfile;
+import com.jbaacount.payload.response.post.PostResponseForProfile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;

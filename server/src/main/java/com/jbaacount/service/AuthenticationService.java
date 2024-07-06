@@ -7,6 +7,7 @@ import com.jbaacount.global.security.jwt.JwtService;
 import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
 import com.jbaacount.mapper.MemberMapper;
 import com.jbaacount.model.Member;
+import com.jbaacount.model.type.Platform;
 import com.jbaacount.payload.request.MemberRegisterRequest;
 import com.jbaacount.payload.response.AuthenticationResponse;
 import com.jbaacount.payload.response.MemberDetailResponse;
@@ -15,15 +16,15 @@ import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RequestMapping("/api/v1/auth")
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
 @RequiredArgsConstructor
 @Slf4j
 @RestController
@@ -35,11 +36,13 @@ public class AuthenticationService
     private final JwtService jwtService;
     private final BCryptPasswordEncoder passwordEncoder;
 
+
     @Transactional
     public MemberDetailResponse register(MemberRegisterRequest request)
     {
         Member member = MemberMapper.INSTANCE.toMemberEntity(request);
         member.updatePassword(passwordEncoder.encode(request.getPassword()));
+        member.setPlatform(Platform.HOME);
         List<String> roles = authorityUtils.createRoles(request.getEmail());
         member.setRoles(roles);
         Member savedMember = memberService.save(member);
@@ -78,6 +81,7 @@ public class AuthenticationService
         return MemberMapper.INSTANCE.toMemberDetailResponse(member);
     }
 
+
     public String logout(String refreshToken)
     {
         jwtService.isValidToken(refreshToken);
@@ -86,6 +90,7 @@ public class AuthenticationService
             throw new InvalidTokenException(ExceptionMessage.TOKEN_NOT_FOUND);
 
         redisRepository.deleteRefreshToken(refreshToken);
+        SecurityContextHolder.clearContext();
         return "로그아웃에 성공했습니다";
     }
 
@@ -122,9 +127,7 @@ public class AuthenticationService
     public HttpHeaders setHeadersWithNewAccessToken(String newAccessToken)
     {
         HttpHeaders response = new HttpHeaders();
-        response.set("Authorization", "Bearer " + newAccessToken);
+        response.set(AUTHORIZATION, "Bearer " + newAccessToken);
         return response;
     }
-
-
 }

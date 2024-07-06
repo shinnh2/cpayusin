@@ -12,13 +12,13 @@ import { getAccessToken } from "../assets/tokenActions";
 
 const InnerList = React.memo(function InnerList({
 	board,
-	categories,
+	category,
 	editData,
 }: any) {
-	return categories.map((category: any, index: any) => (
+	return category.map((categoryItem: any, index: any) => (
 		<AdminCategoryItem
-			key={category.id}
-			category={category}
+			key={categoryItem.id}
+			category={categoryItem}
 			index={index}
 			board={board}
 			editData={editData}
@@ -26,13 +26,7 @@ const InnerList = React.memo(function InnerList({
 	));
 });
 
-function AdminBoardItem({
-	board,
-	categories,
-	index,
-	editData,
-	fetchData,
-}: any) {
+function AdminBoardItem({ board, category, index, editData, fetchData }: any) {
 	const api = process.env.REACT_APP_API_URL;
 	const [newCategory, setNewCategory] = useState("");
 	const [isEdit, setIsEdit] = useState(false);
@@ -48,6 +42,7 @@ function AdminBoardItem({
 		const newCategoryData = {
 			name: newCategory,
 			isAdminOnly: false,
+			parentId: board.id,
 		};
 		const postAxiosConfig = {
 			headers: {
@@ -57,7 +52,7 @@ function AdminBoardItem({
 		};
 		axios
 			.post(
-				`${api}/api/v1/admin/manage/category/create?board=${board.id}`,
+				`${api}/api/v1/admin/manage/board/create`,
 				newCategoryData,
 				postAxiosConfig
 			)
@@ -168,7 +163,7 @@ function AdminBoardItem({
 							>
 								<InnerList
 									board={board}
-									categories={categories}
+									category={category}
 									editData={editData}
 								/>
 								{provided.placeholder}

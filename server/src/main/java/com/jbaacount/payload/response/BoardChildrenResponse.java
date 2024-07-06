@@ -16,6 +16,7 @@ public class BoardChildrenResponse
     private String type;
 
     private Integer orderIndex;
+    private Boolean isAdminOnly;
 
     private Long parentId;
 }

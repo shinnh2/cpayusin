@@ -1,85 +1,218 @@
 package com.jbaacount.service;
 
-import com.jbaacount.global.security.dto.OAuthAttributes;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.jbaacount.global.oauth2.OAuth2Response;
 import com.jbaacount.global.security.jwt.JwtService;
-import com.jbaacount.global.security.utiles.CustomAuthorityUtils;
+import com.jbaacount.model.File;
 import com.jbaacount.model.Member;
-import com.jbaacount.model.Platform;
-import com.jbaacount.repository.MemberRepository;
+import com.jbaacount.model.type.Platform;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
-import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
+import org.springframework.core.env.Environment;
+import org.springframework.http.*;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+
+@Transactional(readOnly = true)
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class OAuth2Service implements OAuth2UserService<OAuth2UserRequest, OAuth2User>
+public class OAuth2Service
 {
-    private final MemberRepository memberRepository;
+
     private final JwtService jwtService;
-    private final CustomAuthorityUtils authorityUtils;
+    private final MemberService memberService;
+    private final FileService fileService;
+    private final Environment env;
+    private final RestTemplate restTemplate = new RestTemplate();
+    public final String BASIC_URL = "oauth2.";
+    public final String GRANT_TYPE = "authorization_code";
 
-    @Override
-    public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException
+    @Transactional
+    public OAuth2Response oauth2Login(String code, String registrationId)
     {
-        log.info("===OAuth2Service===");
+        log.info("code = {}", code);
+        String accessToken = getAccessToken(code, registrationId);
+        log.info("authorization token = {}", accessToken);
 
-        OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate =new DefaultOAuth2UserService();
-        OAuth2User oAuth2User = delegate.loadUser(userRequest);
+        JsonNode userResource = getUserInfoFromToken(accessToken, registrationId);
 
-        String registrationId = userRequest.getClientRegistration().getRegistrationId();
-        String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
-
-        OAuthAttributes attributes = OAuthAttributes.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
-
-        Member member = saveOrUpdate(attributes);
-
-        String accessToken = jwtService.generateAccessToken(member.getEmail(), member.getRoles());
-        String refreshToken = jwtService.generateRefreshToken(member.getEmail());
-
-        OAuth2UserAuthority userAuthority = new OAuth2UserAuthority(attributes.getAttributes());
-
-        DefaultOAuth2User user = new DefaultOAuth2User(
-                Collections.singleton(userAuthority),
-                attributes.getAttributes(),
-                userNameAttributeName);
-
-        return user;
+        return userLoginProcess(userResource, registrationId);
     }
 
-    private Member saveOrUpdate(OAuthAttributes attributes)
+
+    private String getAccessToken(String code, String registrationId)
     {
-        Optional<Member> optionalMember = memberRepository.findByEmail(attributes.getEmail());
+        String clientId = env.getProperty(BASIC_URL + registrationId + ".client-id");
+        String clientSecret = env.getProperty(BASIC_URL + registrationId + ".client-secret");
+        String redirectUri = env.getProperty(BASIC_URL + registrationId + ".redirect-uri");
+        String tokenUri = env.getProperty(BASIC_URL + registrationId + ".token-uri");
 
-        //if present = existing member
-        if(optionalMember.isPresent())
+        log.info("tokenuri = {}", tokenUri);
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("client_id", clientId);
+        params.add("client_secret", clientSecret);
+        params.add("code", code);
+        params.add("grant_type", GRANT_TYPE);
+        params.add("redirect_uri", redirectUri);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity httpEntity = new HttpEntity<>(params, headers);
+
+        ResponseEntity<JsonNode> exchange = restTemplate.exchange(tokenUri, HttpMethod.POST, httpEntity, JsonNode.class);
+
+
+        return exchange.getBody().get("access_token").asText();
+    }
+
+    private JsonNode getUserInfoFromToken(String accessToken, String registrationId)
+    {
+        String resourceUri = env.getProperty(BASIC_URL + registrationId + ".resource-uri");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(AUTHORIZATION, "Bearer " + accessToken);
+
+        HttpEntity entity = new HttpEntity(headers);
+        log.info("entity = {}", entity);
+
+        return restTemplate.exchange(resourceUri, HttpMethod.GET, entity, JsonNode.class).getBody();
+    }
+
+    private OAuth2Response userLoginProcess(JsonNode resource, String registrationId)
+    {
+        log.info("registrationId = {}", registrationId);
+
+        switch (registrationId)
         {
-            return optionalMember.get();
+            case "google":
+                return processGoogleLogin(resource);
+
+            case "kakao":
+                return processKakaoLogin(resource);
+
+            case "naver":
+                return processNaverLogin(resource);
+
+            default:
+                throw new IllegalArgumentException("Unsupported registrationId: " + registrationId);
         }
+    }
 
-        // else = should sign up first
-        else
-        {
-            String email = attributes.getEmail();
-            String nickname = attributes.getNickname();
-            List<String> roles = authorityUtils.createRoles(email);
-            Platform platform = attributes.getPlatform();
+    private OAuth2Response processNaverLogin(JsonNode resource)
+    {
+        JsonNode response = resource.get("response");
 
-            Member member = new Member(nickname, email, roles, platform);
+        String email = response.get("email").asText();
+        String nickname = response.get("nickname").asText();
+        String picture = response.get("profile_image").asText();
+        Member member = saveOrUpdate(nickname, email, picture, Platform.NAVER.getValue());
 
-            return memberRepository.save(member);
-        }
+        setToken(email);
+
+        return OAuth2Response.builder()
+                .name(nickname)
+                .email(email)
+                .picture(picture)
+                .role("USER")
+                .build();
+    }
+
+    private OAuth2Response processKakaoLogin(JsonNode resource)
+    {
+        JsonNode properties = resource.get("properties");
+        String nickname = properties.get("nickname").asText();
+        String picture = properties.get("profile_image").asText();
+        String email = resource.get("kakao_account").get("email").asText();
+
+        Member member = saveOrUpdate(nickname, email, picture, Platform.KAKAO.getValue());
+
+        setToken(email);
+
+        return OAuth2Response.builder()
+                .name(nickname)
+                .email(email)
+                .picture(picture)
+                .role("USER")
+                .build();
+    }
+
+    private OAuth2Response processGoogleLogin(JsonNode resource) {
+        String name = resource.get("name").asText();
+        String email = resource.get("email").asText();
+        String picture = resource.get("picture").asText();
+
+        Member member = saveOrUpdate(name, email, picture, Platform.GOOGLE.getValue());
+
+        setToken(email);
+
+        return OAuth2Response.builder()
+                .name(name)
+                .email(email)
+                .picture(picture)
+                .role("USER")
+                .build();
+    }
+
+    private Member saveOrUpdate(String name, String email, String picture, String registrationId)
+    {
+        Member member = memberService.findOptionalMemberByEmail(email)
+                .orElseGet(() ->
+                {
+                    Member savedMember = memberService.save(Member.builder()
+                            .nickname(name)
+                            .email(email)
+                            .password(UUID.randomUUID().toString())
+                            .roles(List.of("USER"))
+                            .platform(Platform.platformValue(registrationId))
+                            .build());
+
+                    Optional.ofNullable(picture)
+                            .ifPresent(url -> fileService.saveForOauth2(url, savedMember));
+                    return savedMember;
+                });
+
+        member.setNickname(name);
+        Optional.ofNullable(picture)
+                .ifPresent(url -> fileService.updateForOAuth2(url, member));
+
+        return member;
+    }
+
+    private void setToken(String email)
+    {
+        String accessToken = jwtService.generateAccessToken(email, List.of("USER"));
+        String refreshToken = jwtService.generateRefreshToken(email);
+
+        log.info("accessToken = {}", accessToken);
+
+        setHeadersWithNewAccessToken(accessToken);
+        setHeadersWithRefreshToken(refreshToken);
+    }
+
+    private void setHeadersWithNewAccessToken(String newAccessToken)
+    {
+        HttpHeaders response = new HttpHeaders();
+        response.set(AUTHORIZATION, "Bearer " + newAccessToken);
+    }
+
+
+    private void setHeadersWithRefreshToken(String refreshToken)
+    {
+        HttpHeaders response = new HttpHeaders();
+        response.set("Refresh", refreshToken);
     }
 
 }

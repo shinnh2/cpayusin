@@ -59,7 +59,7 @@ class PostControllerTest extends DummyObject
 
         Board board2 = boardRepository.save(newMockBoard(2L, "board2", 2));
 
-        postRepository.save(newMockPost(1L, "title", "content",board1, member));
+        postRepository.save(newMockPost(1L, "title", "content", board1, member));
 
 
     }

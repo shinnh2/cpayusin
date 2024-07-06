@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 @Service
 public class FileService
@@ -29,6 +30,42 @@ public class FileService
 
     private final String bucket = "jbaccount";
     private final AmazonS3 amazonS3;
+
+    @Transactional
+    public File save(File file)
+    {
+        return fileRepository.save(file);
+    }
+
+    @Transactional
+    public File saveForOauth2(String picture, Member member)
+    {
+        File file = File
+                .builder()
+                .uploadFileName(UUID.randomUUID().toString())
+                .storeFileName(UUID.randomUUID().toString())
+                .url(picture)
+                .contentType(UUID.randomUUID().toString())
+                .build();
+
+        file.addMember(member);
+
+        return fileRepository.save(file);
+    }
+
+    @Transactional
+    public File updateForOAuth2(String picture, Member member)
+    {
+        File file = getFileByMemberId(member.getId())
+                .orElseGet(() -> {
+                    return saveForOauth2(picture, member);
+                });
+
+        file.setUrl(picture);
+
+        return file;
+    }
+
 
     @Transactional
     public List<File> storeFiles(List<MultipartFile> files, Post post)
@@ -105,6 +142,11 @@ public class FileService
 
         file.addMember(member);
         return fileRepository.save(file);
+    }
+
+    private Optional<File> getFileByMemberId(Long memberId)
+    {
+        return fileRepository.findByMemberId(memberId);
     }
 
 

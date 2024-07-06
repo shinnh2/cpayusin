@@ -1,4 +1,4 @@
-import React, { useState, Dispatch, SetStateAction } from "react";
+import React, { useState, Dispatch, useEffect } from "react";
 import Input from "./../components/Input";
 import Button from "./../components/Button";
 import { validator, ValidatorStatus } from "../assets/validater";
@@ -13,6 +13,7 @@ interface Props {
 const Login = (props: Props) => {
 	const api = process.env.REACT_APP_API_URL;
 	const navigate = useNavigate();
+	const googleLoginURI = process.env.REACT_APP_GOOGLE_LOGIN_URI;
 	const [form, setForm] = useState({
 		email: "",
 		password: "",
@@ -33,6 +34,7 @@ const Login = (props: Props) => {
 			password: value,
 		}));
 	};
+
 	//유효성 검사
 	const validatorStatusEmail: ValidatorStatus = {
 		value: form.email,
@@ -60,11 +62,12 @@ const Login = (props: Props) => {
 			})
 			.catch((error) => {
 				console.error("에러", error);
+				alert("로그인에 실패했습니다."); //수정 필요
 			});
 	};
 
 	return (
-		<div className="input_box login_box col_4">
+		<div className="input_box login_box">
 			<h3 className="title_h3">로그인</h3>
 			<div className="content">
 				<Input
@@ -91,6 +94,20 @@ const Login = (props: Props) => {
 					buttonLabel="로그인"
 					onClick={handleSubmit}
 				/>
+				<div className="sns_login_wrap">
+					<h4 className="sns_login_title">소셜 로그인</h4>
+					<p className="sns_login_description">
+						별도의 회원가입없이 기존에 가입된 다른 소셜 계정으로 로그인이
+						가능합니다.
+					</p>
+				</div>
+				<div className="sns_login_btns">
+					<button className="sns_btn kakao">카카오 로그인</button>
+					<button className="sns_btn naver">네이버 로그인</button>
+					<a className="sns_btn google" href={googleLoginURI}>
+						구글 로그인
+					</a>
+				</div>
 			</div>
 		</div>
 	);

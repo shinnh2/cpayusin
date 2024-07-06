@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import Button from "../components/Button";
 import axios from "axios";
 import { getAccessToken } from "../assets/tokenActions";
+import BoardComment from "../components/BoardComment";
 
 interface BoardDetailData {
 	postId: number;
@@ -38,7 +38,7 @@ const BoardDetail = () => {
 
 		if (accessToken) {
 			axios
-				.get(`${api}/api/v1/member/single-info`, {
+				.get(`${api}/api/v1/member/profile`, {
 					headers: { Authorization: accessToken },
 				})
 				.then((res) => {
@@ -58,7 +58,7 @@ const BoardDetail = () => {
 		if (isDeleteYes) {
 			console.log(params.postId);
 			axios
-				.delete(`${api}/api/v1/post/${params.postId}`, {
+				.delete(`${api}/api/v1/post/delete/${params.postId}`, {
 					headers: { Authorization: accessToken },
 				})
 				.then((res) => {
@@ -76,16 +76,15 @@ const BoardDetail = () => {
 				"게시글을 불러오지 못했습니다."
 			) : (
 				<>
-					{" "}
 					<div className="board_header">
-						<p className="board_date">{postData.createdAt}</p>
-						<h4 className="title_h1">{postData.title}</h4>
 						<div className="board_detail_info">
 							<p className="board_info">{params.boardInfo?.split("-")[1]}</p>
 							{postData!.categoryId ? (
 								<p className="board_info">{postData!.categoryId}</p>
 							) : null}
+							<p className="board_date">{postData.createdAt}</p>
 						</div>
+						<h4 className="board_detail_title">{postData.title}</h4>
 						<div className="board_detail_info">
 							<div className="writer_profile">
 								<div className="profile_img_wrap"></div>
@@ -116,31 +115,7 @@ const BoardDetail = () => {
 						className="board_content"
 						dangerouslySetInnerHTML={{ __html: postData.content }}
 					></div>
-					<div className="board_comment">
-						<div className="comment_write">
-							<dl>
-								<dt className="title_h4">댓글 작성</dt>
-								<dd>
-									<textarea placeholder="댓글을 작성하세요"></textarea>
-								</dd>
-							</dl>
-							<Button
-								buttonType="primary"
-								buttonSize="big"
-								buttonLabel="댓글 입력"
-							/>
-						</div>
-						<div className="comment_list">
-							{/* 기본  */}
-							{/* 답글 있을 때: 접혔을 때  */}
-							{/* 답글 있을 때: 펼쳤을 때  */}
-							{/* 내가 쓴 글인 경우 */}
-							{/* 내가 쓴 글인 경우: 수정할 때  */}
-							{/* 대댓글 기본  */}
-							{/* 대댓글 기본: 내가 쓴 경우 */}
-							{/* 대댓글 기본: 내가 쓴 경우: 수정할 때 */}
-						</div>
-					</div>
+					<BoardComment postId={params.postId!} memberId={myMemberId!} />
 				</>
 			)}
 		</div>

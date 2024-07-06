@@ -7,10 +7,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public interface BoardRepository extends JpaRepository<Board, Long>, BoardRepositoryCustom
+public interface BoardRepository extends JpaRepository<Board, Long>
 {
 
     @Query("SELECT b FROM Board b WHERE b.parent.id = :parentId")

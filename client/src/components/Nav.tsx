@@ -11,12 +11,12 @@ const createMenuNode = (data: any[]) => {
 		<li key={idx} className="nav_menu_item">
 			{el.name ? (
 				<NavLink
-					to={`/board/${el.id}-${el.name}`}
+					to={`/board/${el.id}-${el.name}${el.isAdminOnly?"-adminOnly":""}`}
 					onClick={clickHandler}
 					className={({ isActive }) => (isActive ? "active" : "")}
 				>
 					{el.name}
-					{el.categories && el.categories.length !== 0 ? (
+					{el.category && el.category.length !== 0 ? (
 						<i className="toggle_updown">
 							<img src={iconArrowDown} alt="메뉴 펼치기 접기 토글 아이콘" />
 						</i>
@@ -25,8 +25,8 @@ const createMenuNode = (data: any[]) => {
 			) : (
 				<a href="">{el.categoryName}</a>
 			)}
-			{el.categories && el.categories.length !== 0 ? (
-				<ul className="nav_menu depth2">{createMenuNode(el.categories)}</ul>
+			{el.category && el.category.length !== 0 ? (
+				<ul className="nav_menu depth2">{createMenuNode(el.category)}</ul>
 			) : null}
 		</li>
 	));
@@ -41,7 +41,7 @@ const Nav = () => {
 	const [data, setData] = useState<any[]>([]);
 	useEffect(() => {
 		axios
-			.get(`${api}/api/v1/board-category`)
+			.get(`${api}/api/v1/board/menu`)
 			.then((response) => {
 				setData(response.data.data);
 			})

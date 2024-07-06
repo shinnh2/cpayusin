@@ -2,6 +2,7 @@ import { useEffect, useState, Dispatch } from "react";
 import BoardItem from "../components/Boarditem";
 import { useParams } from "react-router-dom";
 import axios from "axios";
+// import BoardListData from "../data/boardListData.json";
 
 const BoardList = () => {
 	//의사코드
@@ -27,7 +28,12 @@ const BoardList = () => {
 		generatePageRange(1, pageInfo.totalPages)
 	);
 	const params = useParams();
-	const [boardId, boardName] = params.boardInfo!.split("-");
+	const boardId = params.boardInfo!.split("-")[0];
+	const boardName = params.boardInfo!.split("-")[1];
+	let boardIsAdminOnly = false;
+	if (params.boardInfo!.split("-")[2]) {
+		boardIsAdminOnly = true;
+	}
 	const api = process.env.REACT_APP_API_URL;
 	const [data, setData] = useState<any[]>([]);
 	useEffect(() => {
@@ -47,6 +53,16 @@ const BoardList = () => {
 			.catch((error) => {
 				console.error("에러", error);
 			});
+		//dummy data
+		// const pageInfo: any = BoardListData.pageInfo;
+		// const totalPageNum = pageInfo.totalPages;
+		// const maxPaginationNum = totalPageNum >= 5 ? 5 : totalPageNum;
+		// setPageInfo({
+		// 	totalPages: totalPageNum,
+		// 	maxPaginationValue: maxPaginationNum,
+		// });
+		// setPagenation(generatePageRange(1, totalPageNum));
+		// setData(BoardListData.data);
 	}, [boardId]);
 	useEffect(() => {
 		axios
@@ -105,7 +121,12 @@ const BoardList = () => {
 
 	return (
 		<div>
-			<h3>{boardName}</h3>
+			<div className="board_title_wrap">
+				<h3 className="board_title">{boardName}</h3>
+				{boardIsAdminOnly ? (
+					<p className="board_title_desc">관리자만 작성가능한 게시판입니다.</p>
+				) : null}
+			</div>
 
 			{data.length === 0 ? (
 				<div className="no_board_list">등록된 게시글이 없습니다.</div>
