@@ -19,7 +19,7 @@ export function validator(validateStatus: ValidatorStatus): boolean {
 			reg = /^[a-zA-Z0-9+-\_.]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/;
 			break;
 		case "password":
-			reg = /(?=.*\d)(?=.*[a-zA-Z])(?=.*[~!@]).{8,20}/;
+			reg = /(?=.*\d)(?=.*[a-zA-Z]).{8,20}/;
 			break;
 		case "nickname":
 			reg = /(?=.*\d)|(?=.*[a-zA-Z])|(?=.*[가-힣]).{2,8}/;
