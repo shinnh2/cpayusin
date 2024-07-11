@@ -45,7 +45,11 @@ const Header = (props: HeaderProps) => {
 	};
 	return (
 		<header className="header">
-			<h1 className="logo">JB account</h1>
+			<h1>
+				<a href="./" className="logo" title="JBaccount 홈">
+					JB account
+				</a>
+			</h1>
 			<LoginInfo
 				isDrawer={false}
 				isLogin={props.isLogin}
