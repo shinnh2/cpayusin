@@ -352,6 +352,8 @@ input.error {
 	z-index: 2;
 }
 .header .logo {
+	display: flex;
+	align-items: center;
 	font-size: var(--fs-h4);
 	font-weight: var(--fw-bold);
 	color: var(--white);
@@ -419,9 +421,10 @@ input.error {
 	width: 24px;
 	height: 24px;
 	margin-left: auto;
+	transform: rotate(180deg);
 }
 .nav a.unfold .toggle_updown {
-	transform: rotate(180deg);
+	transform: rotate(0deg);
 }
 .depth2 {
 	padding: 0;
