@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { isAccessToken } from "../assets/tokenActions";
 import { userDataType } from "./../App";
 import BoardListPagination from "../components/BoardListPagination";
+import CommentListPagination from "../components/CommentListPagination";
 import iconUser from "./../assets/icon_user.svg";
 
 // interface userDataType {
@@ -90,14 +91,7 @@ const UserPage: React.FC<userPageProps> = ({ userData }) => {
 							tabIndex === 1 ? "tabContentItem show" : "tabContentItem"
 						}
 					>
-						<ul className="comment">
-							<li>
-								<CommentItem />
-							</li>
-							<li>
-								<CommentItem />
-							</li>
-						</ul>
+						<CommentListPagination />
 					</div>
 				</div>
 			</div>
