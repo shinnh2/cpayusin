@@ -1126,6 +1126,9 @@ input.error {
 .user_button_wrap {
 	margin-left: auto;
 }
+.user_button_wrap a {
+	color: var(--primary-color);
+}
 .user_button_wrap > button:first-child {
 	margin-right: 12px;
 }
@@ -1431,6 +1434,9 @@ input.error {
 		padding: 102px 0 72px 0;
 	}
 	/* header */
+	.header {
+		justify-content: space-between;
+	}
 	.header .logo {
 		margin-right: auto;
 		font-size: var(--fs-h6);
@@ -1607,6 +1613,28 @@ input.error {
 		margin-bottom: 16px;
 	}
 	/* userPage: css는 수정할 것 없음. 컴포넌트 이미지 경로 부분 수정 필요 */
+	.user_profile {
+		flex-direction: column;
+	}
+	.profile_img_wrap {
+		margin-right: 0;
+		width: 100px;
+		height: 100px;
+	}
+	.user_info_wrap {
+		margin-right: 0;
+		padding-top: 16px;
+		text-align: center;
+	}
+	.user_button_wrap {
+		margin: 0 auto;
+		padding-top: 24px;
+	}
+	.user_button_wrap a {
+		display: block;
+		text-align: center;
+		margin-bottom: 8px;
+	}
 	/* userEdit */
 	.user_edit_wrap {
 		padding: 24px;
