@@ -7,6 +7,7 @@ import BoardComment from "../components/BoardComment";
 interface BoardDetailData {
 	postId: number;
 	boardId: number;
+	boardName: string;
 	categoryId?: number;
 	memberId: number;
 	nickname: string;
@@ -18,11 +19,10 @@ interface BoardDetailData {
 	voteStatus: boolean;
 }
 
-const BoardDetail = () => {
+const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 	const api = process.env.REACT_APP_API_URL;
 	const params = useParams();
 	const navigate = useNavigate();
-	const [boardId, boardName] = params.boardInfo!.split("-");
 	const [postData, setPostData] = useState<BoardDetailData>();
 	const [myMemberId, setmyMemberID] = useState<number>();
 	useEffect(() => {
@@ -62,7 +62,7 @@ const BoardDetail = () => {
 					headers: { Authorization: accessToken },
 				})
 				.then((res) => {
-					navigate(`/board/${boardId}-${boardName}`);
+					navigate(`/board/${postData!.boardName}`);
 				})
 				.catch((error) => {
 					alert("게시물 삭제를 실패했습니다.");
@@ -78,7 +78,7 @@ const BoardDetail = () => {
 				<>
 					<div className="board_header">
 						<div className="board_detail_info">
-							<p className="board_info">{params.boardInfo?.split("-")[1]}</p>
+							<p className="board_info">{postData!.boardName}</p>
 							{postData!.categoryId ? (
 								<p className="board_info">{postData!.categoryId}</p>
 							) : null}
@@ -93,16 +93,13 @@ const BoardDetail = () => {
 							<div className="info_item votes_info">
 								<input type="checkbox" id="board_vote" className="icon" />
 								<label htmlFor="board_vote" className="info">
-									12
+									{postData.voteCount}
 								</label>
 							</div>
 						</div>
 						{myMemberId === postData.memberId ? (
 							<div className="writer_action">
-								<a
-									href={`/board/edit/${boardId}-${boardName}/${params.postId}`}
-									className="link"
-								>
+								<a href={`/board/edit/${params.postId}`} className="link">
 									수정
 								</a>
 								<a href="" className="link" onClick={handleClickDeletePost}>
