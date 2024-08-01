@@ -33,12 +33,10 @@ interface BoardItemData {
 }
 
 const BoardItem = ({ data }: { data: BoardItemData }) => {
+	console.log(data.postId);
 	return (
 		<div className="board_item">
-			<a
-				href={`/board/${data.boardId}-${data.boardName}/${data.postId}`}
-				title={data.title}
-			>
+			<a href={`/${data.postId}`} title={data.title}>
 				<div className="board_item_element_wrap">
 					{data.boardId ? (
 						<p className="category_tag">{data.boardName}</p>
