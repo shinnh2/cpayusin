@@ -46,7 +46,7 @@ const Header = (props: HeaderProps) => {
 	return (
 		<header className="header">
 			<h1>
-				<a href="./" className="logo" title="JBaccount 홈">
+				<a href="/" className="logo" title="JBaccount 홈">
 					JB account
 				</a>
 			</h1>
