@@ -1,8 +1,18 @@
 import Nav from "./Nav";
 import LoginInfo from "./LoginInfo";
 import iconClose from "./../assets/icon_close.svg";
+import { userDataType } from "./../App";
 
-const NavDrawer = (props: any) => {
+interface NavDrawerProps {
+	isLogin: boolean;
+	setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
+	userData: userDataType | undefined;
+	setIsNavDrawerOn: React.Dispatch<React.SetStateAction<boolean>>;
+	isNavDrawerOn: boolean;
+	menuData: any[];
+}
+
+const NavDrawer = (props: NavDrawerProps) => {
 	const handleClickNavDrawerClose = () => {
 		props.setIsNavDrawerOn(false);
 	};
@@ -22,10 +32,17 @@ const NavDrawer = (props: any) => {
 					>
 						<img src={iconClose} alt="네비게이션 드로어 닫기" />
 					</button>
-					<div className="drawer_title_wrap">
-						<h3 className="drawer_title">안녕하세요.</h3>
-						<p className="drawer_sub_title">로그인이 필요합니다.</p>
-					</div>
+					{props.isLogin ? (
+						<div className="drawer_title_wrap">
+							<h3 className="drawer_title">{props.userData?.nickname}</h3>
+							<p className="drawer_sub_title">{props.userData?.email}</p>
+						</div>
+					) : (
+						<div className="drawer_title_wrap">
+							<h3 className="drawer_title">안녕하세요.</h3>
+							<p className="drawer_sub_title">로그인이 필요합니다.</p>
+						</div>
+					)}
 					<LoginInfo
 						isDrawer={true}
 						isLogin={props.isLogin}
@@ -34,7 +51,7 @@ const NavDrawer = (props: any) => {
 					/>
 				</div>
 
-				<Nav />
+				<Nav menuData={props.menuData} />
 			</div>
 		</div>
 	);
