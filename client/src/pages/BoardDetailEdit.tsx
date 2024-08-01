@@ -34,7 +34,7 @@ interface postData {
 	createdAt: string;
 }
 
-const BoardWrite = () => {
+const BoardDetailEdit = () => {
 	const api = process.env.REACT_APP_API_URL;
 	const [accessToken, setAccessToken] = useState("");
 	const navigate = useNavigate();
@@ -180,4 +180,4 @@ const BoardWrite = () => {
 		</div>
 	);
 };
-export default BoardWrite;
+export default BoardDetailEdit;
