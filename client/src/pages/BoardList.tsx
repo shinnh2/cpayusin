@@ -4,7 +4,8 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 // import BoardListData from "../data/boardListData.json";
 
-const BoardList = () => {
+const BoardList = ({ menuData }: { menuData: any[] }) => {
+	const api = process.env.REACT_APP_API_URL;
 	//의사코드
 	/*
 	0. 필요한 변수
@@ -28,17 +29,35 @@ const BoardList = () => {
 		generatePageRange(1, pageInfo.totalPages)
 	);
 	const params = useParams();
-	const boardId = params.boardInfo!.split("-")[0];
-	const boardName = params.boardInfo!.split("-")[1];
-	let boardIsAdminOnly = false;
-	if (params.boardInfo!.split("-")[2]) {
-		boardIsAdminOnly = true;
-	}
-	const api = process.env.REACT_APP_API_URL;
+	const [boardMap, setBoardMap] = useState({});
+	const [boardInfo, setBoardInfo] = useState({
+		boardName: params.boardInfo,
+		boardId: 0,
+		boardIsAdminOnly: false,
+	});
 	const [data, setData] = useState<any[]>([]);
 	useEffect(() => {
+		const boardMap: any = {};
+		menuData.forEach((el) => {
+			boardMap[el.name] = { id: el.id, isAdminOnly: el.isAdminOnly };
+			if (el.category !== undefined) {
+				for (let category of el.category) {
+					boardMap[category.name] = {
+						id: category.id,
+						isAdminOnly: category.isAdminOnly,
+					};
+				}
+			}
+		});
+		setBoardMap(boardMap);
+		const boardInfo = {
+			boardName: params.boardInfo,
+			boardId: boardMap[params.boardInfo!].id,
+			boardIsAdminOnly: boardMap[params.boardInfo!].isAdminOnly,
+		};
+		setBoardInfo(boardInfo);
 		axios
-			.get(`${api}/api/v1/post/board?id=${boardId}&page=1&size=8`)
+			.get(`${api}/api/v1/post/board?id=${boardInfo.boardId}&page=1&size=8`)
 			.then((response) => {
 				const pageInfo = response.data.pageInfo;
 				const totalPageNum = pageInfo.totalPages;
@@ -53,20 +72,13 @@ const BoardList = () => {
 			.catch((error) => {
 				console.error("에러", error);
 			});
-		//dummy data
-		// const pageInfo: any = BoardListData.pageInfo;
-		// const totalPageNum = pageInfo.totalPages;
-		// const maxPaginationNum = totalPageNum >= 5 ? 5 : totalPageNum;
-		// setPageInfo({
-		// 	totalPages: totalPageNum,
-		// 	maxPaginationValue: maxPaginationNum,
-		// });
-		// setPagenation(generatePageRange(1, totalPageNum));
-		// setData(BoardListData.data);
-	}, [boardId]);
+	}, [params.boardInfo]);
+
 	useEffect(() => {
 		axios
-			.get(`${api}/api/v1/post/board?id=${boardId}&page=${nowPage}&size=8`)
+			.get(
+				`${api}/api/v1/post/board?id=${boardInfo.boardId}&page=${nowPage}&size=8`
+			)
 			.then((response) => {
 				setData(response.data.data);
 			})
@@ -122,8 +134,8 @@ const BoardList = () => {
 	return (
 		<div>
 			<div className="board_title_wrap">
-				<h3 className="board_title">{boardName}</h3>
-				{boardIsAdminOnly ? (
+				<h3 className="board_title">{boardInfo.boardName}</h3>
+				{boardInfo.boardIsAdminOnly ? (
 					<p className="board_title_desc">관리자만 작성가능한 게시판입니다.</p>
 				) : null}
 			</div>
