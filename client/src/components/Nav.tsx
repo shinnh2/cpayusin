@@ -3,7 +3,6 @@ import { ReactComponent as IconHome } from "./../assets/icon_home.svg";
 import iconArrowDown from "./../assets/icon_arrow_down.svg";
 import { MouseEvent, useEffect, useState, Dispatch } from "react";
 import { NavLink } from "react-router-dom";
-import axios from "axios";
 import NavInfo from "./NavInfo";
 
 const createMenuNode = (data: any[]) => {
@@ -11,7 +10,7 @@ const createMenuNode = (data: any[]) => {
 		<li key={idx} className="nav_menu_item">
 			{el.name ? (
 				<NavLink
-					to={`/board/${el.id}-${el.name}${el.isAdminOnly?"-adminOnly":""}`}
+					to={`/board/${el.name}`}
 					onClick={clickHandler}
 					className={({ isActive }) => (isActive ? "active" : "")}
 				>
@@ -36,19 +35,8 @@ const clickHandler = (event: React.MouseEvent<HTMLAnchorElement>): void => {
 	event.currentTarget.classList.toggle("unfold");
 };
 
-const Nav = () => {
+const Nav = ({ menuData }: { menuData: any[] }) => {
 	const api = process.env.REACT_APP_API_URL;
-	const [data, setData] = useState<any[]>([]);
-	useEffect(() => {
-		axios
-			.get(`${api}/api/v1/board/menu`)
-			.then((response) => {
-				setData(response.data.data);
-			})
-			.catch((error) => {
-				console.error("에러", error);
-			});
-	}, []);
 	return (
 		<nav className="nav">
 			<div className="home_link">
@@ -57,7 +45,7 @@ const Nav = () => {
 					HOME
 				</a>
 			</div>
-			<ul className="nav_menu depth1">{createMenuNode(data)}</ul>
+			<ul className="nav_menu depth1">{createMenuNode(menuData)}</ul>
 			<NavInfo />
 		</nav>
 	);
