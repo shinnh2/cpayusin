@@ -47,7 +47,7 @@ const Header = (props: HeaderProps) => {
 		<header className="header">
 			<h1>
 				<a href="/" className="logo" title="JBaccount 홈">
-					JB account
+					<img className="logo_img" src="/images/logo.png" />
 				</a>
 			</h1>
 			<LoginInfo
