@@ -6,6 +6,8 @@ export interface ButtonProps {
 	buttonSize: "big" | "small";
 	buttonLabel: string;
 	onClick?: () => void;
+	onKeyPress?: (event: React.KeyboardEvent<HTMLElement>) => void;
+	type?: "button" | "submit" | "reset";
 }
 
 const Button = ({
