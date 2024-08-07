@@ -4,6 +4,7 @@ import CommentListItem from "./CommentListItem";
 import axios from "axios";
 import { getAccessToken } from "../assets/tokenActions";
 import dummyCommentsData from "./../data/boardCommentsData.json";
+import Loading from "./Loading";
 
 const BoardComment = ({
 	postId,
@@ -15,17 +16,17 @@ const BoardComment = ({
 	const api = process.env.REACT_APP_API_URL;
 	const [comment, setComment] = useState<string>("");
 	const [commentList, setCommentList] = useState<any>();
+	const [isLoading, setIsLoading] = useState(true);
 
 	const fetchCommentData = () => {
 		const accessToken = getAccessToken();
 		if (accessToken) {
 			axios
-				.get(`${api}/api/v1/comment?postId=${postId}`, {
-					headers: { Authorization: accessToken },
-				})
+				.get(`${api}/api/v1/comment?postId=${postId}`)
 				.then((res) => {
 					// console.log(res.data.data); 성공적으로 삭제해도 isRemoved 떠서 확인필요
-					setCommentList(res.data.data);
+					setCommentList(res.data.data.comments);
+					setIsLoading(false);
 				})
 				.catch((_) => {});
 		}
@@ -85,52 +86,49 @@ const BoardComment = ({
 					onClick={handleClickCommentSubmit}
 				/>
 			</div>
-			{commentList ? (
+			{isLoading ? (
+				<Loading />
+			) : (
 				<div className="comments_list_wrap">
 					<h4 className="comments_title">댓글 목록</h4>
-					<ul className="comment_list">
-						{/* 기본  */}
-						{commentList?.map((el: any, idx: number) => {
-							return (
-								<li className="comment_list_item" key={idx}>
-									<CommentListItem
-										data={el}
-										isChild={false}
-										postId={postId}
-										memberId={memberId}
-										fetchData={fetchCommentData}
-									/>
-									{el.children.length > 0 ? (
-										<div className="comment_children_wrap">
-											<ul className="comment_children_list">
-												{el.children.map((child: any, childIdx: number) => (
-													<li className="comment_list_item">
-														<CommentListItem
-															data={child}
-															isChild={true}
-															postId={postId}
-															memberId={memberId}
-															fetchData={fetchCommentData}
-														/>
-													</li>
-												))}
-											</ul>
-										</div>
-									) : null}
-								</li>
-							);
-						})}
-
-						{/* 답글 있을 때: 접혔을 때  */}
-						{/* 답글 있을 때: 펼쳤을 때  */}
-						{/* 내가 쓴 글인 경우 */}
-						{/* 내가 쓴 글인 경우: 수정할 때  */}
-						{/* 대댓글 기본  */}
-						{/* 대댓글 기본: 내가 쓴 경우 */}
-						{/* 대댓글 기본: 내가 쓴 경우: 수정할 때 */}
-					</ul>
+					{commentList.length > 0 ? (
+						<ul className="comment_list">
+							{commentList?.map((el: any, idx: number) => {
+								return (
+									<li className="comment_list_item" key={idx}>
+										<CommentListItem
+											data={el}
+											isChild={false}
+											postId={postId}
+											memberId={memberId}
+											fetchData={fetchCommentData}
+										/>
+										{el.children.length > 0 ? (
+											<div className="comment_children_wrap">
+												<ul className="comment_children_list">
+													{el.children.map((child: any, childIdx: number) => (
+														<li className="comment_list_item">
+															<CommentListItem
+																data={child}
+																isChild={true}
+																postId={postId}
+																memberId={memberId}
+																fetchData={fetchCommentData}
+															/>
+														</li>
+													))}
+												</ul>
+											</div>
+										) : null}
+									</li>
+								);
+							})}
+						</ul>
+					) : (
+						"댓글이 없습니다."
+					)}
 				</div>
-			) : null}
+			)}
 		</div>
 	);
 };
