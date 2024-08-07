@@ -30,11 +30,15 @@ const LoginInfo = (props: LoginInfoProps) => {
 						className="login_info_btns link_profile"
 						title="클릭시 내 프로필로 이동합니다."
 					>
-						<div className="login_info_icon_wrap">
+						<div className="login_info_icon_wrap profile">
 							{props.userData?.profileImage ? (
 								<img src={props.userData?.profileImage} />
 							) : (
-								<img src={iconUser} alt="기본 유저 아이콘" />
+								<img
+									src={iconUser}
+									alt="기본 유저 아이콘"
+									className="default"
+								/>
 							)}
 						</div>
 						{props.isDrawer ? (
