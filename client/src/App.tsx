@@ -64,7 +64,7 @@ function App() {
 					setIsNavDrawerOn={setIsNavDrawerOn}
 				/>
 				<div className="page_wrap">
-					<Nav menuData={menuData} />
+					<Nav menuData={menuData} setIsNavDrawerOn={setIsNavDrawerOn} />
 					<main className="container">
 						{isLoading ? (
 							<Loading />
