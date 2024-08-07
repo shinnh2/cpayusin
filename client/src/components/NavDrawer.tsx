@@ -51,7 +51,10 @@ const NavDrawer = (props: NavDrawerProps) => {
 					/>
 				</div>
 
-				<Nav menuData={props.menuData} />
+				<Nav
+					menuData={props.menuData}
+					setIsNavDrawerOn={props.setIsNavDrawerOn}
+				/>
 			</div>
 		</div>
 	);
