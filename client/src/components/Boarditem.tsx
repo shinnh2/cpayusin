@@ -1,22 +1,5 @@
-//api문서 기준
-// interface Data {
-// 	postId: number;
-// 	boardId: number;
-// 	boardName: string;
-// 	categoryId?: number;
-// 	categoryName?: string;
-// 	memberId: number;
-// 	memberName: string;
-// 	title: string;
-// 	content: string;
-// 	commentsCount?: number;
-// 	createdAt: string;
-// 	timeInfo: string;
-// }
-
 import { useEffect } from "react";
 
-//서버 응답 기준
 interface BoardItemData {
 	postId?: number;
 	boardId: number;
@@ -33,7 +16,6 @@ interface BoardItemData {
 }
 
 const BoardItem = ({ data }: { data: BoardItemData }) => {
-	console.log(data.postId);
 	return (
 		<div className="board_item">
 			<a href={`/${data.postId}`} title={data.title}>
@@ -50,10 +32,6 @@ const BoardItem = ({ data }: { data: BoardItemData }) => {
 								<span className="info">{data.commentsCount}</span>
 							</p>
 						) : null}
-						{/* <p className="info_item votes_info">
-						<span className="icon">득표수</span>
-						<span className="info">{data.voteCount}</span>
-					</p> */}
 					</div>
 				</div>
 				<h3 className="title">{data.title}</h3>
