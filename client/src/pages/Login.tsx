@@ -46,7 +46,8 @@ const Login = (props: Props) => {
 		isRequired: true,
 		valueType: "password",
 	};
-	const handleSubmit = () => {
+	const handleSubmit = (event?: React.FormEvent) => {
+		if (event && "preventDefault" in event) event.preventDefault();
 		setIsError((prevState) => ({
 			...prevState,
 			email: !validator(validatorStatusEmail),
@@ -65,35 +66,48 @@ const Login = (props: Props) => {
 				alert("로그인에 실패했습니다."); //수정 필요
 			});
 	};
+	const handleKeyPress = (event: React.KeyboardEvent<HTMLElement>) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+			handleSubmit();
+		}
+	};
 
 	return (
 		<div className="input_box login_box">
 			<h3 className="title_h3">로그인</h3>
 			<div className="content">
-				<Input
-					InputLabel="이메일"
-					isLabel={true}
-					errorMsg="올바른 이메일을 입력해 주세요."
-					inputAttr={{ type: "text", placeholder: "이메일을 입력하세요" }}
-					setInputValue={setEmailValue}
-					inputValue={form.email}
-					isError={isError.email}
-				/>
-				<Input
-					InputLabel="비밀번호"
-					isLabel={true}
-					errorMsg="올바른 비밀번호를 입력해 주세요."
-					inputAttr={{ type: "password", placeholder: "비밀번호를 입력하세요" }}
-					setInputValue={setPasswordValue}
-					inputValue={form.password}
-					isError={isError.password}
-				/>
-				<Button
-					buttonType="primary"
-					buttonSize="big"
-					buttonLabel="로그인"
-					onClick={handleSubmit}
-				/>
+				<form onSubmit={handleSubmit} onKeyDown={handleKeyPress}>
+					<Input
+						InputLabel="이메일"
+						isLabel={true}
+						errorMsg="올바른 이메일을 입력해 주세요."
+						inputAttr={{ type: "text", placeholder: "이메일을 입력하세요" }}
+						setInputValue={setEmailValue}
+						inputValue={form.email}
+						isError={isError.email}
+					/>
+					<Input
+						InputLabel="비밀번호"
+						isLabel={true}
+						errorMsg="올바른 비밀번호를 입력해 주세요."
+						inputAttr={{
+							type: "password",
+							placeholder: "비밀번호를 입력하세요",
+						}}
+						setInputValue={setPasswordValue}
+						inputValue={form.password}
+						isError={isError.password}
+					/>
+					<Button
+						buttonType="primary"
+						buttonSize="big"
+						buttonLabel="로그인"
+						type="submit"
+						onClick={handleSubmit}
+						onKeyPress={handleKeyPress}
+					/>
+				</form>
 				<div className="sns_login_wrap">
 					<h4 className="sns_login_title">소셜 로그인</h4>
 					<p className="sns_login_description">
