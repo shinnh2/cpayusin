@@ -15,7 +15,7 @@ export const saveAccessToken = (token: string) => {
 };
 export const removeAccessToken = () => {
 	if (document.cookie !== "") {
-		document.cookie = "cookiename= ; expires = Thu, 01 Jan 1970 00:00:00 GMT";
+		document.cookie = "token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
 	}
 	localStorage.removeItem("accessToken");
 };
