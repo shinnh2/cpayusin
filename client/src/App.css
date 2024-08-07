@@ -332,6 +332,20 @@ input.error {
 	height: 36px;
 	padding: 6px 0;
 	background-color: var(--primary-container-color);
+	position: relative;
+	overflow: hidden;
+}
+.login_info_icon_wrap.profile > img {
+	width: 100%;
+	aspect-ratio: 10 / 10;
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.login_info_icon_wrap.profile > .default {
+	width: 24px;
+	height: 24px;
+	position: static;
 }
 .login_info_wrap .login_info_btns_name {
 	display: none;
@@ -509,7 +523,11 @@ input.error {
 	margin-left: auto;
 	transform: rotate(180deg);
 }
-.nav a.unfold .toggle_updown {
+.nav a .toggle_updown > img {
+	width: 24px;
+	height: 24px;
+}
+.nav a .toggle_updown.unfold {
 	transform: rotate(0deg);
 }
 .depth2 {
@@ -528,7 +546,8 @@ input.error {
 	background: none;
 	color: var(--primary-color);
 }
-.depth2 .nav_menu_item a:hover::before {
+.depth2 .nav_menu_item a:hover::before,
+.depth2 .nav_menu_item a.active::before {
 	content: "";
 	position: absolute;
 	left: 16px;
@@ -538,7 +557,7 @@ input.error {
 	border-radius: 100%;
 	background: var(--primary-color);
 }
-.nav a.unfold + .nav_menu.depth2 {
+.nav_menu.depth2.unfold {
 	max-height: fit-content;
 	padding: 12px 0;
 }
@@ -1220,10 +1239,16 @@ input.error {
 .user_button_wrap {
 	margin-left: auto;
 }
-.user_button_wrap a {
+.user_button_wrap .user_button {
+	padding: 10px 24px;
+	font-size: var(--fs-normal);
+	font-weight: var(--fw-bold);
+	background: var(--white);
+	border-radius: var(--br-md);
+	border: 1px solid var(--primary-color);
 	color: var(--primary-color);
 }
-.user_button_wrap > button:first-child {
+.user_button_wrap > .user_button:first-child {
 	margin-right: 12px;
 }
 .user_written_wrap {
@@ -1507,7 +1532,7 @@ input.error {
 }
 
 /* ------------------------------- responsive: mobile ------------------------------- */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1023px) {
 	:root {
 		/* font size */
 		--fs-h1: 36px;
@@ -1723,11 +1748,17 @@ input.error {
 	.user_button_wrap {
 		margin: 0 auto;
 		padding-top: 24px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
 	}
-	.user_button_wrap a {
+	.user_button_wrap .user_button {
 		display: block;
 		text-align: center;
 		margin-bottom: 8px;
+	}
+	.user_button_wrap .user_button:first-child {
+		margin-right: 0;
 	}
 	/* userEdit */
 	.user_edit_wrap {
