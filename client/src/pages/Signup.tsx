@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Input from "./../components/Input";
 import Button from "./../components/Button";
 import { validator, ValidatorStatus } from "../assets/validater";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const Signup = () => {
+const Signup = ({
+	isEmailCheck,
+	validatedEmail,
+}: {
+	isEmailCheck: boolean;
+	validatedEmail: string;
+}) => {
 	const api = process.env.REACT_APP_API_URL;
 	const navigate = useNavigate();
 	const [form, setForm] = useState({
-		email: "",
+		email: validatedEmail,
 		password: "",
 		nickname: "",
 	});
@@ -18,12 +24,20 @@ const Signup = () => {
 		password: false,
 		nickname: false,
 	});
-	const setEmailValue = (value: string) => {
-		setForm((prevState) => ({
-			...prevState,
-			email: value,
-		}));
-	};
+
+	useEffect(() => {
+		if (!isEmailCheck || !validatedEmail) {
+			alert("이메일 인증이 필요합니다.");
+			navigate("/validateEmail");
+		}
+	}, []);
+
+	// const setEmailValue = (value: string) => {
+	// 	setForm((prevState) => ({
+	// 		...prevState,
+	// 		email: validatedEmail,
+	// 	}));
+	// };
 	const setPasswordValue = (value: string) => {
 		setForm((prevState) => ({
 			...prevState,
@@ -36,6 +50,7 @@ const Signup = () => {
 			nickname: value,
 		}));
 	};
+
 	//유효성 검사
 	const validatorStatusEmail: ValidatorStatus = {
 		value: form.email,
@@ -52,6 +67,7 @@ const Signup = () => {
 		isRequired: true,
 		valueType: "nickname",
 	};
+
 	const handleSubmit = () => {
 		setIsError((prevState) => ({
 			...prevState,
@@ -62,7 +78,6 @@ const Signup = () => {
 		if (isError.email || isError.password || isError.nickname) {
 			return;
 		}
-		console.log(form);
 
 		axios
 			.post(`${api}/api/v1/sign-up`, form, { withCredentials: true })
@@ -96,17 +111,15 @@ const Signup = () => {
 					isLabel={true}
 					errorMsg="올바른 이메일을 입력해 주세요."
 					inputAttr={{ type: "text", placeholder: "이메일을 입력하세요" }}
-					setInputValue={setEmailValue}
-					inputValue={form.email}
-					isError={isError.email}
+					inputValue={validatedEmail}
 				/>
-				{/* <Button
+				<Button
 					buttonType="primary"
 					buttonSize="big"
 					buttonLabel="이메일 인증"
 				/>
 				<p className="validate_email_msg">이메일 인증이 완료되었습니다.</p>
-				<p className="validate_email_msg error">이미 가입한 이메일입니다.</p> */}
+				{/* <p className="validate_email_msg error">이미 가입한 이메일입니다.</p> */}
 			</div>
 			<div className="content">
 				<Input
