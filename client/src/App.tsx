@@ -35,6 +35,8 @@ function App() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [isLogin, setIsLogin] = useState(false);
 	const [userData, setUserData] = useState<userDataType>();
+	const [isEmailCheck, setIsEmailCheck] = useState(false);
+	const [validatedEmail, setValidatedEmail] = useState("");
 	const [isNavDrawerOn, setIsNavDrawerOn] = useState(false);
 	const [menuData, setMenuData] = useState<any[]>([]);
 	const fetchMenuData = () => {
@@ -75,8 +77,26 @@ function App() {
 									path="/login"
 									element={<Login setIsLogin={setIsLogin} />}
 								/>
-								<Route path="/signup" element={<Signup />} />
-								<Route path="/validateEmail" element={<ValidateEmail />} />
+								<Route
+									path="/signup"
+									element={
+										<Signup
+											isEmailCheck={isEmailCheck}
+											validatedEmail={validatedEmail}
+										/>
+									}
+								/>
+								<Route
+									path="/validateEmail"
+									element={
+										<ValidateEmail
+											setIsEmailCheck={setIsEmailCheck}
+											setValidatedEmail={setValidatedEmail}
+											isEmailCheck={isEmailCheck}
+											validatedEmail={validatedEmail}
+										/>
+									}
+								/>
 								<Route path="/newPassword" element={<NewPassword />} />
 								<Route
 									path="/board/:boardInfo"
