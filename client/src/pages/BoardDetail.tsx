@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import { getAccessToken } from "../assets/tokenActions";
 import BoardComment from "../components/BoardComment";
+import VoteInfo from "../components/VoteInfo";
 
 interface BoardDetailData {
 	postId: number;
@@ -90,12 +91,11 @@ const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 								<div className="profile_img_wrap"></div>
 								<p className="board_writer">{postData.nickname}</p>
 							</div>
-							<div className="info_item votes_info">
-								<input type="checkbox" id="board_vote" className="icon" />
-								<label htmlFor="board_vote" className="info">
-									{postData.voteCount}
-								</label>
-							</div>
+							<VoteInfo
+								voteCount={postData.voteCount}
+								isVoted={postData.voteStatus}
+								endpoint={`/api/v1/vote/post/${postData.postId}`}
+							/>
 						</div>
 						{myMemberId === postData.memberId ? (
 							<div className="writer_action">
