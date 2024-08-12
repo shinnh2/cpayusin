@@ -16,7 +16,14 @@ const VoteInfo = ({
 	const [hasVoted, setHasVoted] = useState(isVoted);
 
 	const handleClickVote = () => {
+		if (hasVoted) {
+			alert("이미 투표 완료된 글입니다.");
+			return;
+		}
 		const accessToken = getAccessToken();
+		if (!accessToken) {
+			alert("로그인이 필요합니다.");
+		}
 		axios
 			.post(
 				`${api}${endpoint}`,
@@ -26,7 +33,6 @@ const VoteInfo = ({
 				}
 			)
 			.then((_) => {
-				alert("투표 성공");
 				setVotes((prev) => Number(prev) + 1);
 				setHasVoted(true);
 			})
