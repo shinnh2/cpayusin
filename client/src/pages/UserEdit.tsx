@@ -15,7 +15,9 @@ const UserEdit: React.FC<userPageProps> = ({ userData }) => {
 	const api = process.env.REACT_APP_API_URL;
 	const params = useParams();
 	const navigate = useNavigate();
-	const [userNickname, setUserNickname] = useState(userData?.nickname);
+	const [fileName, setFileName] = useState("이미지 파일을 선택하세요");
+	const [file, setFile] = useState("");
+	const [userNickname, setUserNickname] = useState("");
 	const [isNameError, setIsNameError] = useState(false);
 
 	const handleSetNickname = (value: string) => {
@@ -35,6 +37,11 @@ const UserEdit: React.FC<userPageProps> = ({ userData }) => {
 		}
 	}, []);
 
+	const handleOnChange = (event: any) => {
+		setFileName(event.currentTarget.files[0].name);
+		setFile(event.currentTarget.files[0]);
+	};
+
 	const handleSubmit = () => {
 		setIsNameError(!validator(validatorStatusNickname));
 		if (isNameError) return;
@@ -50,6 +57,9 @@ const UserEdit: React.FC<userPageProps> = ({ userData }) => {
 				type: "application/json",
 			})
 		);
+		if (file) {
+			formData.append("image", new Blob([JSON.stringify(file)]));
+		}
 		const postAxiosConfig = {
 			headers: {
 				"Content-Type": "multipart/form-data", // FormData를 사용할 때 Content-Type을 변경
@@ -117,12 +127,18 @@ const UserEdit: React.FC<userPageProps> = ({ userData }) => {
 						type: "text",
 						placeholder: "이미지를 업로드하세요",
 					}}
+					inputValue={fileName}
+					isReadonly={true}
 				>
-					<Button
-						buttonType="another"
-						buttonSize="big"
-						buttonLabel="이미지 업로드"
-					/>
+					<button className="file_upload big">
+						파일 선택
+						<input
+							type="file"
+							onChange={(event) => handleOnChange(event)}
+							id="selectImg"
+							className="file_upload"
+						/>
+					</button>
 				</Input>
 				<a href="" className="link">
 					회원 탈퇴하기
