@@ -92,7 +92,7 @@ const BoardWrite = () => {
 	};
 	//취소 클릭시 목록으로 이동
 	const cancelClickHandler = () => {
-		navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
+		navigate(`/board/${nowBoardData!.name}`);
 	};
 
 	//이미지 관련
@@ -147,6 +147,11 @@ const BoardWrite = () => {
 
 	//함수 - 게시글 제출
 	const submitHandler = async () => {
+		//게시판 선택하지 않았을 경우
+		if (nowBoardData === undefined) {
+			alert("게시판을 선택해주세요.");
+			return;
+		}
 		//게시판 id
 		const id = nowCategoryId
 			? nowCategoryId.toString()
@@ -177,8 +182,9 @@ const BoardWrite = () => {
 			);
 			axios
 				.post(`${api}/api/v1/post/create`, newFormData, postAxiosConfig)
-				.then((_) => {
-					navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
+				.then((response) => {
+					const newPostId = response.data.data.id;
+					navigate(`/${newPostId}`);
 				})
 				.catch((error) => {
 					alert("게시판 등록을 실패했습니다.");
