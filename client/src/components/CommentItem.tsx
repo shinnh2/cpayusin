@@ -1,11 +1,10 @@
-import VoteInfo from "./VoteInfo";
-
 interface CommentItemData {
 	postId: number;
 	postTitle: string;
 	commentId: number;
 	text: string;
 	voteCount: number;
+	voteStatus: boolean;
 	createdAt?: string;
 }
 
@@ -24,11 +23,6 @@ const CommentItem = ({ data }: { data: any }) => {
 						<span className="icon">득표수</span>
 						<span className="info">{data.voteCount}</span>
 					</p>
-					<VoteInfo
-						voteCount={data.voteCount}
-						isVoted={false}
-						endpoint={`/api/v1/vote/comment/${data.commentId}`}
-					/>
 				</div>
 			</div>
 			<p className="comment">{data.text}</p>
