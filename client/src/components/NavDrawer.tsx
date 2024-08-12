@@ -48,6 +48,7 @@ const NavDrawer = (props: NavDrawerProps) => {
 						isLogin={props.isLogin}
 						userData={props.userData}
 						setIsLogin={props.setIsLogin}
+						setIsNavDrawerOn={props.setIsNavDrawerOn}
 					/>
 				</div>
 
