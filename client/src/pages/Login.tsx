@@ -14,6 +14,7 @@ const Login = (props: Props) => {
 	const api = process.env.REACT_APP_API_URL;
 	const navigate = useNavigate();
 	const googleLoginURI = process.env.REACT_APP_GOOGLE_LOGIN_URI;
+	const kakaoLoginURI = process.env.REACT_APP_KAKAO_LOGIN_URI;
 	const [form, setForm] = useState({
 		email: "",
 		password: "",
@@ -116,9 +117,19 @@ const Login = (props: Props) => {
 					</p>
 				</div>
 				<div className="sns_login_btns">
-					<button className="sns_btn kakao">카카오 로그인</button>
-					<button className="sns_btn naver">네이버 로그인</button>
-					<a className="sns_btn google" href={googleLoginURI}>
+					<a
+						className="sns_btn kakao"
+						href={kakaoLoginURI}
+						title="클릭시 카카오 로그인 화면으로 이동합니다."
+					>
+						카카오 로그인
+					</a>
+					{/* <a className="sns_btn naver" href="">네이버 로그인</a> */}
+					<a
+						className="sns_btn google"
+						href={googleLoginURI}
+						title="클릭시 구글 로그인 화면으로 이동합니다."
+					>
 						구글 로그인
 					</a>
 				</div>
