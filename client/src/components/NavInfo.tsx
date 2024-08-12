@@ -50,7 +50,7 @@ const NavInfo = () => {
 					<dd className="info_content">{visitorInfo.today}</dd>
 				</dl>
 			</div>
-			<div className="user_rank">
+			{/* <div className="user_rank">
 				<p className="title">이달의 질문왕</p>
 				<ul>
 					{userRank.map((el, idx) => (
@@ -61,7 +61,7 @@ const NavInfo = () => {
 						</li>
 					))}
 				</ul>
-			</div>
+			</div> */}
 		</div>
 	);
 };
