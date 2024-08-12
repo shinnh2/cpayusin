@@ -11,6 +11,7 @@ interface LoginInfoProps {
 	isLogin: boolean;
 	setIsLogin: Dispatch<React.SetStateAction<boolean>>;
 	userData: userDataType | undefined;
+	setIsNavDrawerOn?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const LoginInfo = (props: LoginInfoProps) => {
@@ -20,7 +21,13 @@ const LoginInfo = (props: LoginInfoProps) => {
 		props.setIsLogin(false);
 		alert("로그아웃되었습니다.");
 		navigate("/");
+		if (props.setIsNavDrawerOn !== undefined) props.setIsNavDrawerOn(false);
 	};
+
+	const handleClickLink = (event: React.MouseEvent<HTMLElement>) => {
+		if (props.setIsNavDrawerOn !== undefined) props.setIsNavDrawerOn(false);
+	};
+
 	return (
 		<div className="login_info_wrap">
 			{props.isLogin ? (
@@ -29,6 +36,7 @@ const LoginInfo = (props: LoginInfoProps) => {
 						href={`/user/${props.userData?.id}`}
 						className="login_info_btns link_profile"
 						title="클릭시 내 프로필로 이동합니다."
+						onClick={handleClickLink}
 					>
 						<div className="login_info_icon_wrap profile">
 							{props.userData?.profileImage ? (
@@ -49,6 +57,7 @@ const LoginInfo = (props: LoginInfoProps) => {
 						href="/board/write"
 						className="login_info_btns link_write"
 						title="클릭시 글쓰기 페이지로 이동합니다."
+						onClick={handleClickLink}
 					>
 						<div className="login_info_icon_wrap">
 							<img src={iconWrite} alt="글쓰기 아이콘" />
@@ -71,10 +80,18 @@ const LoginInfo = (props: LoginInfoProps) => {
 				</>
 			) : (
 				<>
-					<NavLink to="/login" className="login_info_links login">
+					<NavLink
+						to="/login"
+						className="login_info_links login"
+						onClick={handleClickLink}
+					>
 						로그인
 					</NavLink>
-					<NavLink to="/signup" className="login_info_links signup">
+					<NavLink
+						to="/signup"
+						className="login_info_links signup"
+						onClick={handleClickLink}
+					>
 						회원가입
 					</NavLink>
 				</>
