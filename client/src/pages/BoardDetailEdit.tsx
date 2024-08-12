@@ -79,7 +79,7 @@ const BoardDetailEdit = () => {
 	};
 	//취소 클릭시 게시글로 이동
 	const cancelClickHandler = () => {
-		navigate(`/board/${boardId}-${boardName}/${params.postId}`);
+		navigate(`/${params.postId}`);
 	};
 	//제출
 	const submitHandler = () => {
@@ -116,7 +116,7 @@ const BoardDetailEdit = () => {
 				postAxiosConfig
 			)
 			.then((_) => {
-				navigate(`/board/${boardId}-${boardName}/${params.postId}`);
+				navigate(`/${params.postId}`);
 			})
 			.catch((error) => {
 				if (error.response) {
