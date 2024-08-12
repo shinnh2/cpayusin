@@ -28,25 +28,29 @@ const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 	const [myMemberId, setmyMemberID] = useState<number>();
 	useEffect(() => {
 		const accessToken = getAccessToken();
+
+		let headerConfig = {};
+
+		if (accessToken) {
+			headerConfig = {
+				headers: { Authorization: accessToken },
+			};
+			axios
+				.get(`${api}/api/v1/member/profile`, headerConfig)
+				.then((res) => {
+					setmyMemberID(res.data.data.id);
+				})
+				.catch((_) => {});
+		}
+
 		axios
-			.get(`${api}/api/v1/post/${params.postId}`)
+			.get(`${api}/api/v1/post/${params.postId}`, headerConfig)
 			.then((response) => {
 				setPostData(response.data.data);
 			})
 			.catch((error) => {
 				console.error("에러", error);
 			});
-
-		if (accessToken) {
-			axios
-				.get(`${api}/api/v1/member/profile`, {
-					headers: { Authorization: accessToken },
-				})
-				.then((res) => {
-					setmyMemberID(res.data.data.id);
-				})
-				.catch((_) => {});
-		}
 	}, []);
 
 	const handleClickDeletePost = (
@@ -57,7 +61,6 @@ const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 		//팝업창으로 대체할 것
 		let isDeleteYes = window.confirm("게시물을 삭제하시겠습니까?");
 		if (isDeleteYes) {
-			console.log(params.postId);
 			axios
 				.delete(`${api}/api/v1/post/delete/${params.postId}`, {
 					headers: { Authorization: accessToken },
