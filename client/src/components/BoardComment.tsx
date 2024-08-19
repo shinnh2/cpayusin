@@ -3,8 +3,8 @@ import Button from "../components/Button";
 import CommentListItem from "./CommentListItem";
 import axios from "axios";
 import { getAccessToken } from "../assets/tokenActions";
-import dummyCommentsData from "./../data/boardCommentsData.json";
-import Loading from "./Loading";
+// import dummyCommentsData from "./../data/boardCommentsData.json";
+// import Loading from "./Loading";
 
 const BoardComment = ({
 	postId,
@@ -18,21 +18,34 @@ const BoardComment = ({
 	const [commentList, setCommentList] = useState<any>();
 	const [isLoading, setIsLoading] = useState(true);
 
-	const fetchCommentData = () => {
-		const accessToken = getAccessToken();
-		if (accessToken) {
-			axios
-				.get(`${api}/api/v1/comment?postId=${postId}`)
-				.then((res) => {
-					// console.log(res.data.data); 성공적으로 삭제해도 isRemoved 떠서 확인필요
-					setCommentList(res.data.data.comments);
-					setIsLoading(false);
-				})
-				.catch((_) => {});
+	const fetchCommentData = async () => {
+		// const accessToken = getAccessToken();
+		// if (accessToken) {
+		// 	axios
+		// 		.get(`${api}/api/v1/comment?postId=${postId}`)
+		// 		.then((res) => {
+		// 			// console.log(res.data.data); 성공적으로 삭제해도 isRemoved 떠서 확인필요
+		// 			setCommentList(res.data.data.comments);
+		// 			setIsLoading(false);
+		// 		})
+		// 		.catch((_) => {});
+		// }
+
+		try {
+			const response = await axios.get(
+				`${api}/api/v1/comment?postId=${postId}`
+			);
+			setCommentList(response.data.data.comments); // 데이터가 있을 경우 설정
+		} catch (error) {
+			console.error("에러", error);
+			setCommentList([]); // 데이터가 없을 경우 빈 배열로 설정 (로딩이 끝나게 하기 위함)
+		} finally {
+			setIsLoading(false); // 로딩 상태 종료
 		}
 	};
 
 	useEffect(() => {
+		setIsLoading(true);
 		//댓글목록 Read
 		fetchCommentData();
 	}, []);
@@ -87,7 +100,7 @@ const BoardComment = ({
 				/>
 			</div>
 			{isLoading ? (
-				<Loading />
+				<div className="comments_list_wrap">댓글 목록을 불러오는 중입니다.</div>
 			) : (
 				<div className="comments_list_wrap">
 					<h4 className="comments_title">댓글 목록</h4>
