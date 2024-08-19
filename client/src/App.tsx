@@ -39,19 +39,21 @@ function App() {
 	const [validatedEmail, setValidatedEmail] = useState("");
 	const [isNavDrawerOn, setIsNavDrawerOn] = useState(false);
 	const [menuData, setMenuData] = useState<any[]>([]);
-	const fetchMenuData = () => {
-		axios
-			.get(`${api}/api/v1/board/menu`)
-			.then((response) => {
-				setMenuData(response.data.data);
-				setIsLoading(false);
-			})
-			.catch((error) => {
-				console.error("에러", error);
-				setIsLoading(true);
-			});
+
+	const fetchMenuData = async () => {
+		try {
+			const response = await axios.get(`${api}/api/v1/board/menu`);
+			setMenuData(response.data.data); // 데이터가 있을 경우 setMenuData에 설정
+		} catch (error) {
+			console.error("에러", error);
+			setMenuData([]); // 데이터가 없을 경우 빈 배열로 설정 (로딩이 끝나게 하기 위함)
+		} finally {
+			setIsLoading(false); // 로딩 상태 종료
+		}
 	};
+
 	useEffect(() => {
+		setIsLoading(true);
 		fetchMenuData();
 	}, []);
 
@@ -68,7 +70,7 @@ function App() {
 				<div className="page_wrap">
 					<Nav menuData={menuData} setIsNavDrawerOn={setIsNavDrawerOn} />
 					<main className="container">
-						{isLoading ? (
+						{isLoading || !menuData ? (
 							<Loading />
 						) : (
 							<Routes>
