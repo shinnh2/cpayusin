@@ -4,26 +4,26 @@ import { useState, useEffect } from "react";
 
 const NavInfo = () => {
 	const api = process.env.REACT_APP_API_URL;
-	const [userRank, setUserRank] = useState<any[]>(["-", "-", "-"]);
+	// const [userRank, setUserRank] = useState<any[]>(["-", "-", "-"]);
 	const [visitorInfo, setVisitorInfo] = useState({
 		yesterday: 0,
 		today: 0,
 		total: 0,
 	});
 	useEffect(() => {
-		axios
-			.get(`${api}/api/v1/member/score`)
-			.then((response) => {
-				const length = response.data.data.length;
-				const newRank = userRank;
-				for (let i = 0; i < length; i++) {
-					newRank[i] = response.data.data[i];
-				}
-				setUserRank(newRank);
-			})
-			.catch((error) => {
-				console.error("에러", error);
-			});
+		// axios
+		// 	.get(`${api}/api/v1/member/score`)
+		// 	.then((response) => {
+		// 		const length = response.data.data.length;
+		// 		const newRank = userRank;
+		// 		for (let i = 0; i < length; i++) {
+		// 			newRank[i] = response.data.data[i];
+		// 		}
+		// 		setUserRank(newRank);
+		// 	})
+		// 	.catch((error) => {
+		// 		console.error("에러", error);
+		// 	});
 
 		axios
 			.get(`${api}/api/v1/visitor`)
