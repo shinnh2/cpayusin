@@ -1085,12 +1085,16 @@ input.error {
 	font-weight: var(--fw-bold);
 }
 .comment_list_item {
-	padding: 16px 0 0 0;
+	/* padding: 16px 0 0 0; */
 	border-bottom: 1px solid var(--border-color);
+}
+.comment_removed {
+	padding: 24px 0;
 }
 .comment_head {
 	display: flex;
 	align-items: center;
+	margin-top: 16px;
 	margin-bottom: 12px;
 }
 .comment_user_profile {
