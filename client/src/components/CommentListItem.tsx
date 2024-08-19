@@ -120,7 +120,7 @@ const CommentListItem = ({
 	return (
 		<>
 			{data.isRemoved ? (
-				<div>삭제된 댓글입니다.</div>
+				<div className="comment_removed">삭제된 댓글입니다.</div>
 			) : (
 				<>
 					<div className="comment_head">
