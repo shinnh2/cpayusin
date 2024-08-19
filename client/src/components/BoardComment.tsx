@@ -107,7 +107,7 @@ const BoardComment = ({
 											<div className="comment_children_wrap">
 												<ul className="comment_children_list">
 													{el.children.map((child: any, childIdx: number) => (
-														<li className="comment_list_item">
+														<li className="comment_list_item" key={childIdx}>
 															<CommentListItem
 																data={child}
 																isChild={true}
