@@ -31,7 +31,7 @@ const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 
 		let headerConfig = {};
 
-		if (accessToken) {
+		if (accessToken && accessToken !== "") {
 			headerConfig = {
 				headers: { Authorization: accessToken },
 			};
@@ -41,16 +41,25 @@ const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 					setmyMemberID(res.data.data.id);
 				})
 				.catch((_) => {});
-		}
 
-		axios
-			.get(`${api}/api/v1/post/${params.postId}`, headerConfig)
-			.then((response) => {
-				setPostData(response.data.data);
-			})
-			.catch((error) => {
-				console.error("에러", error);
-			});
+			axios
+				.get(`${api}/api/v1/post/${params.postId}`, headerConfig)
+				.then((response) => {
+					setPostData(response.data.data);
+				})
+				.catch((error) => {
+					console.error("에러", error);
+				});
+		} else {
+			axios
+				.get(`${api}/api/v1/post/${params.postId}`)
+				.then((response) => {
+					setPostData(response.data.data);
+				})
+				.catch((error) => {
+					console.error("에러", error);
+				});
+		}
 	}, []);
 
 	const handleClickDeletePost = (
