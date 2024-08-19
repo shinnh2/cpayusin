@@ -62,6 +62,12 @@ const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 		}
 	}, []);
 
+	//날짜 변경 함수
+	const changedDate = (date: string) => {
+		const newDate = new Date(date);
+		return newDate.toLocaleString("ko-KR");
+	};
+
 	const handleClickDeletePost = (
 		event: React.MouseEvent<HTMLAnchorElement>
 	) => {
@@ -95,7 +101,7 @@ const BoardDetail = ({ menuData }: { menuData: any[] }) => {
 							{postData!.categoryId ? (
 								<p className="board_info">{postData!.categoryId}</p>
 							) : null}
-							<p className="board_date">{postData.createdAt}</p>
+							<p className="board_date">{changedDate(postData.createdAt)}</p>
 						</div>
 						<h4 className="board_detail_title">{postData.title}</h4>
 						<div className="board_detail_info">
