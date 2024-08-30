@@ -33,11 +33,29 @@ const ValidateEmail = ({
 		valueType: "email",
 	};
 	const handleClickValidateCode = () => {
+		//이메일 유효성 검사
 		setIsEmailrror(!validator(validatorStatusEmail));
 		if (isEmailError) {
 			return;
 		}
+		//이메일 중복 확인
+		const form = {
+			email: emailValue,
+		};
+		axios
+			.post(`${api}/api/v1/member/verify-email`, form)
+			.then((response) => {
+				sendVerifyCode();
+			})
+			.catch((error) => {
+				alert("등록할 수 없는 이메일입니다.");
+			});
+	};
+	const handleInputCode = (value: string) => {
+		setCodeValue(value);
+	};
 
+	const sendVerifyCode = () => {
 		axios
 			.post(`${api}/api/v1/mail/send-verification`, { email: emailValue })
 			.then((response) => {
@@ -48,9 +66,7 @@ const ValidateEmail = ({
 				setIsValidateError(true);
 			});
 	};
-	const handleInputCode = (value: string) => {
-		setCodeValue(value);
-	};
+
 	const handleClickSubmitCode = () => {
 		const form = {
 			email: emailValue,
