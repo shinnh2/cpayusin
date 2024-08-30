@@ -12,10 +12,7 @@ const CommentItem = ({ data }: { data: any }) => {
 	return (
 		<div className="board_item">
 			<div className="board_item_element_wrap">
-				<a
-					href={`/board/${data.boardId}-${data.boardName}/${data.postId}`}
-					className="link em"
-				>
+				<a href={`/${data.postId}`} className="link em">
 					게시글 바로가기
 				</a>
 				<div className="board_info">
