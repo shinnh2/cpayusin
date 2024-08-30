@@ -37,18 +37,21 @@ const UserPage: React.FC<userPageProps> = ({ userData }) => {
 			alert("로그인이 필요한 서비스입니다.");
 			navigate(`/login`);
 		}
-		console.log(userData);
 	}, []);
 
 	return (
 		<div className="user_page_wrap">
 			<div className="user_profile">
-				{userData?.profileImage !== null ? null : (
-					<div className="profile_img_wrap">
-						<img src={iconUser} className="profile_img_default" />
-					</div>
-				)}
-
+				<div className="profile_img_wrap">
+					<img
+						src={
+							userData?.profileImage !== null
+								? userData?.profileImage
+								: iconUser
+						}
+						className="profile_img_default"
+					/>
+				</div>
 				<div className="user_info_wrap">
 					<p className="title_h4">{userData?.nickname}</p>
 					<p className="email">{userData?.email}</p>
