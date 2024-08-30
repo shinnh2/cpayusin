@@ -32,12 +32,6 @@ const Signup = ({
 		}
 	}, []);
 
-	// const setEmailValue = (value: string) => {
-	// 	setForm((prevState) => ({
-	// 		...prevState,
-	// 		email: validatedEmail,
-	// 	}));
-	// };
 	const setPasswordValue = (value: string) => {
 		setForm((prevState) => ({
 			...prevState,
@@ -49,6 +43,21 @@ const Signup = ({
 			...prevState,
 			nickname: value,
 		}));
+	};
+
+	//닉네임 중복 검사
+	const handleClickVerifyName = () => {
+		const verifyNameForm = {
+			nickname: form.nickname,
+		};
+		axios
+			.post(`${api}/api/v1/member/verify-nickname`, verifyNameForm)
+			.then((response) => {
+				alert("사용 가능한 닉네임입니다.");
+			})
+			.catch((error) => {
+				alert("사용할 수 없는 닉네임입니다.");
+			});
 	};
 
 	//유효성 검사
@@ -82,24 +91,17 @@ const Signup = ({
 		axios
 			.post(`${api}/api/v1/sign-up`, form, { withCredentials: true })
 			.then((response) => {
-				console.log("회원가입 성공 !!!!", response.data);
 				navigate("/login");
 			})
 			.catch((error) => {
-				if (error.response) {
+				if (
+					error.response.valueErrors === undefined ||
+					error.response.valueErrors.length
+				) {
 					alert("회원가입에 실패했습니다."); //팝업으로 바꾸기
-					// 서버 응답이 있을 경우 (에러 상태 코드가 반환된 경우)
-					console.error("서버 응답 에러:", error.response.data);
-					console.error("응답 상태 코드:", error.response.status);
-					console.error("응답 헤더:", error.response.headers);
-				} else if (error.request) {
-					// 요청이 전혀 되지 않았을 경우
-					console.error("요청 에러:", error.request);
 				} else {
-					// 설정에서 문제가 있어 요청이 전송되지 않은 경우
-					console.error("Axios 설정 에러:", error.message);
+					alert(error.response.valueErrors[0].reason);
 				}
-				console.error("에러 구성:", error.config);
 			});
 	};
 	return (
@@ -156,6 +158,7 @@ const Signup = ({
 						buttonType="another"
 						buttonSize="big"
 						buttonLabel="중복 확인"
+						onClick={handleClickVerifyName}
 					/>
 				</Input>
 				<Button
