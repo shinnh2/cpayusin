@@ -1,7 +1,7 @@
 // import { ReactComponent as iconMenu } from "./../assets/icon _menu_.svg";
 import { useState, Dispatch, useEffect } from "react";
 import iconMenu from "./../assets/icon_menu.svg";
-import { getAccessToken } from "../assets/tokenActions";
+import { getAccessToken, removeAccessToken } from "../assets/tokenActions";
 import axios from "axios";
 import { userDataType } from "./../App";
 import LoginInfo from "./LoginInfo";
@@ -37,6 +37,7 @@ const Header = (props: HeaderProps) => {
 				})
 				.catch((error) => {
 					props.setIsLogin(false);
+					removeAccessToken();
 				});
 		} else props.setIsLogin(false);
 	}, []);
@@ -46,7 +47,7 @@ const Header = (props: HeaderProps) => {
 	return (
 		<header className="header">
 			<h1>
-				<a href="/" className="logo" title="JBaccount 홈">
+				<a href="/" className="logo" title="cpayusin 홈">
 					<img className="logo_img" src="/images/logo.png" />
 				</a>
 			</h1>
