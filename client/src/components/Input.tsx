@@ -16,6 +16,7 @@ export interface InputProps {
 	inputValue?: string; //값
 	isError?: boolean; //에러 여부
 	isReadonly?: boolean;
+	maxLength?: number;
 }
 
 const Input = ({
@@ -28,6 +29,7 @@ const Input = ({
 	inputValue,
 	isError,
 	isReadonly,
+	maxLength,
 }: InputProps) => {
 	const id = `jb-input-${Math.random()}` ?? inputAttr.id;
 	const handleOnchange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +48,7 @@ const Input = ({
 					value={inputValue}
 					className={isError ? "error" : ""}
 					readOnly={!!isReadonly}
+					maxLength={maxLength}
 				/>
 				{children && children}
 			</div>
