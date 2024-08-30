@@ -112,7 +112,7 @@ const BoardWrite = () => {
 	const uploadImage = async (formData: FormData, config: any) => {
 		try {
 			const res = await axios.post(
-				`http://13.124.241.118:8080/api/v1/post/create`, //240828임시URL변경
+				`${api}/api/v1/post/create`, //240828임시URL변경
 				formData,
 				config
 			);
@@ -181,11 +181,7 @@ const BoardWrite = () => {
 				})
 			);
 			axios
-				.post(
-					`http://13.124.241.118:8080/api/v1/post/create`,
-					newFormData,
-					postAxiosConfig
-				) //240828임시URL변경
+				.post(`${api}/api/v1/post/create`, newFormData, postAxiosConfig) //240828임시URL변경
 				.then((response) => {
 					const newPostId = response.data.data.id;
 					navigate(`/${newPostId}`);
@@ -234,7 +230,7 @@ const BoardWrite = () => {
 
 			axios
 				.patch(
-					`http://13.124.241.118:8080/api/v1/post/update/${postId}`, //240828임시URL변경
+					`${api}/api/v1/post/update/${postId}`, //240828임시URL변경
 					newFormData,
 					postAxiosConfig
 				)
