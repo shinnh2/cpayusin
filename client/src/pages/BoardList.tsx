@@ -32,7 +32,7 @@ const BoardList = ({ menuData }: { menuData: any[] }) => {
 	const [boardMap, setBoardMap] = useState({});
 	const [boardInfo, setBoardInfo] = useState({
 		boardName: params.boardInfo,
-		boardId: 0,
+		boardId: menuData.filter((el) => el.name === params.boardInfo)[0].id,
 		boardIsAdminOnly: false,
 	});
 	const [data, setData] = useState<any[]>([]);
@@ -56,6 +56,7 @@ const BoardList = ({ menuData }: { menuData: any[] }) => {
 			boardIsAdminOnly: boardMap[params.boardInfo!].isAdminOnly,
 		};
 		setBoardInfo(boardInfo);
+
 		axios
 			.get(`${api}/api/v1/post/board?id=${boardInfo.boardId}&page=1&size=8`)
 			.then((response) => {
