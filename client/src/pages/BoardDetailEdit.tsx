@@ -40,7 +40,7 @@ const BoardDetailEdit = () => {
 	const navigate = useNavigate();
 	const [postdata, setPostData] = useState<postData>();
 	const params = useParams();
-	const [boardId, boardName] = params.boardInfo!.split("-");
+	const boardId = params.postId;
 	const [categoryItem, setCategoryItem] = useState<categoryDataType[]>([]); //카테고리 목록
 	const [nowCategoryId, setNowCategoryId] = useState(0); //현재 선택된 카테고리 id
 	const [selectValueCategory, setSelectValueCategory] = useState(""); //현재 선택된 카테고리
@@ -111,7 +111,7 @@ const BoardDetailEdit = () => {
 		};
 		axios
 			.patch(
-				`${api}/api/v1/post/update/${params.postId}`,
+				`http://13.124.241.118:8080/api/v1/post/update/${params.postId}`, //240828임시URL변경
 				formData,
 				postAxiosConfig
 			)
