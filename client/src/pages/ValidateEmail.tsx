@@ -56,7 +56,6 @@ const ValidateEmail = ({
 			email: emailValue,
 			verificationCode: codeValue,
 		};
-		console.log(form);
 		axios
 			.post(`${api}/api/v1/verification`, form)
 			.then((response) => {
@@ -98,7 +97,9 @@ const ValidateEmail = ({
 					onClick={handleClickValidateCode}
 				/>
 				{canInputValidateCode ? (
-					<p className="validate_email_msg">인증코드가 전송되었습니다.</p>
+					<p className="validate_email_msg">
+						인증코드가 전송되었습니다. (유효시간 10분)
+					</p>
 				) : null}
 				{isValidateError ? (
 					<p className="validate_email_msg error">
