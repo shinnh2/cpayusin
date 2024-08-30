@@ -112,7 +112,7 @@ const BoardWrite = () => {
 	const uploadImage = async (formData: FormData, config: any) => {
 		try {
 			const res = await axios.post(
-				`${api}/api/v1/post/create`,
+				`http://13.124.241.118:8080/api/v1/post/create`, //240828임시URL변경
 				formData,
 				config
 			);
@@ -181,7 +181,11 @@ const BoardWrite = () => {
 				})
 			);
 			axios
-				.post(`${api}/api/v1/post/create`, newFormData, postAxiosConfig)
+				.post(
+					`http://13.124.241.118:8080/api/v1/post/create`,
+					newFormData,
+					postAxiosConfig
+				) //240828임시URL변경
 				.then((response) => {
 					const newPostId = response.data.data.id;
 					navigate(`/${newPostId}`);
@@ -230,12 +234,12 @@ const BoardWrite = () => {
 
 			axios
 				.patch(
-					`${api}/api/v1/post/update/${postId}`,
+					`http://13.124.241.118:8080/api/v1/post/update/${postId}`, //240828임시URL변경
 					newFormData,
 					postAxiosConfig
 				)
 				.then((_) => {
-					navigate(`/board/${nowBoardData!.id}-${nowBoardData!.name}`);
+					navigate(`/board/${nowBoardData!.name}`);
 				})
 				.catch((error) => {
 					alert("게시판 등록을 실패했습니다.");
@@ -293,6 +297,7 @@ const BoardWrite = () => {
 								}}
 								setInputValue={setTitleValue}
 								inputValue={titleValue}
+								maxLength={50}
 							/>
 						</div>
 					</div>
