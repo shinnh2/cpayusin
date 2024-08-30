@@ -19,18 +19,6 @@ const BoardComment = ({
 	const [isLoading, setIsLoading] = useState(true);
 
 	const fetchCommentData = async () => {
-		// const accessToken = getAccessToken();
-		// if (accessToken) {
-		// 	axios
-		// 		.get(`${api}/api/v1/comment?postId=${postId}`)
-		// 		.then((res) => {
-		// 			// console.log(res.data.data); 성공적으로 삭제해도 isRemoved 떠서 확인필요
-		// 			setCommentList(res.data.data.comments);
-		// 			setIsLoading(false);
-		// 		})
-		// 		.catch((_) => {});
-		// }
-
 		try {
 			const response = await axios.get(
 				`${api}/api/v1/comment?postId=${postId}`
@@ -84,20 +72,26 @@ const BoardComment = ({
 			<div className="comment_write">
 				<dl>
 					<dt className="comment_write_title">댓글 작성</dt>
-					<dd>
-						<textarea
-							placeholder="댓글을 작성하세요"
-							onChange={(e) => handleChangeComment(e)}
-							value={comment}
-						></textarea>
+					<dd className="comment_write_body">
+						{memberId === undefined ? (
+							"로그인 후 댓글 작성이 가능합니다."
+						) : (
+							<textarea
+								placeholder="댓글을 작성하세요"
+								onChange={(e) => handleChangeComment(e)}
+								value={comment}
+							></textarea>
+						)}
 					</dd>
 				</dl>
-				<Button
-					buttonType="primary"
-					buttonSize="big"
-					buttonLabel="댓글 입력"
-					onClick={handleClickCommentSubmit}
-				/>
+				{memberId === undefined ? null : (
+					<Button
+						buttonType="primary"
+						buttonSize="big"
+						buttonLabel="댓글 입력"
+						onClick={handleClickCommentSubmit}
+					/>
+				)}
 			</div>
 			{isLoading ? (
 				<div className="comments_list_wrap">댓글 목록을 불러오는 중입니다.</div>
