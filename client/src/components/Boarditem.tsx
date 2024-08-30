@@ -12,10 +12,15 @@ interface BoardItemData {
 	title: string;
 	content: string;
 	createdAt: string;
-	timeInfo: string;
 }
 
 const BoardItem = ({ data }: { data: BoardItemData }) => {
+	//날짜 변경 함수
+	const changedDate = (date: string) => {
+		const newDate = new Date(date);
+		return newDate.toLocaleString("ko-KR");
+	};
+
 	return (
 		<div className="board_item">
 			<a href={`/${data.postId}`} title={data.title}>
@@ -36,7 +41,7 @@ const BoardItem = ({ data }: { data: BoardItemData }) => {
 				</div>
 				<h3 className="title">{data.title}</h3>
 				<div className="board_item_element_wrap">
-					<p className="board_date">{data.timeInfo}</p>
+					<p className="board_date">{changedDate(data.createdAt)}</p>
 					<p className="board_writer">{data.memberName}</p>
 				</div>
 			</a>
