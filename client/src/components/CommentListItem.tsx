@@ -116,6 +116,11 @@ const CommentListItem = ({
 				});
 		}
 	};
+	//날짜 변경 함수
+	const changedDate = (date: string) => {
+		const newDate = new Date(date);
+		return newDate.toLocaleString("ko-KR");
+	};
 
 	return (
 		<>
@@ -123,7 +128,9 @@ const CommentListItem = ({
 				<div className="comment_user_profile">
 					<div className="user_img_wrap"></div>
 					<h5 className="user_name">{data.memberName}</h5>
-					<div className="comment_ceated_time">{data.createdAt}</div>
+					<div className="comment_ceated_time">
+						{changedDate(data.createdAt)}
+					</div>
 				</div>
 				<div className="comment_likes">{data.voteCount}</div>
 			</div>
