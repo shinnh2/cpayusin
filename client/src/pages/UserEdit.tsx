@@ -5,13 +5,19 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { validator, ValidatorStatus } from "../assets/validater";
-import { getAccessToken, isAccessToken } from "../assets/tokenActions";
+import {
+	getAccessToken,
+	isAccessToken,
+	removeAccessToken,
+} from "../assets/tokenActions";
 
-interface userPageProps {
+const UserEdit = ({
+	userData,
+	setIsLogin,
+}: {
 	userData: userDataType | undefined;
-}
-
-const UserEdit: React.FC<userPageProps> = ({ userData }) => {
+	setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
 	const api = process.env.REACT_APP_API_URL;
 	const params = useParams();
 	const navigate = useNavigate();
@@ -91,6 +97,27 @@ const UserEdit: React.FC<userPageProps> = ({ userData }) => {
 			});
 	};
 
+	const handleClickMemberDelete = () => {
+		const config = {
+			headers: { Authorization: `${getAccessToken()}` },
+		};
+		//팝업창으로 대체할 것
+		let isDeleteYes = window.confirm("정말로 탈퇴하시겠습니까?");
+		if (isDeleteYes) {
+			axios
+				.delete(`${api}/api/v1/member/delete`, config)
+				.then((_) => {
+					alert("탈퇴되었습니다.");
+					removeAccessToken();
+					setIsLogin(false);
+					navigate(`/`);
+				})
+				.catch((error) => {
+					alert("회원 탈퇴에 실패하였습니다.");
+				});
+		}
+	};
+
 	return (
 		<div className="user_edit_wrap">
 			<div className="user_profile">
@@ -140,9 +167,9 @@ const UserEdit: React.FC<userPageProps> = ({ userData }) => {
 						/>
 					</button>
 				</Input>
-				<a href="" className="link">
+				<button className="link" onClick={handleClickMemberDelete}>
 					회원 탈퇴하기
-				</a>
+				</button>
 			</div>
 			<div className="user_edit_button_wrap">
 				<Button
