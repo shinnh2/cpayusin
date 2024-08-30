@@ -119,7 +119,9 @@ function App() {
 								/>
 								<Route
 									path="/user/:userId/edit"
-									element={<UserEdit userData={userData} />}
+									element={
+										<UserEdit userData={userData} setIsLogin={setIsLogin} />
+									}
 								/>
 								<Route path="/admin" element={<Admin />} />
 							</Routes>
