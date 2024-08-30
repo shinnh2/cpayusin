@@ -111,7 +111,7 @@ const BoardDetailEdit = () => {
 		};
 		axios
 			.patch(
-				`http://13.124.241.118:8080/api/v1/post/update/${params.postId}`, //240828임시URL변경
+				`${api}/api/v1/post/update/${params.postId}`, //240828임시URL변경
 				formData,
 				postAxiosConfig
 			)
