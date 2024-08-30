@@ -70,7 +70,7 @@ const CommentListItem = ({
 			const accessToken = getAccessToken();
 			if (accessToken) {
 				axios
-					.get(`${api}/api/v1/comment/${data.id}`, {
+					.delete(`${api}/api/v1/comment/delete/${data.id}`, {
 						headers: { Authorization: accessToken },
 					})
 					.then((res) => {
@@ -119,104 +119,98 @@ const CommentListItem = ({
 
 	return (
 		<>
-			{data.isRemoved ? (
-				<div className="comment_removed">삭제된 댓글입니다.</div>
-			) : (
-				<>
-					<div className="comment_head">
-						<div className="comment_user_profile">
-							<div className="user_img_wrap"></div>
-							<h5 className="user_name">{data.memberName}</h5>
-							<div className="comment_ceated_time">{data.createdAt}</div>
-						</div>
-						<div className="comment_likes">{data.voteCount}</div>
+			<div className="comment_head">
+				<div className="comment_user_profile">
+					<div className="user_img_wrap"></div>
+					<h5 className="user_name">{data.memberName}</h5>
+					<div className="comment_ceated_time">{data.createdAt}</div>
+				</div>
+				<div className="comment_likes">{data.voteCount}</div>
+			</div>
+			{isUpdating ? (
+				<div className="comment_body">
+					<textarea
+						className="comment_content_textarea"
+						onChange={(e) => handleChangeComment(e)}
+					>
+						{comment}
+					</textarea>
+					<div className="comment_update_btn_wrap">
+						<button
+							className="comment_btn update"
+							onClick={handleClickCommentUpdateComplete}
+						>
+							수정완료
+						</button>
+						<button
+							className="comment_btn delete"
+							onClick={handleClickCommentDelete}
+						>
+							삭제
+						</button>
 					</div>
-					{isUpdating ? (
-						<div className="comment_body">
-							<textarea
-								className="comment_content_textarea"
-								onChange={(e) => handleChangeComment(e)}
+				</div>
+			) : (
+				<div className="comment_body">
+					<div className="comment_content">{comment}</div>
+					{memberId === data.memberId ? (
+						<div className="comment_update_btn_wrap">
+							<button
+								className="comment_btn update"
+								onClick={handleClickCommentUpdate}
 							>
-								{comment}
-							</textarea>
-							<div className="comment_update_btn_wrap">
+								수정
+							</button>
+							<button
+								className="comment_btn delete"
+								onClick={handleClickCommentDelete}
+							>
+								삭제
+							</button>
+						</div>
+					) : null}
+				</div>
+			)}
+			{isChild ? null : (
+				<div className="comment_reply_btns_wrap">
+					{/* {data.children!.length > 0 ? (
+					<button className="comment_reply_btn toggle_view_child_comments show">
+						답글 더보기
+					</button>
+				) : null} */}
+					{isReplyWriting ? (
+						<div className="reply_create_wrap">
+							<div>
+								<textarea
+									placeholder="답글을 작성하세요"
+									onChange={(e) => handleChangeReply(e)}
+									value={reply}
+								></textarea>
+							</div>
+							<div className="reply_create_btns">
 								<button
-									className="comment_btn update"
-									onClick={handleClickCommentUpdateComplete}
+									className="reply_create_btn reply_cancel"
+									onClick={handleClicktoggleReply}
 								>
-									수정완료
+									취소
 								</button>
 								<button
-									className="comment_btn delete"
-									onClick={handleClickCommentDelete}
+									className="reply_create_btn reply_submit"
+									onClick={handleClickReplySubmit}
 								>
-									삭제
+									작성 완료
 								</button>
 							</div>
 						</div>
 					) : (
-						<div className="comment_body">
-							<div className="comment_content">{comment}</div>
-							{memberId === data.memberId ? (
-								<div className="comment_update_btn_wrap">
-									<button
-										className="comment_btn update"
-										onClick={handleClickCommentUpdate}
-									>
-										수정
-									</button>
-									<button
-										className="comment_btn delete"
-										onClick={handleClickCommentDelete}
-									>
-										삭제
-									</button>
-								</div>
-							) : null}
-						</div>
+						<button
+							className="comment_reply_btn create_comment_child"
+							onClick={handleClicktoggleReply}
+						>
+							답글
+						</button>
 					)}
-					{isChild ? null : (
-						<div className="comment_reply_btns_wrap">
-							{/* {data.children!.length > 0 ? (
-								<button className="comment_reply_btn toggle_view_child_comments show">
-									답글 더보기
-								</button>
-							) : null} */}
-							{isReplyWriting ? (
-								<div className="reply_create_wrap">
-									<div>
-										<textarea
-											placeholder="답글을 작성하세요"
-											onChange={(e) => handleChangeReply(e)}
-											value={reply}
-										></textarea>
-									</div>
-									<div className="reply_create_btns">
-										<button
-											className="reply_create_btn reply_cancel"
-											onClick={handleClicktoggleReply}
-										>
-											취소
-										</button>
-										<button
-											className="reply_create_btn reply_submit"
-											onClick={handleClickReplySubmit}
-										>
-											작성 완료
-										</button>
-									</div>
-								</div>
-							) : (
-								<button
-									className="comment_reply_btn create_comment_child"
-									onClick={handleClicktoggleReply}
-								>
-									답글
-								</button>
-							)}
-						</div>
-					)}
-				</>
+				</div>
 			)}
 		</>
 	);
