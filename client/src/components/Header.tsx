@@ -1,7 +1,7 @@
 // import { ReactComponent as iconMenu } from "./../assets/icon _menu_.svg";
 import { useState, Dispatch, useEffect } from "react";
 import iconMenu from "./../assets/icon_menu.svg";
-import { getAccessToken, removeAccessToken } from "../assets/tokenActions";
+// import { getAccessToken, removeAccessToken } from "../assets/tokenActions";
 import axios from "axios";
 import { userDataType } from "./../App";
 import LoginInfo from "./LoginInfo";
@@ -23,24 +23,24 @@ export interface HeaderProps {
 // 	timeInfo: string;
 // }
 const Header = (props: HeaderProps) => {
-	const api = process.env.REACT_APP_API_URL;
-	useEffect(() => {
-		let token = getAccessToken();
-		if (token) {
-			axios
-				.get(`${api}/api/v1/member/profile`, {
-					headers: { Authorization: token },
-				})
-				.then((res) => {
-					props.setUserData(res.data.data);
-					props.setIsLogin(true);
-				})
-				.catch((error) => {
-					props.setIsLogin(false);
-					removeAccessToken();
-				});
-		} else props.setIsLogin(false);
-	}, []);
+	// const api = process.env.REACT_APP_API_URL;
+	// useEffect(() => {
+	// 	let token = getAccessToken();
+	// 	if (token) {
+	// 		axios
+	// 			.get(`${api}/api/v1/member/profile`, {
+	// 				headers: { Authorization: token },
+	// 			})
+	// 			.then((res) => {
+	// 				props.setUserData(res.data.data);
+	// 				props.setIsLogin(true);
+	// 			})
+	// 			.catch((error) => {
+	// 				props.setIsLogin(false);
+	// 				removeAccessToken();
+	// 			});
+	// 	} else props.setIsLogin(false);
+	// }, []);
 	const handleNavDrawerClick = () => {
 		props.setIsNavDrawerOn(true);
 	};
