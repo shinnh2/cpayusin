@@ -5,6 +5,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { validator, ValidatorStatus } from "../assets/validater";
+import iconUser from "./../assets/icon_user.svg";
 import {
 	getAccessToken,
 	isAccessToken,
@@ -14,16 +15,18 @@ import {
 const UserEdit = ({
 	userData,
 	setIsLogin,
+	fetchUserData,
 }: {
 	userData: userDataType | undefined;
 	setIsLogin: React.Dispatch<React.SetStateAction<boolean>>;
+	fetchUserData: () => Promise<void>;
 }) => {
 	const api = process.env.REACT_APP_API_URL;
 	const params = useParams();
 	const navigate = useNavigate();
 	const [fileName, setFileName] = useState("이미지 파일을 선택하세요");
-	const [file, setFile] = useState("");
-	const [userNickname, setUserNickname] = useState("");
+	const [file, setFile] = useState();
+	const [userNickname, setUserNickname] = useState(userData?.nickname);
 	const [isNameError, setIsNameError] = useState(false);
 
 	const handleSetNickname = (value: string) => {
@@ -43,28 +46,41 @@ const UserEdit = ({
 		}
 	}, []);
 
+	//닉네임 중복 검사
+	const handleClickVerifyName = () => {
+		const verifyNameForm = {
+			nickname: userNickname,
+		};
+		axios
+			.post(`${api}/api/v1/member/verify-nickname`, verifyNameForm)
+			.then((response) => {
+				alert("사용 가능한 닉네임입니다.");
+			})
+			.catch((error) => {
+				alert("사용할 수 없는 닉네임입니다.");
+			});
+	};
+
 	const handleOnChange = (event: any) => {
 		setFileName(event.currentTarget.files[0].name);
 		setFile(event.currentTarget.files[0]);
 	};
 
 	const handleSubmit = () => {
-		setIsNameError(!validator(validatorStatusNickname));
-		if (isNameError) return;
+		const formData = new FormData();
+
 		const data = {
 			nickname: userNickname,
-			//비밀번호 받아야 함. 그런데 그러면 화면을 수정해야할 필요가 있으므로 논의할 것
 		};
-
-		const formData = new FormData();
 		formData.append(
 			"data",
 			new Blob([JSON.stringify(data)], {
 				type: "application/json",
 			})
 		);
+
 		if (file) {
-			formData.append("image", new Blob([JSON.stringify(file)]));
+			formData.append("image", file);
 		}
 		const postAxiosConfig = {
 			headers: {
@@ -73,27 +89,16 @@ const UserEdit = ({
 			},
 		};
 		axios
-			.patch(`${api}/api/v1/member/update`, formData, postAxiosConfig)
+			.patch(`${api}/api/v1/member`, formData, postAxiosConfig)
 			.then((_) => {
 				alert("회원 정보가 수정되었습니다.");
+				fetchUserData();
 				navigate(`/user/${userData?.id}`);
 			})
 			.catch((error) => {
 				alert("회원 정보 수정에 실패하였습니다.");
-				setUserNickname(userData?.nickname!);
-				if (error.response) {
-					// 서버 응답이 있을 경우 (에러 상태 코드가 반환된 경우)
-					console.error("서버 응답 에러:", error.response.data);
-					console.error("응답 상태 코드:", error.response.status);
-					console.error("응답 헤더:", error.response.headers);
-				} else if (error.request) {
-					// 요청이 전혀 되지 않았을 경우
-					console.error("요청 에러:", error.request);
-				} else {
-					// 설정에서 문제가 있어 요청이 전송되지 않은 경우
-					console.error("Axios 설정 에러:", error.message);
-				}
-				console.error("에러 구성:", error.config);
+				setUserNickname("");
+				console.error(error);
 			});
 	};
 
@@ -121,7 +126,17 @@ const UserEdit = ({
 	return (
 		<div className="user_edit_wrap">
 			<div className="user_profile">
-				<div className="profile_img_wrap"></div>
+				<div className="profile_img_wrap">
+					<img
+						src={
+							userData?.profileImage
+								? userData?.profileImage
+								: "/images/profile_defult_img.png"
+						}
+						alt="유저 아이콘"
+						className="profile_img_default"
+					/>
+				</div>
 				<div className="user_info_wrap">
 					<p className="title_h5">{userData?.nickname}</p>
 					<p className="email">{userData?.email}</p>
@@ -144,6 +159,7 @@ const UserEdit = ({
 						buttonType="another"
 						buttonSize="big"
 						buttonLabel="중복 확인"
+						onClick={handleClickVerifyName}
 					/>
 				</Input>
 				<Input
@@ -167,9 +183,17 @@ const UserEdit = ({
 						/>
 					</button>
 				</Input>
-				<button className="link" onClick={handleClickMemberDelete}>
-					회원 탈퇴하기
-				</button>
+				<div className="user_edit_link_wrap">
+					<button className="link" onClick={() => navigate("/newPassword")}>
+						비밀번호 변경하기
+					</button>
+					<button
+						className="link member_delete"
+						onClick={handleClickMemberDelete}
+					>
+						회원 탈퇴하기
+					</button>
+				</div>
 			</div>
 			<div className="user_edit_button_wrap">
 				<Button
