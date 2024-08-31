@@ -30,19 +30,6 @@ const EditorUnit = React.forwardRef((props: any, ref) => {
 		callback사용용도: 이미지를 먼저 서버에 업로드하여 응답으로 오는 url이나 파일명을 html에 처리한다.
 		*/
 
-		console.log("이미지 업로드 실행");
-
-		// //blob데이터 저장
-		// props.setBlobData(blob);
-
-		// //일단 이미지 그대로 두기
-		// const reader = new FileReader();
-		// reader.readAsDataURL(blob);
-		// reader.onloadend = () => {
-		// 	const base64data = reader.result;
-		// 	callback(`${base64data}`, `${blob.name}`); //이미지 저장된 url, img 대체 텍스트
-		// };
-
 		//이미지 API 적용
 		//이미지 대체 텍스트 처리
 		const blobName = blob.name === "" ? "사용자 이미지" : blob.name;
