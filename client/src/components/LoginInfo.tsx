@@ -3,7 +3,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { getAccessToken, removeAccessToken } from "../assets/tokenActions";
 import iconWrite from "./../assets/edit_document.svg";
 import iconLogout from "./../assets/logout.svg";
-import iconUser from "./../assets/icon_user.svg";
 import { userDataType } from "./../App";
 
 interface LoginInfoProps {
@@ -39,15 +38,15 @@ const LoginInfo = (props: LoginInfoProps) => {
 						onClick={handleClickLink}
 					>
 						<div className="login_info_icon_wrap profile">
-							{props.userData?.profileImage ? (
-								<img src={props.userData?.profileImage} />
-							) : (
-								<img
-									src={iconUser}
-									alt="기본 유저 아이콘"
-									className="default"
-								/>
-							)}
+							<img
+								src={
+									props.userData?.profileImage
+										? props.userData?.profileImage
+										: "/images/profile_defult_img.png"
+								}
+								alt="기본 유저 아이콘"
+								className="profile_img_default"
+							/>
 						</div>
 						{props.isDrawer ? (
 							<span className="login_info_btns_name">내 프로필</span>
