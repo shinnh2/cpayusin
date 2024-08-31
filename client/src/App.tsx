@@ -123,7 +123,10 @@ function App() {
 										<UserEdit userData={userData} setIsLogin={setIsLogin} />
 									}
 								/>
-								<Route path="/admin" element={<Admin />} />
+								<Route
+									path="/admin"
+									element={<Admin fetchMenuData={fetchMenuData} />}
+								/>
 							</Routes>
 						)}
 					</main>
