@@ -59,15 +59,15 @@ const BoardDetailEdit = () => {
 			.catch((error) => {
 				console.error("에러", error);
 			});
-		//카테고리 목록 받아오기
-		axios
-			.get(`${api}/api/v1/category/${boardId}`)
-			.then((response) => {
-				setCategoryItem(response.data.data);
-			})
-			.catch((error) => {
-				console.error("에러", error);
-			});
+		// //카테고리 목록 받아오기: 삭제
+		// axios
+		// 	.get(`${api}/api/v1/category/${boardId}`)
+		// 	.then((response) => {
+		// 		setCategoryItem(response.data.data);
+		// 	})
+		// 	.catch((error) => {
+		// 		console.error("에러", error);
+		// 	});
 	}, []);
 	//카테고리 선택
 	const handleSelectCategory = (categoryName: string) => {
@@ -84,54 +84,24 @@ const BoardDetailEdit = () => {
 	//제출
 	const submitHandler = () => {
 		const editorData: string = editorRef.current!.getInstance().getHTML(); //작성된 데이터
-		const form: FormType =
-			nowCategoryId > 0
-				? {
-						title: titleValue,
-						content: editorData,
-						categoryId: nowCategoryId,
-				  }
-				: {
-						title: titleValue,
-						content: editorData,
-				  };
+		const form: FormType = {
+			title: titleValue,
+			content: editorData,
+		};
 
-		const formData = new FormData();
-		formData.append(
-			"data",
-			new Blob([JSON.stringify(form)], {
-				type: "application/json",
-			})
-		);
 		const postAxiosConfig = {
 			headers: {
-				"Content-Type": "multipart/form-data", // FormData를 사용할 때 Content-Type을 변경
 				Authorization: `${getAccessToken()}`,
 			},
 		};
 		axios
-			.patch(
-				`${api}/api/v1/post/update/${params.postId}`, //240828임시URL변경
-				formData,
-				postAxiosConfig
-			)
+			.patch(`${api}/api/v1/post/${params.postId}`, form, postAxiosConfig)
 			.then((_) => {
 				navigate(`/${params.postId}`);
 			})
 			.catch((error) => {
-				if (error.response) {
-					// 서버 응답이 있을 경우 (에러 상태 코드가 반환된 경우)
-					console.error("서버 응답 에러:", error.response.data);
-					console.error("응답 상태 코드:", error.response.status);
-					console.error("응답 헤더:", error.response.headers);
-				} else if (error.request) {
-					// 요청이 전혀 되지 않았을 경우
-					console.error("요청 에러:", error.request);
-				} else {
-					// 설정에서 문제가 있어 요청이 전송되지 않은 경우
-					console.error("Axios 설정 에러:", error.message);
-				}
-				console.error("에러 구성:", error.config);
+				console.log(error);
+				alert("게시글 등록에 실패했습니다.");
 			});
 	};
 
