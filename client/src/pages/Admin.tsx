@@ -27,6 +27,7 @@ const InnerList = React.memo(function InnerList({
 	editCategory,
 	editData,
 	fetchData,
+	fetchMenuData,
 }: any) {
 	return (
 		<AdminBoardItem
@@ -36,11 +37,12 @@ const InnerList = React.memo(function InnerList({
 			editCategory={editCategory}
 			editData={editData}
 			fetchData={fetchData}
+			fetchMenuData={fetchMenuData}
 		/>
 	);
 });
 
-const Admin = () => {
+const Admin = ({ fetchMenuData }: { fetchMenuData: () => Promise<void> }) => {
 	const api = process.env.REACT_APP_API_URL;
 	const navigate = useNavigate();
 	const [boardListData, setBoardListData] = useState<any>(null);
@@ -89,7 +91,9 @@ const Admin = () => {
 			)
 			.then((response) => {
 				alert("게시판이 추가되었습니다.");
+				setNewBoard("");
 				fetchDataMap();
+				fetchMenuData();
 			})
 			.catch((error) => {
 				console.error("에러", error);
@@ -245,7 +249,6 @@ const Admin = () => {
 			boardDataArray.push(nowBoard);
 		}
 
-		console.log(boardDataArray);
 		const postAxiosConfig = {
 			headers: {
 				"Content-Type": "application/json",
@@ -261,6 +264,7 @@ const Admin = () => {
 			.then((response) => {
 				alert("게시판 수정이 완료되었습니다.");
 				fetchDataMap();
+				fetchMenuData();
 			})
 			.catch((err) => {
 				console.log(err);
@@ -293,6 +297,7 @@ const Admin = () => {
 											index={index}
 											editData={editData}
 											fetchData={fetchDataMap}
+											fetchMenuData={fetchMenuData}
 										/>
 									);
 								})}
