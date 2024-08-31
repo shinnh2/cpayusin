@@ -26,7 +26,14 @@ const InnerList = React.memo(function InnerList({
 	));
 });
 
-function AdminBoardItem({ board, category, index, editData, fetchData }: any) {
+function AdminBoardItem({
+	board,
+	category,
+	index,
+	editData,
+	fetchData,
+	fetchMenuData,
+}: any) {
 	const api = process.env.REACT_APP_API_URL;
 	const [newCategory, setNewCategory] = useState("");
 	const [isEdit, setIsEdit] = useState(false);
@@ -84,6 +91,9 @@ function AdminBoardItem({ board, category, index, editData, fetchData }: any) {
 		if (isBoardDelete) {
 			board["isDeleted"] = true;
 			setIsDelete(true);
+			alert(
+				"게시판을 삭제했습니다. 게시글 수정완료를 클릭하셔야 최종 반영됩니다."
+			);
 		} else {
 			alert("게시판 삭제를 취소했습니다.");
 		}
