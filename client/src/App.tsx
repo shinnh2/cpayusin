@@ -18,6 +18,7 @@ import UserEdit from "./pages/UserEdit";
 import BoardDetailEdit from "./pages/BoardDetailEdit";
 import Admin from "./pages/Admin";
 import Loading from "./components/Loading";
+import { getAccessToken, removeAccessToken } from "./assets/tokenActions";
 
 export interface userDataType {
 	createdAt: string;
@@ -52,9 +53,28 @@ function App() {
 		}
 	};
 
+	const fetchUserData = async () => {
+		let token = getAccessToken();
+		if (token) {
+			axios
+				.get(`${api}/api/v1/member/profile`, {
+					headers: { Authorization: token },
+				})
+				.then((res) => {
+					setUserData(res.data.data);
+					setIsLogin(true);
+				})
+				.catch((error) => {
+					setIsLogin(false);
+					removeAccessToken();
+				});
+		} else setIsLogin(false);
+	};
+
 	useEffect(() => {
 		setIsLoading(true);
 		fetchMenuData();
+		fetchUserData();
 	}, []);
 
 	return (
@@ -99,7 +119,12 @@ function App() {
 										/>
 									}
 								/>
-								<Route path="/newPassword" element={<NewPassword />} />
+								<Route
+									path="/newPassword"
+									element={
+										userData ? <NewPassword userData={userData} /> : <Loading />
+									}
+								/>
 								<Route
 									path="/board/:boardInfo"
 									element={<BoardList menuData={menuData} />}
@@ -115,12 +140,22 @@ function App() {
 								/>
 								<Route
 									path="/user/:userId"
-									element={<UserPage userData={userData} />}
+									element={
+										userData ? <UserPage userData={userData} /> : <Loading />
+									}
 								/>
 								<Route
 									path="/user/:userId/edit"
 									element={
-										<UserEdit userData={userData} setIsLogin={setIsLogin} />
+										userData ? (
+											<UserEdit
+												userData={userData}
+												setIsLogin={setIsLogin}
+												fetchUserData={fetchUserData}
+											/>
+										) : (
+											<Loading />
+										)
 									}
 								/>
 								<Route
