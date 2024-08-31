@@ -24,6 +24,7 @@ const Signup = ({
 		password: false,
 		nickname: false,
 	});
+	const [passwordChk, setPasswordChk] = useState("");
 
 	useEffect(() => {
 		if (!isEmailCheck || !validatedEmail) {
@@ -37,6 +38,9 @@ const Signup = ({
 			...prevState,
 			password: value,
 		}));
+	};
+	const setPasswordChkValue = (value: string) => {
+		setPasswordChk(value);
 	};
 	const setNicknameValue = (value: string) => {
 		setForm((prevState) => ({
@@ -85,6 +89,10 @@ const Signup = ({
 			nickname: !validator(validatorStatusNickname),
 		}));
 		if (isError.email || isError.password || isError.nickname) {
+			return;
+		}
+		if (form.password !== passwordChk) {
+			alert("비밀번호 확인을 잘못 입력했습니다.");
 			return;
 		}
 
@@ -141,6 +149,8 @@ const Signup = ({
 						type: "password",
 						placeholder: "비밀번호를 한 번 더 입력하세요",
 					}}
+					setInputValue={setPasswordChkValue}
+					inputValue={passwordChk}
 				/>
 				<Input
 					InputLabel="닉네임"
