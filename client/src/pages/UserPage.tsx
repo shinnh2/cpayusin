@@ -45,10 +45,11 @@ const UserPage: React.FC<userPageProps> = ({ userData }) => {
 				<div className="profile_img_wrap">
 					<img
 						src={
-							userData?.profileImage !== null
+							userData?.profileImage
 								? userData?.profileImage
-								: iconUser
+								: "/images/profile_defult_img.png"
 						}
+						alt="기본 유저 아이콘"
 						className="profile_img_default"
 					/>
 				</div>
