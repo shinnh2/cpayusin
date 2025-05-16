@@ -19,6 +19,8 @@
 Github, Notion, Discord를 사용해 백엔드와 협업하였습니다.
 
 ## 주요기능	
+각 링크를 클릭하시면 설명과 함께 코드를 확인하실 수 있습니다.
+
 - 페이지네이션 기능 (https://github.com/shinnh2/cpayusin/pull/61)
 - 버튼, input 등의 커스텀 공통 컴포넌트 제작 (https://github.com/shinnh2/cpayusin/pull/32)
 - 드래그 앤 드롭 기능을 활용해 게시판 순서를 변경 (https://github.com/shinnh2/cpayusin/pull/74)
