@@ -1,4 +1,4 @@
-![banner]https://github.com/user-attachments/assets/3ec4d851-39e6-4c3a-9224-8048e465e0d0)
+![banner](https://github.com/user-attachments/assets/3ec4d851-39e6-4c3a-9224-8048e465e0d0)
 
 # 패치 노트
  - 250516: 서버가 내려간 관계로 사이트 보기가 어렵습니다. 때문에 조만간 더미데이터를 사용해 사이트를 재배포할 계획입니다.
