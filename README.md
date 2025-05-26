@@ -27,6 +27,7 @@ Github, Notion, Discord를 사용해 백엔드와 협업하였습니다.
 - 반응형, 디자인 시스템 및 전역스타일 CSS, figma 작업 100% (https://github.com/shinnh2/cpayusin/pull/89)
 
 ## 화면
+클릭하여 보시면 자세히 보실 수 있습니다.
 ![화면](https://github.com/user-attachments/assets/82e87ab6-c04a-4127-accf-0d3ae13df16c)
 
 ## 배포 사이트 링크: 
